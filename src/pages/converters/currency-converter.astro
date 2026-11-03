@@ -1,15 +1,21 @@
 
 ---
+/**
+ * Count Loft — Currency Converter
+ * Real-time currency conversions using static versioned benchmark FX feeds.
+ */
 import ToolShell from '@components/tool/ToolShell.astro';
 import FaqAccordion from '@components/tool/FaqAccordion.astro';
 import JsonLd from '@components/seo/JsonLd.astro';
 import SearchableDropdown from '@components/ui/SearchableDropdown.astro';
+
 import { buildBreadcrumbs } from '@lib/format/breadcrumbs';
 import {
   generateWebApplicationJsonLd,
   generateFaqJsonLd,
   generateBreadcrumbJsonLd
 } from '@lib/seo/jsonld';
+
 import fxData from '../../data/fx-rates.json';
 
 const currencyOptions = [
@@ -70,7 +76,7 @@ const webAppSchema = generateWebApplicationJsonLd({
   lastUpdated={fxData.lastVerified}
 >
   <div slot="inputs">
-    <form id="fx-form" novalidate onsubmit="return false;">
+    <form id="fx-form" novalidate>
       <div class="form-group">
         <label for="fx-amount" class="form-label">Amount</label>
         <input
@@ -85,7 +91,7 @@ const webAppSchema = generateWebApplicationJsonLd({
 
       <div class="currency-pair-grid">
         <div class="form-group">
-          <label for="fx-from" class="form-label">From</label>
+          <label class="form-label">From</label>
           <SearchableDropdown
             name="fx-from"
             options={currencyOptions}
@@ -105,7 +111,7 @@ const webAppSchema = generateWebApplicationJsonLd({
         </button>
 
         <div class="form-group">
-          <label for="fx-to" class="form-label">To</label>
+          <label class="form-label">To</label>
           <SearchableDropdown
             name="fx-to"
             options={currencyOptions}
@@ -120,7 +126,7 @@ const webAppSchema = generateWebApplicationJsonLd({
   <div slot="results">
     <div class="result-hero">
       <span class="result-hero-label">Converted Amount</span>
-      <span class="result-hero-value" id="fx-converted-val">€92.15</span>
+      <span class="result-hero-value" id="fx-converted-val">92.15 EUR</span>
       <span class="result-hero-subtext" id="fx-rate-sub">
         1 USD = 0.9215 EUR
       </span>
@@ -141,7 +147,7 @@ const webAppSchema = generateWebApplicationJsonLd({
   <div slot="how-to">
     <ol>
       <li><strong>Enter the amount:</strong> Specify how much money you want to convert.</li>
-      <li><strong>Select currencies:</strong> Choose from 10 major world currencies.</li>
+      <li><strong>Select currencies:</strong> Choose from supported world currencies.</li>
       <li><strong>View conversion:</strong> Results and mid-market rates calculate instantly.</li>
     </ol>
   </div>
@@ -162,27 +168,9 @@ const webAppSchema = generateWebApplicationJsonLd({
         </tr>
       </thead>
       <tbody>
-        <tr>
-          <td>$100</td>
-          <td>€92.15</td>
-          <td>£77.12</td>
-          <td>Rs 27,785</td>
-          <td>₹8,408</td>
-        </tr>
-        <tr>
-          <td>$500</td>
-          <td>€460.75</td>
-          <td>£385.60</td>
-          <td>Rs 138,925</td>
-          <td>₹42,040</td>
-        </tr>
-        <tr>
-          <td>$1,000</td>
-          <td>€921.50</td>
-          <td>£771.20</td>
-          <td>Rs 277,850</td>
-          <td>₹84,080</td>
-        </tr>
+        <tr><td>$100</td><td>€92.15</td><td>£77.12</td><td>Rs 27,785</td><td>₹8,408</td></tr>
+        <tr><td>$500</td><td>€460.75</td><td>£385.60</td><td>Rs 138,925</td><td>₹42,040</td></tr>
+        <tr><td>$1,000</td><td>€921.50</td><td>£771.20</td><td>Rs 277,850</td><td>₹84,080</td></tr>
       </tbody>
     </table>
   </div>
@@ -213,10 +201,7 @@ const webAppSchema = generateWebApplicationJsonLd({
     generateBreadcrumbJsonLd([
       { name: 'Home', item: '/' },
       { name: 'Converters', item: '/converters' },
-      {
-        name: 'Currency Converter',
-        item: '/converters/currency-converter'
-      }
+      { name: 'Currency Converter', item: '/converters/currency-converter' }
     ])
   ]}
 />
@@ -238,6 +223,7 @@ const webAppSchema = generateWebApplicationJsonLd({
     min-height: 44px;
     font-size: 1.25rem;
     padding: 0 var(--space-3);
+    flex-shrink: 0;
   }
 
   .fx-metadata-card {
@@ -263,77 +249,58 @@ const webAppSchema = generateWebApplicationJsonLd({
   import { convertCurrency } from '@lib/calc/currency';
   import { parseNumberInput, formatNumber } from '@lib/format/number';
 
-  const currencies = [
-    { label: 'USD — US Dollar', value: 'USD' },
-    { label: 'EUR — Euro', value: 'EUR' },
-    { label: 'GBP — British Pound', value: 'GBP' },
-    { label: 'CAD — Canadian Dollar', value: 'CAD' },
-    { label: 'AUD — Australian Dollar', value: 'AUD' },
-    { label: 'JPY — Japanese Yen', value: 'JPY' },
-    { label: 'PKR — Pakistani Rupee', value: 'PKR' },
-    { label: 'INR — Indian Rupee', value: 'INR' },
-    { label: 'AED — UAE Dirham', value: 'AED' },
-    { label: 'SAR — Saudi Riyal', value: 'SAR' }
-  ];
-
   function initCurrency() {
-    const amountIn = document.querySelector('#fx-amount');
+    const amountInput = document.getElementById('fx-amount');
     const fromInput = document.querySelector('input[name="fx-from"]');
     const toInput = document.querySelector('input[name="fx-to"]');
-    const swapBtn = document.querySelector('#btn-swap-currency');
+    const swapButton = document.getElementById('btn-swap-currency');
 
-    const resultDisplay = document.querySelector('#fx-converted-val');
-    const rateDisplay = document.querySelector('#fx-rate-sub');
+    const resultDisplay = document.getElementById('fx-converted-val');
+    const rateDisplay = document.getElementById('fx-rate-sub');
 
-    if (!amountIn || !fromInput || !toInput) return;
-
-    function getLabel(value) {
-      return currencies.find((item) => item.value === value)?.label || value;
+    if (!amountInput || !fromInput || !toInput || !resultDisplay || !rateDisplay) {
+      console.warn('Currency converter: required elements not found.');
+      return;
     }
 
     function update() {
+      const amount = parseNumberInput(amountInput.value, 100);
       const from = fromInput.value || 'USD';
       const to = toInput.value || 'EUR';
-      const amount = parseNumberInput(amountIn.value, 100);
 
-      const result = convertCurrency(amount, from, to);
+      try {
+        const result = convertCurrency(amount, from, to);
 
-      if (resultDisplay) {
         resultDisplay.textContent =
           `${formatNumber(result.convertedAmount, 2)} ${to}`;
-      }
 
-      if (rateDisplay) {
         rateDisplay.textContent =
-          `1 ${from} = ${result.exchangeRate} ${to}`;
+          `1 ${from} = ${formatNumber(result.exchangeRate, 6)} ${to}`;
+      } catch (error) {
+        console.error('Currency conversion failed:', error);
+        resultDisplay.textContent = 'Conversion unavailable';
+        rateDisplay.textContent = 'Please check the selected currencies.';
       }
     }
 
-    function updateVisibleLabels() {
-      const fromVisible =
-        fromInput.parentElement?.querySelector('.dropdown-input');
-      const toVisible =
-        toInput.parentElement?.querySelector('.dropdown-input');
+    amountInput.addEventListener('input', update);
+    fromInput.addEventListener('change', update);
+    fromInput.addEventListener('input', update);
+    toInput.addEventListener('change', update);
+    toInput.addEventListener('input', update);
 
-      if (fromVisible) fromVisible.value = getLabel(fromInput.value);
-      if (toVisible) toVisible.value = getLabel(toInput.value);
-    }
-
-    swapBtn?.addEventListener('click', () => {
-      const temp = fromInput.value;
+    swapButton?.addEventListener('click', () => {
+      const oldFrom = fromInput.value;
       fromInput.value = toInput.value;
-      toInput.value = temp;
+      toInput.value = oldFrom;
 
-      updateVisibleLabels();
+      // Notify dropdown components about the changed values.
+      fromInput.dispatchEvent(new Event('change', { bubbles: true }));
+      toInput.dispatchEvent(new Event('change', { bubbles: true }));
+
       update();
     });
 
-    [amountIn, fromInput, toInput].forEach((element) => {
-      element.addEventListener('input', update);
-      element.addEventListener('change', update);
-    });
-
-    updateVisibleLabels();
     update();
   }
 
