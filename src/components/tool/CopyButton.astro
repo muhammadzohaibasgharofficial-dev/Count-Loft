@@ -1,0 +1,81 @@
+---
+/**
+ * Count Loft — Copy Result Button
+ * Copies formatted text summary with accessible toast announcement.
+ */
+
+export interface Props {
+  targetId?: string;
+  label?: string;
+  customText?: string;
+}
+
+const {
+  targetId,
+  label = 'Copy Result',
+  customText
+} = Astro.props;
+---
+
+<button
+  type="button"
+  class="btn btn-secondary copy-result-btn"
+  data-target-id={targetId}
+  data-copy-text={customText}
+  aria-label={label}
+>
+  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+    <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+    <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+  </svg>
+  <span>{label}</span>
+</button>
+
+<script>
+  function setupCopyButtons() {
+    document.querySelectorAll<HTMLButtonElement>('.copy-result-btn').forEach((btn) => {
+      btn.addEventListener('click', async () => {
+        let textToCopy = btn.getAttribute('data-copy-text') || '';
+        const targetId = btn.getAttribute('data-target-id');
+
+        if (!textToCopy && targetId) {
+          const targetEl = document.getElementById(targetId);
+          if (targetEl) {
+            textToCopy = targetEl.innerText || targetEl.textContent || '';
+          }
+        }
+
+        if (!textToCopy) return;
+
+        try {
+          if (navigator.clipboard && navigator.clipboard.writeText) {
+            await navigator.clipboard.writeText(textToCopy);
+          } else {
+            const textarea = document.createElement('textarea');
+            textarea.value = textToCopy;
+            textarea.style.position = 'fixed';
+            textarea.style.opacity = '0';
+            document.body.appendChild(textarea);
+            textarea.focus();
+            textarea.select();
+            document.execCommand('copy');
+            document.body.removeChild(textarea);
+          }
+
+          const toastFn = (window as unknown as { showCountLoftToast?: (msg: string) => void }).showCountLoftToast;
+          if (typeof toastFn === 'function') {
+            toastFn('Copied to clipboard');
+          }
+        } catch {
+          // Fallback gracefully
+        }
+      });
+    });
+  }
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', setupCopyButtons);
+  } else {
+    setupCopyButtons();
+  }
+</script>

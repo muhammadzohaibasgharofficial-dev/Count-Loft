@@ -1,0 +1,262 @@
+---
+/**
+ * Count Loft — Fraction Calculator
+ * Add, subtract, multiply, and divide fractions with step-by-step simplification.
+ */
+import ToolShell from '@components/tool/ToolShell.astro';
+import FaqAccordion from '@components/tool/FaqAccordion.astro';
+import JsonLd from '@components/seo/JsonLd.astro';
+import { buildBreadcrumbs } from '@lib/format/breadcrumbs';
+import { generateWebApplicationJsonLd, generateFaqJsonLd, generateBreadcrumbJsonLd } from '@lib/seo/jsonld';
+
+const breadcrumbs = buildBreadcrumbs([
+  { label: 'Math', href: '/math' },
+  { label: 'Fraction Calculator' }
+]);
+
+const faqs = [
+  {
+    question: 'How do you add fractions with different denominators?',
+    answer: 'Find the least common denominator (LCD), convert each fraction to equivalent fractions with that common denominator, add the numerators, and reduce to simplest form.'
+  },
+  {
+    question: 'How do you divide two fractions?',
+    answer: 'Multiply the first fraction by the reciprocal (the inverted form) of the second fraction: (a/b) ÷ (c/d) = (a/b) × (d/c).'
+  },
+  {
+    question: 'What is a mixed number vs an improper fraction?',
+    answer: 'An improper fraction has a numerator larger than or equal to its denominator (e.g. 7/4). A mixed number expresses it as an integer plus a proper fraction (e.g. 1 3/4).'
+  },
+  {
+    question: 'Can you simplify negative fractions?',
+    answer: 'Yes. Divide both numerator and denominator by their greatest common divisor (GCD) and place the negative sign in the numerator or in front of the fraction.'
+  },
+  {
+    question: 'Why cannot a fraction have a denominator of zero?',
+    answer: 'Division by zero is mathematically undefined because there is no number that can be multiplied by zero to produce a non-zero numerator.'
+  }
+];
+
+const webAppSchema = generateWebApplicationJsonLd({
+  name: 'Fraction Calculator — Count Loft',
+  description: 'Add, subtract, multiply, and divide fractions online with step-by-step simplification and mixed numbers.',
+  url: 'https://count-loft.com/math/fraction-calculator',
+  category: 'EducationalApplication'
+});
+---
+
+<ToolShell
+  title="Fraction Calculator"
+  description="Add, subtract, multiply, and divide fractions. Includes step-by-step reduction, mixed number conversion, and decimal values."
+  category="math"
+  breadcrumbs={breadcrumbs}
+  author="Count Loft Team"
+  lastUpdated="2026-10-31"
+>
+  <div slot="inputs">
+    <div class="fraction-calc-box">
+      <div class="fraction-inputs-row">
+        <!-- Fraction 1 -->
+        <div class="fraction-block">
+          <input type="number" id="f1-num" class="form-input frac-input" value="1" />
+          <div class="fraction-bar"></div>
+          <input type="number" id="f1-den" class="form-input frac-input" value="2" min="1" />
+        </div>
+
+        <!-- Operator Select -->
+        <div class="operator-block">
+          <select id="frac-op" class="form-select frac-select" aria-label="Arithmetic operator">
+            <option value="add" selected>+</option>
+            <option value="subtract">−</option>
+            <option value="multiply">×</option>
+            <option value="divide">÷</option>
+          </select>
+        </div>
+
+        <!-- Fraction 2 -->
+        <div class="fraction-block">
+          <input type="number" id="f2-num" class="form-input frac-input" value="1" />
+          <div class="fraction-bar"></div>
+          <input type="number" id="f2-den" class="form-input frac-input" value="3" min="1" />
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div slot="results">
+    <div class="result-hero">
+      <span class="result-hero-label">Simplified Fraction</span>
+      <span class="result-hero-value" id="frac-result-display">5/6</span>
+      <span class="result-hero-subtext" id="frac-decimal-display">Decimal: 0.8333</span>
+    </div>
+
+    <div class="fraction-steps-card">
+      <h4>Step-by-Step Solution:</h4>
+      <ol id="frac-steps-list">
+        <li>Find common denominator: 2 × 3 = 6</li>
+        <li>Adjust numerators: (1 × 3) + (1 × 2) = 5</li>
+        <li>Result: 5/6</li>
+      </ol>
+    </div>
+  </div>
+
+  <div slot="how-to">
+    <ol>
+      <li><strong>Enter numerators and denominators:</strong> Input the top and bottom numbers for both fractions.</li>
+      <li><strong>Select arithmetic operator:</strong> Choose +, −, ×, or ÷.</li>
+      <li><strong>View step-by-step simplification:</strong> Watch the LCD common denominator search and GCD reduction.</li>
+    </ol>
+  </div>
+
+  <div slot="formula">
+    <pre><code>Addition:       (a/b) + (c/d) = (ad + bc) / bd
+Subtraction:    (a/b) - (c/d) = (ad - bc) / bd
+Multiplication: (a/b) × (c/d) = (ac) / (bd)
+Division:       (a/b) ÷ (c/d) = (ad) / (bc)</code></pre>
+  </div>
+
+  <div slot="examples-table">
+    <table class="data-table">
+      <thead>
+        <tr>
+          <th>Operation</th>
+          <th>Simplified Fraction</th>
+          <th>Decimal</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr><td>1/2 + 1/4</td><td>3/4</td><td>0.75</td></tr>
+        <tr><td>3/4 - 1/3</td><td>5/12</td><td>0.4167</td></tr>
+        <tr><td>2/3 × 3/5</td><td>2/5</td><td>0.40</td></tr>
+        <tr><td>4/5 ÷ 2/3</td><td>6/5 (1 1/5)</td><td>1.20</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div slot="faq">
+    <FaqAccordion items={faqs} />
+  </div>
+
+  <div slot="related-tools">
+    <div class="related-tools-grid">
+      <a href="/math/percentage-calculator" class="card related-tool-card">
+        <h3>Percentage Calculator</h3>
+        <p>Convert fractions into percentages and ratios.</p>
+      </a>
+      <a href="/math/scientific-calculator" class="card related-tool-card">
+        <h3>Scientific Calculator</h3>
+        <p>Evaluate complex scientific and algebraic equations.</p>
+      </a>
+    </div>
+  </div>
+</ToolShell>
+
+<JsonLd schema={[webAppSchema, generateFaqJsonLd(faqs), generateBreadcrumbJsonLd([{ name: 'Home', item: '/' }, { name: 'Math', item: '/math' }, { name: 'Fraction Calculator', item: '/math/fraction-calculator' }])]} />
+
+<style>
+  .fraction-calc-box {
+    display: flex;
+    justify-content: center;
+    padding: var(--space-4);
+    background-color: var(--color-surface);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-md);
+  }
+
+  .fraction-inputs-row {
+    display: flex;
+    align-items: center;
+    gap: var(--space-4);
+  }
+
+  .fraction-block {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 80px;
+    gap: var(--space-1);
+  }
+
+  .frac-input {
+    text-align: center;
+    font-size: 1.125rem;
+    font-weight: var(--font-weight-bold);
+  }
+
+  .fraction-bar {
+    width: 100%;
+    height: 2px;
+    background-color: var(--color-text);
+  }
+
+  .frac-select {
+    font-size: 1.25rem;
+    font-weight: var(--font-weight-bold);
+    width: 65px;
+    text-align: center;
+  }
+
+  .fraction-steps-card {
+    margin-top: var(--space-4);
+    padding: var(--space-4);
+    background-color: var(--color-surface);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-md);
+  }
+
+  .fraction-steps-card ol {
+    margin: var(--space-2) 0 0 0;
+    padding-left: var(--space-4);
+    font-size: var(--text-sm);
+    color: var(--color-text-muted);
+  }
+</style>
+
+<script>
+  import { calculateFractions } from '@lib/calc/fraction';
+  import { parseNumberInput } from '@lib/format/number';
+
+  function initFraction() {
+    const f1Num = document.getElementById('f1-num') as HTMLInputElement | null;
+    const f1Den = document.getElementById('f1-den') as HTMLInputElement | null;
+    const f2Num = document.getElementById('f2-num') as HTMLInputElement | null;
+    const f2Den = document.getElementById('f2-den') as HTMLInputElement | null;
+    const opSelect = document.getElementById('frac-op') as HTMLSelectElement | null;
+
+    const resDisplay = document.getElementById('frac-result-display');
+    const decDisplay = document.getElementById('frac-decimal-display');
+    const stepsList = document.getElementById('frac-steps-list');
+
+    function update() {
+      const op = (opSelect?.value || 'add') as 'add' | 'subtract' | 'multiply' | 'divide';
+      const res = calculateFractions(
+        { numerator: parseNumberInput(f1Num?.value, 1), denominator: parseNumberInput(f1Den?.value, 2) },
+        { numerator: parseNumberInput(f2Num?.value, 1), denominator: parseNumberInput(f2Den?.value, 3) },
+        op
+      );
+
+      let text = `${res.simplifiedNumerator}/${res.simplifiedDenominator}`;
+      if (res.wholePart !== 0 && res.remainderNumerator !== 0) {
+        text += ` (${res.wholePart} ${res.remainderNumerator}/${res.simplifiedDenominator})`;
+      } else if (res.simplifiedDenominator === 1) {
+        text = String(res.simplifiedNumerator);
+      }
+
+      if (resDisplay) resDisplay.textContent = text;
+      if (decDisplay) decDisplay.textContent = `Decimal: ${res.decimalValue}`;
+      if (stepsList) {
+        stepsList.innerHTML = res.steps.map(s => `<li>${s}</li>`).join('');
+      }
+    }
+
+    [f1Num, f1Den, f2Num, f2Den].forEach(i => i?.addEventListener('input', update));
+    opSelect?.addEventListener('change', update);
+    update();
+  }
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initFraction);
+  } else {
+    initFraction();
+  }
+</script>

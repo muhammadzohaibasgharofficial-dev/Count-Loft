@@ -1,0 +1,163 @@
+---
+/**
+ * Count Loft — Pure SVG Donut Chart Component
+ * Lightweight, accessible breakdown chart (e.g. Principal vs Interest).
+ */
+
+export interface DonutSegment {
+  label: string;
+  value: number;
+  color: string;
+}
+
+export interface Props {
+  title?: string;
+  segments: DonutSegment[];
+  centerLabel?: string;
+  centerValue?: string;
+}
+
+const {
+  title = 'Breakdown Chart',
+  segments,
+  centerLabel,
+  centerValue
+} = Astro.props;
+
+const total = segments.reduce((sum, s) => sum + s.value, 0) || 1;
+const size = 160;
+const strokeWidth = 24;
+const radius = (size - strokeWidth) / 2;
+const circumference = 2 * Math.PI * radius;
+
+let accumulatedPercent = 0;
+const computedSegments = segments.map((seg) => {
+  const percent = seg.value / total;
+  const strokeDasharray = `${percent * circumference} ${circumference}`;
+  const strokeDashoffset = -accumulatedPercent * circumference;
+  accumulatedPercent += percent;
+
+  return {
+    ...seg,
+    percent: Math.round(percent * 100),
+    strokeDasharray,
+    strokeDashoffset
+  };
+});
+---
+
+<div class="donut-chart-container" role="img" aria-label={`${title}: ${segments.map(s => `${s.label}: ${s.value}`).join(', ')}`}>
+  <div class="donut-svg-wrapper">
+    <svg width={size} height={size} viewBox={`0 0 ${size} ${size}`} class="donut-svg">
+      <circle
+        cx={size / 2}
+        cy={size / 2}
+        r={radius}
+        fill="transparent"
+        stroke="var(--color-surface-muted)"
+        stroke-width={strokeWidth}
+      />
+      {computedSegments.map((seg) => (
+        <circle
+          cx={size / 2}
+          cy={size / 2}
+          r={radius}
+          fill="transparent"
+          stroke={seg.color}
+          stroke-width={strokeWidth}
+          stroke-dasharray={seg.strokeDasharray}
+          stroke-dashoffset={seg.strokeDashoffset}
+          transform={`rotate(-90 ${size / 2} ${size / 2})`}
+          class="donut-segment"
+        />
+      ))}
+    </svg>
+    {(centerLabel || centerValue) && (
+      <div class="donut-center-text">
+        {centerValue && <span class="donut-center-val">{centerValue}</span>}
+        {centerLabel && <span class="donut-center-lbl">{centerLabel}</span>}
+      </div>
+    )}
+  </div>
+
+  <div class="donut-legend">
+    {computedSegments.map((seg) => (
+      <div class="legend-item">
+        <span class="legend-color-dot" style={`background-color: ${seg.color};`}></span>
+        <span class="legend-label">{seg.label}</span>
+        <span class="legend-percent">{seg.percent}%</span>
+      </div>
+    ))}
+  </div>
+</div>
+
+<style>
+  .donut-chart-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: var(--space-4);
+    padding: var(--space-4) 0;
+  }
+
+  .donut-svg-wrapper {
+    position: relative;
+    width: 160px;
+    height: 160px;
+  }
+
+  .donut-svg {
+    transform: rotate(0deg);
+  }
+
+  .donut-segment {
+    transition: stroke-dasharray var(--transition-normal);
+  }
+
+  .donut-center-text {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    pointer-events: none;
+  }
+
+  .donut-center-val {
+    font-size: var(--text-sm);
+    font-weight: var(--font-weight-bold);
+    color: var(--color-text);
+  }
+
+  .donut-center-lbl {
+    font-size: var(--text-xs);
+    color: var(--color-text-muted);
+  }
+
+  .donut-legend {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: var(--space-4);
+  }
+
+  .legend-item {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-2);
+    font-size: var(--text-xs);
+    color: var(--color-text);
+  }
+
+  .legend-color-dot {
+    width: 10px;
+    height: 10px;
+    border-radius: var(--radius-full);
+  }
+
+  .legend-percent {
+    color: var(--color-text-muted);
+  }
+</style>

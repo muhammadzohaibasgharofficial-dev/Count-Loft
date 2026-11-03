@@ -1,0 +1,216 @@
+---
+/**
+ * Count Loft — Compound Interest Calculator
+ * Forecasts investment compounding growth with regular contributions.
+ */
+import ToolShell from '@components/tool/ToolShell.astro';
+import FaqAccordion from '@components/tool/FaqAccordion.astro';
+import JsonLd from '@components/seo/JsonLd.astro';
+import { buildBreadcrumbs } from '@lib/format/breadcrumbs';
+import { generateWebApplicationJsonLd, generateFaqJsonLd, generateBreadcrumbJsonLd } from '@lib/seo/jsonld';
+
+const breadcrumbs = buildBreadcrumbs([
+  { label: 'Finance', href: '/finance' },
+  { label: 'Compound Interest Calculator' }
+]);
+
+const faqs = [
+  {
+    question: 'How does compound interest differ from simple interest?',
+    answer: 'Simple interest is earned only on the initial principal. Compound interest earns interest on both the initial principal and previously accumulated interest, accelerating returns exponentially over time.'
+  },
+  {
+    question: 'What is the Rule of 72?',
+    answer: 'The Rule of 72 is a quick mental math shortcut: divide 72 by your expected annual rate of return to estimate how many years it will take for your money to double (e.g. at 8%, 72 / 8 = 9 years).'
+  },
+  {
+    question: 'How does compounding frequency impact returns?',
+    answer: 'More frequent compounding (daily vs monthly vs annually) increases your Annual Percentage Yield (APY) because interest is converted to earning principal more often.'
+  },
+  {
+    question: 'Are regular monthly contributions better than lump-sum deposits?',
+    answer: 'Regular contributions (dollar-cost averaging) smooth out market volatility and harness compounding over decades, though investing lump sums earlier gives capital more total time to compound.'
+  },
+  {
+    question: 'Does inflation diminish compound interest gains?',
+    answer: 'Yes. To gauge your real purchasing power growth, subtract the expected annual inflation rate from your nominal return rate (the real rate of return).'
+  }
+];
+
+const webAppSchema = generateWebApplicationJsonLd({
+  name: 'Compound Interest Calculator — Count Loft',
+  description: 'Calculate future investment growth, compounding interest returns, and total periodic deposits over time.',
+  url: 'https://count-loft.com/finance/compound-interest-calculator',
+  category: 'FinanceApplication'
+});
+---
+
+<ToolShell
+  title="Compound Interest Calculator"
+  description="Project your investment growth and future portfolio balance over time with customizable regular monthly contributions and compounding frequencies."
+  category="finance"
+  breadcrumbs={breadcrumbs}
+  author="Count Loft Team"
+  lastUpdated="2026-10-31"
+>
+  <div slot="inputs">
+    <form id="compound-form" novalidate onsubmit="return false;">
+      <div class="form-group">
+        <label for="comp-principal" class="form-label">Initial Investment ($)</label>
+        <input type="number" id="comp-principal" class="form-input" value="10000" step="500" />
+      </div>
+
+      <div class="form-group">
+        <label for="comp-monthly" class="form-label">Monthly Contribution ($)</label>
+        <input type="number" id="comp-monthly" class="form-input" value="200" step="25" />
+      </div>
+
+      <div class="form-row-2">
+        <div class="form-group">
+          <label for="comp-rate" class="form-label">Annual Interest Rate (%)</label>
+          <input type="number" id="comp-rate" class="form-input" value="7.0" step="0.1" />
+        </div>
+        <div class="form-group">
+          <label for="comp-years" class="form-label">Investment Period (Years)</label>
+          <input type="number" id="comp-years" class="form-input" value="10" min="1" max="50" />
+        </div>
+      </div>
+    </form>
+  </div>
+
+  <div slot="results">
+    <div class="result-hero">
+      <span class="result-hero-label">Estimated Future Balance</span>
+      <span class="result-hero-value" id="comp-future-val">$53,607</span>
+      <span class="result-hero-subtext">Principal plus accumulated compound growth</span>
+    </div>
+
+    <div class="mortgage-breakdown-table">
+      <div class="breakdown-row">
+        <span>Total Principal & Deposits:</span>
+        <strong id="comp-total-deposits">$34,000</strong>
+      </div>
+      <div class="breakdown-row">
+        <span>Total Compound Interest:</span>
+        <strong id="comp-total-interest">$19,607</strong>
+      </div>
+    </div>
+  </div>
+
+  <div slot="how-to">
+    <ol>
+      <li><strong>Enter your starting principal:</strong> The lump-sum cash balance currently available.</li>
+      <li><strong>Set periodic monthly contributions:</strong> Regular monthly savings significantly amplify long-term returns.</li>
+      <li><strong>Specify annual rate of return:</strong> Typical historical index fund returns average 7%–10% before inflation.</li>
+    </ol>
+  </div>
+
+  <div slot="formula">
+    <pre><code>Future Value = P × (1 + r/n)^(nt) + PMT × [((1 + r/n)^(nt) - 1) / (r/n)]</code></pre>
+  </div>
+
+  <div slot="examples-table">
+    <table class="data-table">
+      <thead>
+        <tr>
+          <th>Years</th>
+          <th>Starting $10k (7% return)</th>
+          <th>With $200/mo Added</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr><td>5 Years</td><td>$14,025</td><td>$28,247</td></tr>
+        <tr><td>10 Years</td><td>$19,671</td><td>$53,607</td></tr>
+        <tr><td>15 Years</td><td>$27,590</td><td>$89,286</td></tr>
+        <tr><td>20 Years</td><td>$38,696</td><td>$139,364</td></tr>
+        <tr><td>30 Years</td><td>$76,122</td><td>$299,655</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div slot="faq">
+    <FaqAccordion items={faqs} />
+  </div>
+
+  <div slot="related-tools">
+    <div class="related-tools-grid">
+      <a href="/finance/interest-calculator" class="card related-tool-card">
+        <h3>Interest Calculator</h3>
+        <p>Compare simple vs compound interest formulas side-by-side.</p>
+      </a>
+      <a href="/finance/loan-calculator" class="card related-tool-card">
+        <h3>Loan Calculator</h3>
+        <p>Calculate amortized monthly debt payments.</p>
+      </a>
+    </div>
+  </div>
+</ToolShell>
+
+<JsonLd schema={[webAppSchema, generateFaqJsonLd(faqs), generateBreadcrumbJsonLd([{ name: 'Home', item: '/' }, { name: 'Finance', item: '/finance' }, { name: 'Compound Interest Calculator', item: '/finance/compound-interest-calculator' }])]} />
+
+<style>
+  .form-row-2 {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: var(--space-4);
+  }
+
+  @media (min-width: 640px) {
+    .form-row-2 {
+      grid-template-columns: 1fr 1fr;
+    }
+  }
+
+  .mortgage-breakdown-table {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-2);
+    padding: var(--space-4) 0;
+    border-top: 1px solid var(--color-border);
+    margin-top: var(--space-4);
+    font-size: var(--text-sm);
+  }
+
+  .breakdown-row {
+    display: flex;
+    justify-content: space-between;
+  }
+</style>
+
+<script>
+  import { calculateCompoundInterest } from '@lib/calc/compound-interest';
+  import { formatCurrency, parseNumberInput } from '@lib/format/number';
+
+  function initCompound() {
+    const pIn = document.getElementById('comp-principal') as HTMLInputElement | null;
+    const mIn = document.getElementById('comp-monthly') as HTMLInputElement | null;
+    const rIn = document.getElementById('comp-rate') as HTMLInputElement | null;
+    const yIn = document.getElementById('comp-years') as HTMLInputElement | null;
+
+    const futureDisplay = document.getElementById('comp-future-val');
+    const depositsDisplay = document.getElementById('comp-total-deposits');
+    const interestDisplay = document.getElementById('comp-total-interest');
+
+    function update() {
+      const res = calculateCompoundInterest({
+        initialPrincipal: parseNumberInput(pIn?.value, 10000),
+        monthlyDeposit: parseNumberInput(mIn?.value, 200),
+        annualRate: parseNumberInput(rIn?.value, 7.0),
+        years: parseNumberInput(yIn?.value, 10)
+      });
+
+      if (futureDisplay) futureDisplay.textContent = formatCurrency(res.finalBalance);
+      if (depositsDisplay) depositsDisplay.textContent = formatCurrency(res.totalDeposited);
+      if (interestDisplay) interestDisplay.textContent = formatCurrency(res.totalInterest);
+    }
+
+    [pIn, mIn, rIn, yIn].forEach(i => i?.addEventListener('input', update));
+    update();
+  }
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initCompound);
+  } else {
+    initCompound();
+  }
+</script>

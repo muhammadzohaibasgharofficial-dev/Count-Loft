@@ -1,0 +1,64 @@
+/**
+ * Count Loft — Print Stylesheet
+ * High-contrast monochrome output for printing schedules, receipts, and calculation steps.
+ */
+
+@media print {
+  *,
+  *::before,
+  *::after {
+    background: transparent !important;
+    color: #000 !important;
+    box-shadow: none !important;
+    text-shadow: none !important;
+  }
+
+  body {
+    font-size: 12pt;
+    line-height: 1.4;
+    background-color: #fff !important;
+  }
+
+  a,
+  a:visited {
+    text-decoration: underline;
+  }
+
+  /* Show full destination URLs for external links, except internal shortcuts */
+  a[href^="http"]:after {
+    content: " (" attr(href) ")";
+    font-size: 9pt;
+  }
+
+  /* Suppress UI controls, ads, buttons, and theme toggles during print */
+  header,
+  footer,
+  nav,
+  .btn,
+  .theme-toggle,
+  .ad-slot,
+  .no-print {
+    display: none !important;
+  }
+
+  /* Preserve borders on calculation cards and tables */
+  .card,
+  .result-panel,
+  table,
+  th,
+  td {
+    border: 1px solid #333 !important;
+    page-break-inside: avoid;
+  }
+
+  th,
+  td {
+    padding: 6pt 8pt !important;
+  }
+
+  h1,
+  h2,
+  h3 {
+    page-break-after: avoid;
+  }
+}

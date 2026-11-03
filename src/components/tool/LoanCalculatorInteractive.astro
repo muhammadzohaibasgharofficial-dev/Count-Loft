@@ -1,0 +1,340 @@
+---
+/**
+ * Count Loft — Loan Calculator Interactive Component
+ * Complete client-side calculation island with instant recalculation,
+ * debouncing, URL state synchronization, result pulse, and printable schedule.
+ */
+import DonutChart from '@components/tool/DonutChart.astro';
+import ResultPanel from '@components/tool/ResultPanel.astro';
+---
+
+<div class="loan-calculator-app" id="loan-calculator-app">
+  <div class="tool-grid">
+    <!-- Form Inputs Pane -->
+    <div class="calculator-inputs-column">
+      <form id="loan-form" novalidate onsubmit="return false;">
+        <div class="form-group">
+          <label for="loan-principal" class="form-label">
+            Loan Amount ($)
+          </label>
+          <div class="input-affix-wrapper">
+            <span class="input-prefix" aria-hidden="true">$</span>
+            <input
+              type="text"
+              id="loan-principal"
+              name="principal"
+              inputmode="decimal"
+              class="form-input has-prefix"
+              value="20,000"
+              autocomplete="off"
+              aria-describedby="principal-helper"
+            />
+          </div>
+          <span id="principal-helper" class="form-helper">Enter total amount borrowed.</span>
+        </div>
+
+        <div class="form-group">
+          <label for="loan-rate" class="form-label">
+            Annual Interest Rate (%)
+          </label>
+          <div class="input-affix-wrapper">
+            <input
+              type="text"
+              id="loan-rate"
+              name="rate"
+              inputmode="decimal"
+              class="form-input has-suffix"
+              value="6.0"
+              autocomplete="off"
+              aria-describedby="rate-helper"
+            />
+            <span class="input-suffix" aria-hidden="true">%</span>
+          </div>
+          <span id="rate-helper" class="form-helper">Fixed annual interest rate.</span>
+        </div>
+
+        <div class="form-group">
+          <label for="loan-term" class="form-label">
+            Loan Term
+          </label>
+          <div class="term-input-row">
+            <input
+              type="number"
+              id="loan-term"
+              name="term"
+              inputmode="numeric"
+              class="form-input"
+              value="48"
+              min="1"
+              max="600"
+              autocomplete="off"
+              aria-describedby="term-helper"
+            />
+            <select id="loan-term-unit" class="form-select term-unit-select" aria-label="Term duration unit">
+              <option value="months" selected>Months</option>
+              <option value="years">Years</option>
+            </select>
+          </div>
+          <span id="term-helper" class="form-helper">Duration to repay the loan.</span>
+        </div>
+
+        <div class="form-actions-row">
+          <button type="button" id="btn-calculate" class="btn btn-primary">
+            Calculate
+          </button>
+          <button type="button" id="btn-reset" class="btn btn-ghost">
+            Reset
+          </button>
+        </div>
+      </form>
+    </div>
+
+    <!-- Results Display Pane -->
+    <div class="calculator-results-column sticky-panel">
+      <div id="live-result-panel">
+        <ResultPanel
+          heroLabel="Monthly Payment"
+          heroValue="$469.70"
+          heroSubtext="Fixed monthly installment (EMI)"
+          breakdown={[
+            { label: 'Total Principal', value: '$20,000.00' },
+            { label: 'Total Interest', value: '$2,545.60' },
+            { label: 'Total Cost of Loan', value: '$22,545.60' }
+          ]}
+          calculatorTitle="Loan Calculator — Count Loft"
+        />
+      </div>
+
+      <div class="chart-wrapper" id="loan-chart-wrapper">
+        <DonutChart
+          title="Loan Cost Breakdown"
+          segments={[
+            { label: 'Principal', value: 20000, color: 'var(--color-primary)' },
+            { label: 'Interest', value: 2545.60, color: 'var(--color-secondary)' }
+          ]}
+          centerLabel="Total Payment"
+          centerValue="$22,546"
+        />
+      </div>
+    </div>
+  </div>
+
+  <!-- Amortization Schedule Details -->
+  <div class="schedule-section">
+    <details class="card schedule-accordion" id="amortization-accordion">
+      <summary class="schedule-summary">
+        <span class="schedule-title">View Complete Amortization Schedule</span>
+        <span class="schedule-badge" id="schedule-badge">48 Months</span>
+      </summary>
+      <div class="schedule-table-wrapper">
+        <table class="schedule-table" id="amortization-table">
+          <thead>
+            <tr>
+              <th scope="col">Month</th>
+              <th scope="col">Payment</th>
+              <th scope="col">Principal</th>
+              <th scope="col">Interest</th>
+              <th scope="col">Balance</th>
+            </tr>
+          </thead>
+          <tbody id="schedule-table-body">
+            <!-- Dynamically populated or rendered -->
+          </tbody>
+        </table>
+      </div>
+    </details>
+  </div>
+</div>
+
+<style>
+  .term-input-row {
+    display: flex;
+    gap: var(--space-2);
+  }
+
+  .term-unit-select {
+    width: 130px;
+  }
+
+  .form-actions-row {
+    display: flex;
+    gap: var(--space-3);
+    margin-top: var(--space-5);
+  }
+
+  .chart-wrapper {
+    margin-top: var(--space-4);
+    padding-top: var(--space-3);
+    border-top: 1px solid var(--color-border);
+  }
+
+  .schedule-section {
+    margin-top: var(--space-6);
+  }
+
+  .schedule-accordion {
+    padding: var(--space-4);
+  }
+
+  .schedule-summary {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    cursor: pointer;
+    font-weight: var(--font-weight-semibold);
+  }
+
+  .schedule-badge {
+    font-size: var(--text-xs);
+    background-color: var(--color-surface-muted);
+    padding: var(--space-1) var(--space-3);
+    border-radius: var(--radius-full);
+    color: var(--color-text-muted);
+  }
+
+  .schedule-table-wrapper {
+    margin-top: var(--space-4);
+    max-height: 400px;
+    overflow-y: auto;
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-md);
+  }
+
+  .schedule-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: var(--text-sm);
+    text-align: right;
+  }
+
+  .schedule-table th,
+  .schedule-table td {
+    padding: var(--space-2) var(--space-3);
+    border-bottom: 1px solid var(--color-border);
+  }
+
+  .schedule-table th:first-child,
+  .schedule-table td:first-child {
+    text-align: left;
+  }
+
+  .schedule-table th {
+    background-color: var(--color-surface-muted);
+    font-weight: var(--font-weight-medium);
+    position: sticky;
+    top: 0;
+  }
+</style>
+
+<script>
+  import { calculateLoan } from '@lib/calc/loan';
+  import { formatCurrency, parseNumberInput } from '@lib/format/number';
+  import { updateBrowserUrl, decodeQueryState } from '@lib/url-state/url-state';
+
+  function initLoanCalculator() {
+    const principalInput = document.getElementById('loan-principal') as HTMLInputElement | null;
+    const rateInput = document.getElementById('loan-rate') as HTMLInputElement | null;
+    const termInput = document.getElementById('loan-term') as HTMLInputElement | null;
+    const unitSelect = document.getElementById('loan-term-unit') as HTMLSelectElement | null;
+    const calcBtn = document.getElementById('btn-calculate');
+    const resetBtn = document.getElementById('btn-reset');
+    const heroDisplay = document.getElementById('result-hero-display');
+    const scheduleBadge = document.getElementById('schedule-badge');
+    const scheduleBody = document.getElementById('schedule-table-body');
+
+    if (!principalInput || !rateInput || !termInput || !unitSelect || !heroDisplay) return;
+
+    // Check for query parameters on initial page load
+    const params = decodeQueryState();
+    if (params['amount']) principalInput.value = params['amount'];
+    if (params['rate']) rateInput.value = params['rate'];
+    if (params['term']) termInput.value = params['term'];
+    if (params['unit']) unitSelect.value = params['unit'];
+
+    let debounceTimer: ReturnType<typeof setTimeout> | null = null;
+
+    function recalculate() {
+      const rawPrincipal = parseNumberInput(principalInput?.value, 20000);
+      const rawRate = parseNumberInput(rateInput?.value, 6.0);
+      let rawTerm = parseNumberInput(termInput?.value, 48);
+
+      if (unitSelect?.value === 'years') {
+        rawTerm = Math.round(rawTerm * 12);
+      }
+
+      const res = calculateLoan({
+        principal: rawPrincipal,
+        annualRate: rawRate,
+        termMonths: rawTerm
+      }, true);
+
+      // Update hero result with subtle pulse
+      heroDisplay.textContent = formatCurrency(res.monthlyPayment);
+      heroDisplay.classList.remove('result-pulse');
+      void heroDisplay.offsetWidth; // force reflow
+      heroDisplay.classList.add('result-pulse');
+
+      // Update breakdown values
+      const breakdownRows = document.querySelectorAll('.breakdown-row .breakdown-value');
+      if (breakdownRows.length >= 3) {
+        breakdownRows[0]!.textContent = formatCurrency(rawPrincipal);
+        breakdownRows[1]!.textContent = formatCurrency(res.totalInterest);
+        breakdownRows[2]!.textContent = formatCurrency(res.totalPayment);
+      }
+
+      if (scheduleBadge) {
+        scheduleBadge.textContent = `${rawTerm} Months`;
+      }
+
+      // Populate schedule table
+      if (scheduleBody && res.schedule) {
+        scheduleBody.innerHTML = res.schedule.slice(0, 120).map(row => `
+          <tr>
+            <td>${row.month}</td>
+            <td>${formatCurrency(row.payment)}</td>
+            <td>${formatCurrency(row.principalPayment)}</td>
+            <td>${formatCurrency(row.interestPayment)}</td>
+            <td>${formatCurrency(row.remainingBalance)}</td>
+          </tr>
+        `).join('');
+      }
+
+      // Sync state to query string
+      updateBrowserUrl({
+        amount: rawPrincipal,
+        rate: rawRate,
+        term: termInput?.value,
+        unit: unitSelect?.value
+      });
+    }
+
+    function debouncedRecalculate() {
+      if (debounceTimer) clearTimeout(debounceTimer);
+      debounceTimer = setTimeout(recalculate, 150);
+    }
+
+    [principalInput, rateInput, termInput].forEach(inp => {
+      inp?.addEventListener('input', debouncedRecalculate);
+    });
+
+    unitSelect.addEventListener('change', recalculate);
+    calcBtn?.addEventListener('click', recalculate);
+
+    resetBtn?.addEventListener('click', () => {
+      principalInput.value = '20,000';
+      rateInput.value = '6.0';
+      termInput.value = '48';
+      unitSelect.value = 'months';
+      recalculate();
+    });
+
+    // Run initial calculation to ensure schedule and state are synced
+    recalculate();
+  }
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initLoanCalculator);
+  } else {
+    initLoanCalculator();
+  }
+</script>

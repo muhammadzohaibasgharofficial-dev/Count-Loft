@@ -1,0 +1,263 @@
+---
+/**
+ * Count Loft — Calorie Calculator
+ * BMR and TDEE based on Mifflin-St Jeor formula with activity level adjustments.
+ */
+import ToolShell from '@components/tool/ToolShell.astro';
+import FaqAccordion from '@components/tool/FaqAccordion.astro';
+import JsonLd from '@components/seo/JsonLd.astro';
+import { buildBreadcrumbs } from '@lib/format/breadcrumbs';
+import { generateWebApplicationJsonLd, generateFaqJsonLd, generateBreadcrumbJsonLd } from '@lib/seo/jsonld';
+
+const breadcrumbs = buildBreadcrumbs([
+  { label: 'Health', href: '/health' },
+  { label: 'Calorie Calculator' }
+]);
+
+const faqs = [
+  {
+    question: 'What is the difference between BMR and TDEE?',
+    answer: 'Basal Metabolic Rate (BMR) is the baseline calories burned just staying alive at complete rest. Total Daily Energy Expenditure (TDEE) includes your BMR plus calories burned through daily physical activity, digestion, and exercise.'
+  },
+  {
+    question: 'How large of a calorie deficit is recommended for safe weight loss?',
+    answer: 'A sustainable calorie deficit is roughly 500 calories per day, which equates to about 1 pound of fat loss per week (since 1 lb of fat is approximately 3,500 calories).'
+  },
+  {
+    question: 'What is the minimum safe daily calorie intake?',
+    answer: 'General nutritional guidelines suggest women should not consume fewer than 1,200 calories per day and men no fewer than 1,500 calories per day without direct physician or registered dietitian supervision.'
+  },
+  {
+    question: 'How does the Mifflin-St Jeor formula compare to other equations?',
+    answer: 'The American Dietetic Association identified the Mifflin-St Jeor formula as the most accurate non-clinical formula for estimating resting metabolic rate in healthy adults.'
+  },
+  {
+    question: 'Should I adjust my calorie intake as I lose weight?',
+    answer: 'Yes. As your total body weight decreases, your BMR and TDEE naturally drop slightly. Recalculating every 5–10 pounds ensures your intake targets remain aligned with your goals.'
+  }
+];
+
+const webAppSchema = generateWebApplicationJsonLd({
+  name: 'Calorie Calculator — Count Loft',
+  description: 'Calculate daily calories for weight loss, maintenance, and muscle gain using Mifflin-St Jeor BMR and TDEE multipliers.',
+  url: 'https://count-loft.com/health/calorie-calculator',
+  category: 'HealthApplication'
+});
+---
+
+<ToolShell
+  title="Calorie Calculator"
+  description="Estimate your daily calorie needs for weight maintenance, healthy fat loss, or muscle gain based on your age, sex, height, weight, and activity level."
+  category="health"
+  breadcrumbs={breadcrumbs}
+  author="Count Loft Team"
+  lastUpdated="2026-10-31"
+>
+  <div slot="inputs">
+    <form id="calorie-form" novalidate onsubmit="return false;">
+      <div class="form-row-2">
+        <div class="form-group">
+          <label for="cal-age" class="form-label">Age</label>
+          <input type="number" id="cal-age" class="form-input" value="30" min="15" max="100" />
+        </div>
+        <div class="form-group">
+          <label for="cal-sex" class="form-label">Biological Sex</label>
+          <select id="cal-sex" class="form-select">
+            <option value="male" selected>Male</option>
+            <option value="female">Female</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="form-row-2">
+        <div class="form-group">
+          <label for="cal-weight" class="form-label">Weight (kg)</label>
+          <input type="number" id="cal-weight" class="form-input" value="80" min="30" max="250" />
+        </div>
+        <div class="form-group">
+          <label for="cal-height" class="form-label">Height (cm)</label>
+          <input type="number" id="cal-height" class="form-input" value="180" min="100" max="230" />
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label for="cal-activity" class="form-label">Activity Level</label>
+        <select id="cal-activity" class="form-select">
+          <option value="sedentary">Sedentary (desk job, little exercise)</option>
+          <option value="light">Light (exercise 1-3 days/week)</option>
+          <option value="moderate" selected>Moderate (exercise 4-5 days/week)</option>
+          <option value="active">Active (daily intense exercise)</option>
+          <option value="very_active">Very Active (intense training / physical labor)</option>
+        </select>
+      </div>
+    </form>
+  </div>
+
+  <div slot="results">
+    <div class="result-hero">
+      <span class="result-hero-label">Maintenance Calories (TDEE)</span>
+      <span class="result-hero-value" id="tdee-val">2,759</span>
+      <span class="result-hero-subtext">Calories/day to maintain current weight</span>
+    </div>
+
+    <div class="calorie-targets-grid">
+      <div class="target-card">
+        <span class="target-label">Mild Weight Loss (-0.5 lb/wk)</span>
+        <strong class="target-value" id="mild-loss-val">2,509 kcal</strong>
+      </div>
+      <div class="target-card highlight">
+        <span class="target-label">Standard Weight Loss (-1 lb/wk)</span>
+        <strong class="target-value" id="loss-val">2,259 kcal</strong>
+      </div>
+      <div class="target-card">
+        <span class="target-label">Basal Metabolic Rate (BMR)</span>
+        <strong class="target-value" id="bmr-val">1,780 kcal</strong>
+      </div>
+      <div class="target-card">
+        <span class="target-label">Weight Gain (+1 lb/wk)</span>
+        <strong class="target-value" id="gain-val">3,259 kcal</strong>
+      </div>
+    </div>
+  </div>
+
+  <div slot="how-to">
+    <ol>
+      <li><strong>Enter physical parameters:</strong> Your age, height, weight, and biological sex determine your baseline metabolic rate.</li>
+      <li><strong>Select activity multiplier:</strong> Be realistic about your typical weekly structured exercise.</li>
+      <li><strong>Pick your goal target:</strong> Choose maintenance, mild deficit, or lean bulking intake.</li>
+    </ol>
+  </div>
+
+  <div slot="formula">
+    <pre><code>Male BMR:   (10 × weight kg) + (6.25 × height cm) - (5 × age) + 5
+Female BMR: (10 × weight kg) + (6.25 × height cm) - (5 × age) - 161
+TDEE:       BMR × Activity Multiplier</code></pre>
+  </div>
+
+  <div slot="examples-table">
+    <table class="data-table">
+      <thead>
+        <tr>
+          <th>Goal</th>
+          <th>Daily Deficit / Surplus</th>
+          <th>Estimated Rate</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr><td>Weight Loss (Slow)</td><td>-250 kcal/day</td><td>~0.5 lb / week</td></tr>
+        <tr><td>Weight Loss (Standard)</td><td>-500 kcal/day</td><td>~1.0 lb / week</td></tr>
+        <tr><td>Weight Loss (Fast)</td><td>-1000 kcal/day</td><td>~2.0 lb / week</td></tr>
+        <tr><td>Weight Gain (Lean)</td><td>+250 kcal/day</td><td>~0.5 lb / week</td></tr>
+        <tr><td>Weight Gain (Bulking)</td><td>+500 kcal/day</td><td>~1.0 lb / week</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div slot="faq">
+    <FaqAccordion items={faqs} />
+  </div>
+
+  <div slot="related-tools">
+    <div class="related-tools-grid">
+      <a href="/health/bmi-calculator" class="card related-tool-card">
+        <h3>BMI Calculator</h3>
+        <p>Assess Body Mass Index and healthy weight classification.</p>
+      </a>
+      <a href="/health/bmr-calculator" class="card related-tool-card">
+        <h3>BMR Calculator</h3>
+        <p>Stand-alone Basal Metabolic Rate calculations.</p>
+      </a>
+    </div>
+  </div>
+</ToolShell>
+
+<JsonLd schema={[webAppSchema, generateFaqJsonLd(faqs), generateBreadcrumbJsonLd([{ name: 'Home', item: '/' }, { name: 'Health', item: '/health' }, { name: 'Calorie Calculator', item: '/health/calorie-calculator' }])]} />
+
+<style>
+  .form-row-2 {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: var(--space-4);
+  }
+
+  @media (min-width: 640px) {
+    .form-row-2 {
+      grid-template-columns: 1fr 1fr;
+    }
+  }
+
+  .calorie-targets-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: var(--space-3);
+    margin-top: var(--space-4);
+  }
+
+  .target-card {
+    background-color: var(--color-surface);
+    border: 1px solid var(--color-border);
+    padding: var(--space-3);
+    border-radius: var(--radius-md);
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-1);
+  }
+
+  .target-card.highlight {
+    border-color: var(--color-primary);
+  }
+
+  .target-label {
+    font-size: var(--text-xs);
+    color: var(--color-text-muted);
+  }
+
+  .target-value {
+    font-size: var(--text-body);
+    color: var(--color-text);
+  }
+</style>
+
+<script>
+  import { calculateCalories, type ActivityLevel, type BiologicalSex } from '@lib/calc/calorie';
+  import { parseNumberInput, formatNumber } from '@lib/format/number';
+
+  function initCalorie() {
+    const ageIn = document.getElementById('cal-age') as HTMLInputElement | null;
+    const sexIn = document.getElementById('cal-sex') as HTMLSelectElement | null;
+    const weightIn = document.getElementById('cal-weight') as HTMLInputElement | null;
+    const heightIn = document.getElementById('cal-height') as HTMLInputElement | null;
+    const actIn = document.getElementById('cal-activity') as HTMLSelectElement | null;
+
+    const tdeeDisplay = document.getElementById('tdee-val');
+    const mildDisplay = document.getElementById('mild-loss-val');
+    const lossDisplay = document.getElementById('loss-val');
+    const bmrDisplay = document.getElementById('bmr-val');
+    const gainDisplay = document.getElementById('gain-val');
+
+    function update() {
+      const res = calculateCalories({
+        age: parseNumberInput(ageIn?.value, 30),
+        sex: (sexIn?.value || 'male') as BiologicalSex,
+        weightKg: parseNumberInput(weightIn?.value, 80),
+        heightCm: parseNumberInput(heightIn?.value, 180),
+        activityLevel: (actIn?.value || 'moderate') as ActivityLevel
+      });
+
+      if (tdeeDisplay) tdeeDisplay.textContent = formatNumber(res.maintenanceTdee, 0);
+      if (mildDisplay) mildDisplay.textContent = `${formatNumber(res.mildLoss, 0)} kcal`;
+      if (lossDisplay) lossDisplay.textContent = `${formatNumber(res.weightLoss, 0)} kcal`;
+      if (bmrDisplay) bmrDisplay.textContent = `${formatNumber(res.bmr, 0)} kcal`;
+      if (gainDisplay) gainDisplay.textContent = `${formatNumber(res.mildGain, 0)} kcal`;
+    }
+
+    [ageIn, sexIn, weightIn, heightIn, actIn].forEach(i => i?.addEventListener('input', update));
+    update();
+  }
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initCalorie);
+  } else {
+    initCalorie();
+  }
+</script>

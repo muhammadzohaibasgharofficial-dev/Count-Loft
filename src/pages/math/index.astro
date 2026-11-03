@@ -1,0 +1,13 @@
+---
+import CategoryHub from '@components/layout/CategoryHub.astro';
+import { CALCULATORS } from '@data/calculators';
+
+const tools = CALCULATORS.filter(c => c.category === 'math');
+---
+
+<CategoryHub
+  categoryName="Math"
+  categorySlug="math"
+  description="Solve percentage problems, simplify fractions, calculate GPA, compute scientific expressions, and analyze datasets."
+  tools={tools}
+/>

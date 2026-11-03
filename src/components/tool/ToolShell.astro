@@ -1,0 +1,209 @@
+---
+/**
+ * Count Loft — ToolShell Component
+ * Standard 8-section layout for calculator pages per PRD §6.1.
+ */
+import BaseLayout from '@components/layout/BaseLayout.astro';
+import Breadcrumbs from '@components/seo/Breadcrumbs.astro';
+import Disclaimer from '@components/tool/Disclaimer.astro';
+import AdSlot from '@components/ui/AdSlot.astro';
+import type { BreadcrumbItem } from '@lib/format/breadcrumbs';
+
+export interface SourceItem {
+  title: string;
+  url?: string;
+}
+
+export interface Props {
+  title: string;
+  description: string;
+  category: 'finance' | 'health' | 'math' | 'construction' | 'converters' | 'pakistan' | 'islamic';
+  breadcrumbs: BreadcrumbItem[];
+  author?: string;
+  reviewerName?: string;
+  sources?: SourceItem[];
+  lastUpdated?: string;
+}
+
+const {
+  title,
+  description,
+  category,
+  breadcrumbs,
+  author = 'Count Loft Team',
+  reviewerName,
+  sources = [],
+  lastUpdated
+} = Astro.props;
+
+const isYMYL = category === 'finance' || category === 'health';
+---
+
+<BaseLayout title={`${title} — Count Loft`} description={description}>
+  <div class="container tool-shell-container">
+    <!-- Breadcrumbs -->
+    <Breadcrumbs items={breadcrumbs} />
+
+    <!-- Section 1: H1 + Metadata (author, reviewer, sources, last-updated) -->
+    <header class="tool-header">
+      <h1 class="tool-title">{title}</h1>
+      <p class="tool-lead">{description}</p>
+      <div class="tool-meta-bar">
+        <span class="tool-meta-item">Author: <strong>{author}</strong></span>
+        {reviewerName && (
+          <span class="tool-meta-item">Reviewed by: <strong>{reviewerName}</strong></span>
+        )}
+        {lastUpdated && (
+          <span class="tool-meta-item">Last updated: <time datetime={lastUpdated}>{lastUpdated}</time></span>
+        )}
+      </div>
+      {sources.length > 0 && (
+        <div class="tool-sources-bar">
+          <span class="sources-label">Sources:</span>
+          <ul class="sources-list">
+            {sources.map((src) => (
+              <li>
+                {src.url ? (
+                  <a href={src.url} target="_blank" rel="noopener noreferrer">{src.title}</a>
+                ) : (
+                  <span>{src.title}</span>
+                )}
+              </li>
+            ))}
+          </ul>
+        </div>
+      )}
+    </header>
+
+    <!-- Sections 2 & 3: Calculator Card (Inputs, Results, Chart) -->
+    <section class="card calculator-card" aria-labelledby="calculator-heading">
+      <h2 id="calculator-heading" class="visually-hidden">{title} Calculator Interface</h2>
+      <div class="tool-grid">
+        <div class="calculator-inputs-column">
+          <slot name="inputs" />
+        </div>
+        <div class="calculator-results-column sticky-panel">
+          <slot name="results" />
+          <slot name="chart" />
+        </div>
+      </div>
+    </section>
+
+    <!-- Section 3 Disclaimer: Required for Finance and Health -->
+    {isYMYL && <Disclaimer category={category} />}
+
+    <!-- Reserved Ad Slot: Strictly Below Tool (PRD §5.3 & §7.1) -->
+    <AdSlot slotId="tool-post-calculator" format="leaderboard" minHeight="90px" />
+
+    <!-- Educational & Content Sections -->
+    <article class="article-content tool-educational-content">
+      <!-- Section 4: How-to steps -->
+      <section class="tool-section" aria-labelledby="section-how-to">
+        <h2 id="section-how-to">How to Use This Calculator</h2>
+        <slot name="how-to" />
+      </section>
+
+      <!-- Section 5: Formula & worked steps -->
+      <section class="tool-section" aria-labelledby="section-formula">
+        <h2 id="section-formula">Formula and Calculation Steps</h2>
+        <slot name="formula" />
+      </section>
+
+      <!-- Section 6: Worked examples / lookup table -->
+      <section class="tool-section" aria-labelledby="section-examples-table">
+        <h2 id="section-examples-table">Worked Examples and Reference Table</h2>
+        <slot name="examples-table" />
+      </section>
+
+      <!-- Section 7: FAQ (Accordion) -->
+      <section class="tool-section" aria-labelledby="section-faq">
+        <h2 id="section-faq">Frequently Asked Questions</h2>
+        <slot name="faq" />
+      </section>
+    </article>
+
+    <!-- Bottom Reserved Ad Slot -->
+    <AdSlot slotId="tool-bottom" format="rectangle" minHeight="250px" />
+
+    <!-- Section 8: Related Tools (4-8 tool-level links) -->
+    <aside class="related-tools-container" aria-labelledby="section-related-tools">
+      <h2 id="section-related-tools">Related Calculators</h2>
+      <slot name="related-tools" />
+    </aside>
+  </div>
+</BaseLayout>
+
+<style>
+  .tool-shell-container {
+    padding-top: var(--space-6);
+    padding-bottom: var(--space-8);
+  }
+
+  .tool-header {
+    margin-bottom: var(--space-6);
+  }
+
+  .tool-title {
+    margin: 0;
+  }
+
+  .tool-lead {
+    font-size: var(--text-body);
+    color: var(--color-text-muted);
+    margin-top: var(--space-2);
+    margin-bottom: var(--space-3);
+    max-width: var(--article-max-width);
+  }
+
+  .tool-meta-bar {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--space-4);
+    font-size: var(--text-sm);
+    color: var(--color-text-muted);
+  }
+
+  .tool-sources-bar {
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+    margin-top: var(--space-2);
+    font-size: var(--text-xs);
+    color: var(--color-text-muted);
+  }
+
+  .sources-list {
+    display: inline-flex;
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    gap: var(--space-3);
+  }
+
+  .calculator-card {
+    margin-bottom: var(--space-6);
+  }
+
+  .tool-educational-content {
+    margin-top: var(--space-6);
+  }
+
+  .tool-section {
+    margin-bottom: var(--space-6);
+  }
+
+  .tool-section h2 {
+    margin-bottom: var(--space-3);
+  }
+
+  .related-tools-container {
+    margin-top: var(--space-7);
+    padding-top: var(--space-6);
+    border-top: 1px solid var(--color-border);
+  }
+
+  .related-tools-container h2 {
+    margin-bottom: var(--space-4);
+  }
+</style>

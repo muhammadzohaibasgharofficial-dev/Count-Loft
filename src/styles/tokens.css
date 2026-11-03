@@ -1,0 +1,142 @@
+/**
+ * Count Loft — Design Tokens
+ * Follows ui-ux-pro skill and WCAG 2.2 AA contrast specifications.
+ */
+
+:root {
+  /* ==========================================================================
+     Color Tokens — Light Theme (Default)
+     ========================================================================== */
+  --color-bg: #F8FAFC;              /* Slate 50  — Page background */
+  --color-surface: #FFFFFF;         /* Pure white — Cards, form inputs */
+  --color-surface-muted: #F1F5F9;   /* Slate 100 — Muted wells, table stripes */
+  
+  --color-border: #E2E8F0;          /* Slate 200 — Subtle borders, dividers */
+  --color-border-strong: #CBD5E1;   /* Slate 300 — Secondary borders */
+  --color-border-input: #64748B;    /* Slate 500 — Form controls (4.76:1 on white, passes >= 3:1) */
+
+  --color-text: #0F172A;            /* Slate 900 — 17.85:1 on white (passes AAA) */
+  --color-text-muted: #475569;      /* Slate 600 — 7.58:1 on white (passes AAA) */
+
+  --color-primary: #2563EB;         /* Blue 600 — Primary action */
+  --color-primary-hover: #1D4ED8;   /* Blue 700 — Primary hover */
+  --color-primary-contrast: #FFFFFF;/* 5.17:1 on #2563EB (passes AA >= 4.5:1) */
+
+  --color-link: #1D4ED8;            /* Blue 700 — 6.70:1 on white (passes AA) */
+  --color-link-hover: #1E40AF;      /* Blue 800 */
+
+  --color-secondary: #0F766E;       /* Teal 700 — Secondary / chart accent */
+  --color-secondary-contrast: #FFFFFF;
+
+  --color-success: #15803D;         /* Green 700 — Success state */
+  --color-warning: #B45309;         /* Amber 700 — Disclaimers, caution */
+  --color-danger: #B91C1C;          /* Red 700 — Error states */
+
+  --color-focus-ring: #1D4ED8;      /* 6.70:1 on white (passes non-text >= 3:1) */
+
+  /* ==========================================================================
+     Typography Tokens (Fluid scale using system font stack)
+     ========================================================================== */
+  --font-sans: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  --font-mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+
+  --text-h1: clamp(1.75rem, 4vw, 2.5rem);
+  --text-h2: clamp(1.375rem, 3vw, 1.75rem);
+  --text-h3: clamp(1.125rem, 2vw, 1.25rem);
+  --text-body: 1rem;                /* 16px baseline */
+  --text-sm: 0.875rem;              /* 14px */
+  --text-xs: 0.75rem;               /* 12px */
+  --text-label: 0.9375rem;          /* 15px */
+  --text-result: clamp(2rem, 5vw, 3rem);
+
+  --font-weight-regular: 400;
+  --font-weight-medium: 500;
+  --font-weight-semibold: 600;
+  --font-weight-bold: 700;
+
+  --leading-tight: 1.15;
+  --leading-snug: 1.3;
+  --leading-normal: 1.6;
+
+  /* ==========================================================================
+     Spacing Tokens (4px base modular scale)
+     ========================================================================== */
+  --space-1: 0.25rem;  /* 4px */
+  --space-2: 0.5rem;   /* 8px */
+  --space-3: 0.75rem;  /* 12px */
+  --space-4: 1rem;     /* 16px */
+  --space-5: 1.5rem;   /* 24px */
+  --space-6: 2rem;     /* 32px */
+  --space-7: 3rem;     /* 48px */
+  --space-8: 4rem;     /* 64px */
+
+  /* ==========================================================================
+     Radii Tokens
+     ========================================================================== */
+  --radius-sm: 6px;
+  --radius-md: 10px;
+  --radius-lg: 14px;
+  --radius-full: 9999px;
+
+  /* ==========================================================================
+     Shadows & Elevation
+     ========================================================================== */
+  --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+  --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.08), 0 2px 4px -2px rgb(0 0 0 / 0.04);
+
+  /* ==========================================================================
+     Transitions (Subtle & fast, <= 200ms)
+     ========================================================================== */
+  --transition-fast: 150ms ease;
+  --transition-normal: 200ms ease;
+
+  /* ==========================================================================
+     Container & Layout Widths
+     ========================================================================== */
+  --container-max: 72rem;           /* 1152px */
+  --container-narrow: 64rem;        /* 1024px */
+  --article-max-width: 70ch;
+  --min-touch-target: 44px;
+
+  /* Native color scheme */
+  color-scheme: light;
+}
+
+/* ==========================================================================
+   Color Tokens — Dark Theme
+   Activated by :root[data-theme="dark"]
+   ========================================================================== */
+:root[data-theme="dark"] {
+  --color-bg: #0B1220;              /* Deep Navy — Page background */
+  --color-surface: #111827;         /* Gray 900 — Cards, form inputs */
+  --color-surface-muted: #1A2333;   /* Slate 850 — Muted wells, table stripes */
+
+  --color-border: #263247;          /* Slate 750 — Subtle borders, dividers */
+  --color-border-strong: #3B4A63;   /* Slate 650 — Secondary borders */
+  --color-border-input: #64748B;    /* Slate 500 — Form controls (3.73:1 on #111827, passes >= 3:1) */
+
+  --color-text: #F1F5F9;            /* Slate 100 — 16.19:1 on surface (passes AAA) */
+  --color-text-muted: #94A3B8;      /* Slate 400 — 6.92:1 on surface (passes AAA) */
+
+  --color-primary: #60A5FA;         /* Blue 400 — Primary action */
+  --color-primary-hover: #93C5FD;   /* Blue 300 — Primary hover */
+  --color-primary-contrast: #0B1220;/* Deep navy on #60A5FA: 7.36:1 (passes AAA) */
+
+  --color-link: #60A5FA;            /* Blue 400 — 6.98:1 on surface (passes AAA) */
+  --color-link-hover: #93C5FD;      /* Blue 300 */
+
+  --color-secondary: #2DD4BF;       /* Teal 400 — Secondary / chart accent */
+  --color-secondary-contrast: #0B1220;
+
+  --color-success: #4ADE80;         /* Green 400 */
+  --color-warning: #FBBF24;         /* Amber 400 */
+  --color-danger: #F87171;          /* Red 400 */
+
+  --color-focus-ring: #93C5FD;      /* Blue 300 — 9.84:1 on surface (passes non-text >= 3:1) */
+
+  --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.4);
+  --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.5), 0 2px 4px -2px rgb(0 0 0 / 0.3);
+
+  /* Native color scheme */
+  color-scheme: dark;
+}

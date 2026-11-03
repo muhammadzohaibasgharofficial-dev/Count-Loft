@@ -1,0 +1,13 @@
+---
+import CategoryHub from '@components/layout/CategoryHub.astro';
+import { CALCULATORS } from '@data/calculators';
+
+const tools = CALCULATORS.filter(c => c.category === 'health');
+---
+
+<CategoryHub
+  categoryName="Health"
+  categorySlug="health"
+  description="Assess Body Mass Index (BMI), calculate daily caloric requirements, track BMR, and monitor wellness targets."
+  tools={tools}
+/>

@@ -1,0 +1,12 @@
+{
+  "name": "zakat-nisab-data",
+  "source": "Pakistan Ministry of Religious Affairs & Interfaith Harmony Notification (Ramadan 2026)",
+  "lastVerified": "2026-10-31",
+  "currency": "PKR",
+  "silverNisabGrams": 612.36,
+  "silverNisabTolas": 52.5,
+  "goldNisabGrams": 87.48,
+  "goldNisabTolas": 7.5,
+  "notifiedSilverNisabPkr": 503529,
+  "zakatRatePercent": 2.5
+}

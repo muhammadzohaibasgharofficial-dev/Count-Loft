@@ -1,0 +1,257 @@
+---
+import ToolShell from '@components/tool/ToolShell.astro';
+import FaqAccordion from '@components/tool/FaqAccordion.astro';
+import JsonLd from '@components/seo/JsonLd.astro';
+import { buildBreadcrumbs } from '@lib/format/breadcrumbs';
+import { generateWebApplicationJsonLd, generateFaqJsonLd, generateBreadcrumbJsonLd } from '@lib/seo/jsonld';
+
+const breadcrumbs = buildBreadcrumbs([
+  { label: 'Converters', href: '/converters' },
+  { label: 'Length Converter' }
+]);
+
+const faqs = [
+  {
+    question: 'How many feet are in a meter?',
+    answer: 'There are exactly 3.28084 feet in 1 meter. Conversely, 1 foot equals exactly 0.3048 meters.'
+  },
+  {
+    question: 'How do you convert miles to kilometers?',
+    answer: 'Multiply the number of miles by 1.609344. For quick mental estimates, multiply miles by 1.6.'
+  },
+  {
+    question: 'How many inches are in a centimeter?',
+    answer: 'One inch equals exactly 2.54 centimeters. Therefore, 1 centimeter is approximately 0.393701 inches.'
+  },
+  {
+    question: 'What is the base unit of length in the metric system?',
+    answer: 'The base unit is the meter (m), formally defined in physics by the distance light travels in a vacuum in 1/299,792,458 of a second.'
+  },
+  {
+    question: 'Are US customary and British imperial length units identical?',
+    answer: 'Yes. Since the international yard and pound agreement of 1959, standard length units (inch, foot, yard, mile) are mathematically identical in both systems.'
+  }
+];
+
+const webAppSchema = generateWebApplicationJsonLd({
+  name: 'Length Converter — Count Loft',
+  description: 'Convert between meters, kilometers, feet, inches, miles, yards, centimeters, and millimeters.',
+  url: 'https://count-loft.com/converters/length-converter',
+  category: 'WebApplication'
+});
+---
+
+<ToolShell
+  title="Length Converter"
+  description="Instantly convert distances and lengths between metric and imperial units including meters, feet, inches, miles, and kilometers."
+  category="converters"
+  breadcrumbs={breadcrumbs}
+  author="Count Loft Team"
+  lastUpdated="2026-10-31"
+>
+  <div slot="inputs">
+    <form id="len-form" novalidate onsubmit="return false;">
+      <div class="form-group">
+        <label for="len-input-val" class="form-label">Value to Convert</label>
+        <input type="number" id="len-input-val" class="form-input" value="10" step="any" />
+      </div>
+
+      <div class="form-row-2">
+        <div class="form-group">
+          <label for="len-from-unit" class="form-label">From Unit</label>
+          <select id="len-from-unit" class="form-input">
+            <option value="meter" selected>Meters (m)</option>
+            <option value="kilometer">Kilometers (km)</option>
+            <option value="centimeter">Centimeters (cm)</option>
+            <option value="millimeter">Millimeters (mm)</option>
+            <option value="mile">Miles (mi)</option>
+            <option value="yard">Yards (yd)</option>
+            <option value="foot">Feet (ft)</option>
+            <option value="inch">Inches (in)</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label for="len-to-unit" class="form-label">To Unit</label>
+          <select id="len-to-unit" class="form-input">
+            <option value="meter">Meters (m)</option>
+            <option value="kilometer">Kilometers (km)</option>
+            <option value="centimeter">Centimeters (cm)</option>
+            <option value="millimeter">Millimeters (mm)</option>
+            <option value="mile">Miles (mi)</option>
+            <option value="yard">Yards (yd)</option>
+            <option value="foot" selected>Feet (ft)</option>
+            <option value="inch">Inches (in)</option>
+          </select>
+        </div>
+      </div>
+    </form>
+  </div>
+
+  <div slot="results">
+    <div class="result-hero">
+      <span class="result-hero-label">Converted Length</span>
+      <span class="result-hero-value" id="len-result-val">32.8084 ft</span>
+      <span class="result-hero-subtext" id="len-formula-val">10 m = 32.8084 ft</span>
+    </div>
+
+    <div class="len-breakdown-table">
+      <div class="breakdown-row">
+        <span>In Centimeters:</span>
+        <strong id="len-cm-val">1,000 cm</strong>
+      </div>
+      <div class="breakdown-row">
+        <span>In Inches:</span>
+        <strong id="len-in-val">393.7008 in</strong>
+      </div>
+      <div class="breakdown-row">
+        <span>In Yards:</span>
+        <strong id="len-yd-val">10.9361 yd</strong>
+      </div>
+      <div class="breakdown-row">
+        <span>In Kilometers:</span>
+        <strong id="len-km-val">0.01 km</strong>
+      </div>
+    </div>
+  </div>
+
+  <div slot="how-to">
+    <ol>
+      <li><strong>Enter magnitude:</strong> Input any positive or decimal distance value.</li>
+      <li><strong>Select source and target units:</strong> Choose from 8 international metric and imperial units.</li>
+      <li><strong>Instant multi-unit equivalence:</strong> Review the primary target conversion alongside immediate cross-conversions.</li>
+    </ol>
+  </div>
+
+  <div slot="formula">
+    <pre><code>Base Unit: 1 Meter (m)
+1 Foot  = 0.3048 Meters
+1 Inch  = 0.0254 Meters
+1 Mile  = 1,609.344 Meters
+1 Yard  = 0.9144 Meters</code></pre>
+  </div>
+
+  <div slot="examples-table">
+    <table class="data-table">
+      <thead>
+        <tr>
+          <th>Metric Distance</th>
+          <th>Equivalent Imperial</th>
+          <th>Usage Context</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr><td>1 Centimeter</td><td>0.3937 Inches</td><td>Small hardware & screws</td></tr>
+        <tr><td>1 Meter</td><td>3.2808 Feet</td><td>Interior room dimensions</td></tr>
+        <tr><td>1 Kilometer</td><td>0.6214 Miles</td><td>Highway transit distances</td></tr>
+        <tr><td>100 Meters</td><td>109.36 Yards</td><td>Athletic track sprint</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div slot="faq">
+    <FaqAccordion items={faqs} />
+  </div>
+
+  <div slot="related-tools">
+    <div class="related-tools-grid">
+      <a href="/converters/weight-converter" class="card related-tool-card">
+        <h3>Weight Converter</h3>
+        <p>Convert kilograms, pounds, ounces, grams, and stones.</p>
+      </a>
+      <a href="/converters/temperature-converter" class="card related-tool-card">
+        <h3>Temperature Converter</h3>
+        <p>Convert between Celsius, Fahrenheit, and Kelvin temperature scales.</p>
+      </a>
+    </div>
+  </div>
+</ToolShell>
+
+<JsonLd schema={[webAppSchema, generateFaqJsonLd(faqs), generateBreadcrumbJsonLd([{ name: 'Home', item: '/' }, { name: 'Converters', item: '/converters' }, { name: 'Length Converter', item: '/converters/length-converter' }])]} />
+
+<style>
+  .form-row-2 {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: var(--space-4);
+  }
+
+  @media (min-width: 640px) {
+    .form-row-2 {
+      grid-template-columns: 1fr 1fr;
+    }
+  }
+
+  .len-breakdown-table {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-2);
+    padding: var(--space-4) 0;
+    border-top: 1px solid var(--color-border);
+    margin-top: var(--space-4);
+    font-size: var(--text-sm);
+  }
+
+  .breakdown-row {
+    display: flex;
+    justify-content: space-between;
+  }
+</style>
+
+<script>
+  import { convertLength } from '@lib/calc/units';
+  import { parseNumberInput } from '@lib/format/number';
+
+  function initLength() {
+    const valIn = document.getElementById('len-input-val') as HTMLInputElement | null;
+    const fromIn = document.getElementById('len-from-unit') as HTMLSelectElement | null;
+    const toIn = document.getElementById('len-to-unit') as HTMLSelectElement | null;
+
+    const resDisplay = document.getElementById('len-result-val');
+    const formDisplay = document.getElementById('len-formula-val');
+    const cmDisplay = document.getElementById('len-cm-val');
+    const inDisplay = document.getElementById('len-in-val');
+    const ydDisplay = document.getElementById('len-yd-val');
+    const kmDisplay = document.getElementById('len-km-val');
+
+    const unitSymbols: Record<string, string> = {
+      meter: 'm',
+      kilometer: 'km',
+      centimeter: 'cm',
+      millimeter: 'mm',
+      mile: 'mi',
+      yard: 'yd',
+      foot: 'ft',
+      inch: 'in'
+    };
+
+    function update() {
+      const val = parseNumberInput(valIn?.value, 10);
+      const from = fromIn?.value || 'meter';
+      const to = toIn?.value || 'foot';
+
+      const result = convertLength(val, from, to);
+      const toSym = unitSymbols[to] || to;
+      const fromSym = unitSymbols[from] || from;
+
+      if (resDisplay) resDisplay.textContent = `${result} ${toSym}`;
+      if (formDisplay) formDisplay.textContent = `${val} ${fromSym} = ${result} ${toSym}`;
+
+      if (cmDisplay) cmDisplay.textContent = `${convertLength(val, from, 'centimeter')} cm`;
+      if (inDisplay) inDisplay.textContent = `${convertLength(val, from, 'inch')} in`;
+      if (ydDisplay) ydDisplay.textContent = `${convertLength(val, from, 'yard')} yd`;
+      if (kmDisplay) kmDisplay.textContent = `${convertLength(val, from, 'kilometer')} km`;
+    }
+
+    [valIn, fromIn, toIn].forEach(i => {
+      i?.addEventListener('input', update);
+      i?.addEventListener('change', update);
+    });
+    update();
+  }
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initLength);
+  } else {
+    initLength();
+  }
+</script>

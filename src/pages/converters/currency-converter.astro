@@ -1,0 +1,346 @@
+---
+/**
+ * Count Loft — Currency Converter
+ * Real-time currency conversions using static versioned benchmark FX feeds.
+ */
+import ToolShell from '@components/tool/ToolShell.astro';
+import FaqAccordion from '@components/tool/FaqAccordion.astro';
+import JsonLd from '@components/seo/JsonLd.astro';
+import { buildBreadcrumbs } from '@lib/format/breadcrumbs';
+import { generateWebApplicationJsonLd, generateFaqJsonLd, generateBreadcrumbJsonLd } from '@lib/seo/jsonld';
+import fxData from '../../data/fx-rates.json';
+
+const breadcrumbs = buildBreadcrumbs([
+  { label: 'Converters', href: '/converters' },
+  { label: 'Currency Converter' }
+]);
+
+const faqs = [
+  {
+    question: 'Where do these currency exchange rates come from?',
+    answer: 'Count Loft uses audited reference benchmark rates compiled from the European Central Bank and official open market currency fixings, stored statically in versioned data feeds.'
+  },
+  {
+    question: 'Why do bank and airport currency exchange rates differ from these numbers?',
+    answer: 'Consumer retail exchange services add a currency exchange spread (typically 1% to 4%) plus transaction commission fees onto the mid-market interbank benchmark rate.'
+  },
+  {
+    question: 'How often are currency rates updated?',
+    answer: 'Our benchmark feeds are reviewed and refreshed on scheduled build intervals. The last verified date is shown transparently on the calculator.'
+  },
+  {
+    question: 'Can I convert between non-USD currencies directly?',
+    answer: 'Yes. The engine converts from the source currency through the baseline currency into the destination currency with exact reciprocal math.'
+  },
+  {
+    question: 'What is the mid-market rate?',
+    answer: 'The mid-market rate (or interbank rate) is the midpoint between the global buy (bid) and sell (ask) rates traded by international banks.'
+  }
+];
+
+const webAppSchema = generateWebApplicationJsonLd({
+  name: 'Currency Converter — Count Loft',
+  description: 'Convert between USD, EUR, GBP, CAD, AUD, JPY, PKR, INR, AED, and SAR with mid-market exchange rates.',
+  url: 'https://count-loft.com/converters/currency-converter',
+  category: 'FinanceApplication'
+});
+---
+
+<ToolShell
+  title="Currency Converter"
+  description="Convert between world currencies using transparent mid-market benchmark exchange rates. Instant conversions with zero network latency."
+  category="converters"
+  breadcrumbs={breadcrumbs}
+  author="Count Loft Team"
+  lastUpdated={fxData.lastVerified}
+>
+  <div slot="inputs">
+    <form id="fx-form" novalidate onsubmit="return false;">
+      <div class="form-group">
+        <label for="fx-amount" class="form-label">Amount</label>
+        <input type="number" id="fx-amount" class="form-input" value="100" min="1" step="10" />
+      </div>
+
+      <div class="currency-pair-grid">
+        <div class="form-group">
+          <label for="fx-from" class="form-label">From</label>
+          <SearchableDropdown name="fx-from" options={currencyOptions} placeholder="From" selected="USD" />
+            <option value="USD" selected>USD — US Dollar</option>
+            <option value="EUR">EUR — Euro</option>
+            <option value="GBP">GBP — British Pound</option>
+            <option value="CAD">CAD — Canadian Dollar</option>
+            <option value="AUD">AUD — Australian Dollar</option>
+            <option value="JPY">JPY — Japanese Yen</option>
+            <option value="PKR">PKR — Pakistani Rupee</option>
+            <option value="INR">INR — Indian Rupee</option>
+            <option value="AED">AED — UAE Dirham</option>
+            <option value="SAR">SAR — Saudi Riyal</option>
+          </select>
+        </div>
+
+        <button type="button" id="btn-swap-currency" class="btn btn-ghost swap-btn" title="Swap currencies" aria-label="Swap currencies">
+          ⇄
+        </button>
+
+        <div class="form-group">
+          <label for="fx-to" class="form-label">To</label>
+          <SearchableDropdown name="fx-to" options={currencyOptions} placeholder="To" selected="EUR" />
+            <option value="USD">USD — US Dollar</option>
+            <option value="EUR" selected>EUR — Euro</option>
+            <option value="GBP">GBP — British Pound</option>
+            <option value="CAD">CAD — Canadian Dollar</option>
+            <option value="AUD">AUD — Australian Dollar</option>
+            <option value="JPY">JPY — Japanese Yen</option>
+            <option value="PKR">PKR — Pakistani Rupee</option>
+            <option value="INR">INR — Indian Rupee</option>
+            <option value="AED">AED — UAE Dirham</option>
+            <option value="SAR">SAR — Saudi Riyal</option>
+          </select>
+        </div>
+      </div>
+    </form>
+  </div>
+
+  <div slot="results">
+    <div class="result-hero">
+      <span class="result-hero-label">Converted Amount</span>
+      <span class="result-hero-value" id="fx-converted-val">€92.15</span>
+      <span class="result-hero-subtext" id="fx-rate-sub">1 USD = 0.9215 EUR</span>
+    </div>
+
+    <div class="fx-metadata-card">
+      <div class="meta-row">
+        <span>Benchmark Source:</span>
+        <strong>{fxData.source}</strong>
+      </div>
+      <div class="meta-row">
+        <span>Data Last Verified:</span>
+        <strong>{fxData.lastVerified}</strong>
+      </div>
+    </div>
+  </div>
+
+  <div slot="how-to">
+    <ol>
+      <li><strong>Enter the amount:</strong> Specify how much money you want to convert.</li>
+      <li><strong>Select currencies:</strong> Choose from 10+ major world currencies.</li>
+      <li><strong>View conversion:</strong> Results and mid-market rates calculate instantly.</li>
+    </ol>
+  </div>
+
+  <div slot="formula">
+    <pre><code>Converted = (Amount ÷ BaseRateFrom) × BaseRateTo</code></pre>
+  </div>
+
+  <div slot="examples-table">
+    <table class="data-table">
+      <thead>
+        <tr>
+          <th>USD Amount</th>
+          <th>EUR (€)</th>
+          <th>GBP (£)</th>
+          <th>PKR (Rs)</th>
+          <th>INR (₹)</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr><td>$100</td><td>€92.15</td><td>£77.12</td><td>Rs 27,785</td><td>₹8,408</td></tr>
+        <tr><td>$500</td><td>€460.75</td><td>£385.60</td><td>Rs 138,925</td><td>₹42,040</td></tr>
+        <tr><td>$1,000</td><td>€921.50</td><td>£771.20</td><td>Rs 277,850</td><td>₹84,080</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div slot="faq">
+    <FaqAccordion items={faqs} />
+  </div>
+
+  <div slot="related-tools">
+    <div class="related-tools-grid">
+      <a href="/converters/length-converter" class="card related-tool-card">
+        <h3>Length Converter</h3>
+        <p>Convert inches, feet, meters, and kilometers.</p>
+      </a>
+      <a href="/converters/weight-converter" class="card related-tool-card">
+        <h3>Weight Converter</h3>
+        <p>Convert pounds, kilograms, ounces, and grams.</p>
+      </a>
+    </div>
+  </div>
+</ToolShell>
+
+<JsonLd schema={[webAppSchema, generateFaqJsonLd(faqs), generateBreadcrumbJsonLd([{ name: 'Home', item: '/' }, { name: 'Converters', item: '/converters' }, { name: 'Currency Converter', item: '/converters/currency-converter' }])]} />
+
+<style>
+  .currency-pair-grid {
+    display: flex;
+    align-items: flex-end;
+    gap: var(--space-2);
+  }
+
+  .currency-pair-grid .form-group {
+    flex: 1;
+    margin: 0;
+  }
+
+  .swap-btn {
+    min-height: 44px;
+    font-size: 1.25rem;
+    padding: 0 var(--space-3);
+  }
+
+  .fx-metadata-card {
+    margin-top: var(--space-4);
+    padding: var(--space-3);
+    background-color: var(--color-surface);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-md);
+    font-size: var(--text-xs);
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-2);
+  }
+
+  .meta-row {
+    display: flex;
+    justify-content: space-between;
+  }
+</style>
+
+<script>
+  import { convertCurrency } from '@lib/calc/currency';
+  import SearchableDropdown from '@components/ui/SearchableDropdown.astro';
+
+  const currencyOptions = [
+    { label: 'USD — US Dollar', value: 'USD' },
+    { label: 'EUR — Euro', value: 'EUR' },
+    { label: 'GBP — British Pound', value: 'GBP' },
+    { label: 'CAD — Canadian Dollar', value: 'CAD' },
+    { label: 'AUD — Australian Dollar', value: 'AUD' },
+    { label: 'JPY — Japanese Yen', value: 'JPY' },
+    { label: 'PKR — Pakistani Rupee', value: 'PKR' },
+    { label: 'INR — Indian Rupee', value: 'INR' },
+    { label: 'AED — UAE Dirham', value: 'AED' },
+    { label: 'SAR — Saudi Riyal', value: 'SAR' },
+  ];
+
+  function initCurrency() {
+    const amountIn = document.getElementById('fx-amount') as HTMLInputElement | null;
+    const fromInput = document.querySelector('input[name="fx-from"]') as HTMLInputElement | null;
+    const toInput = document.querySelector('input[name="fx-to"]') as HTMLInputElement | null;
+    const swapBtn = document.getElementById('btn-swap-currency');
+
+    const resultDisplay = document.getElementById('fx-converted-val');
+    const rateDisplay = document.getElementById('fx-rate-sub');
+
+    function getLabel(value: string) {
+      const opt = currencyOptions.find(o => o.value === value);
+      return opt ? opt.label : value;
+    }
+
+    function update() {
+      const from = fromInput?.value || 'USD';
+      const to = toInput?.value || 'EUR';
+      const amount = parseNumberInput(amountIn?.value, 100);
+
+      const res = convertCurrency(amount, from, to);
+      if (resultDisplay) resultDisplay.textContent = `${formatNumber(res.convertedAmount, 2)} ${to}`;
+      if (rateDisplay) rateDisplay.textContent = `1 ${from} = ${res.exchangeRate} ${to}`;
+    }
+
+    swapBtn?.addEventListener('click', () => {
+      if (!fromInput || !toInput) return;
+      const tmp = fromInput.value;
+      fromInput.value = toInput.value;
+      toInput.value = tmp;
+      // Update visible input values
+      const fromVis = document.querySelector('input[name="fx-from"]').parentElement?.querySelector('.dropdown-input') as HTMLInputElement;
+      const toVis = document.querySelector('input[name="fx-to"]').parentElement?.querySelector('.dropdown-input') as HTMLInputElement;
+      if (fromVis) fromVis.value = getLabel(fromInput.value);
+      if (toVis) toVis.value = getLabel(toInput.value);
+      update();
+    });
+
+    [amountIn, fromInput, toInput].forEach(el => {
+      el?.addEventListener('input', update);
+      el?.addEventListener('change', update);
+    });
+
+    // Initialize visible labels based on hidden values
+    const fromVisInit = document.querySelector('input[name="fx-from"]').parentElement?.querySelector('.dropdown-input') as HTMLInputElement;
+    const toVisInit = document.querySelector('input[name="fx-to"]').parentElement?.querySelector('.dropdown-input') as HTMLInputElement;
+    if (fromVisInit && fromInput) fromVisInit.value = getLabel(fromInput.value);
+    if (toVisInit && toInput) toVisInit.value = getLabel(toInput.value);
+
+    update();
+  }
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initCurrency);
+  } else {
+    initCurrency();
+  }
+</script>
+  import { convertCurrency } from '@lib/calc/currency';
+import SearchableDropdown from '@components/ui/SearchableDropdown.astro';
+
+const currencyOptions = [
+  { label: 'USD — US Dollar', value: 'USD' },
+  { label: 'EUR — Euro', value: 'EUR' },
+  { label: 'GBP — British Pound', value: 'GBP' },
+  { label: 'CAD — Canadian Dollar', value: 'CAD' },
+  { label: 'AUD — Australian Dollar', value: 'AUD' },
+  { label: 'JPY — Japanese Yen', value: 'JPY' },
+  { label: 'PKR — Pakistani Rupee', value: 'PKR' },
+  { label: 'INR — Indian Rupee', value: 'INR' },
+  { label: 'AED — UAE Dirham', value: 'AED' },
+  { label: 'SAR — Saudi Riyal', value: 'SAR' },
+];
+  import { parseNumberInput, formatNumber } from '@lib/format/number';
+
+  function initCurrency() {
+    const amountIn = document.getElementById('fx-amount') as HTMLInputElement | null;
+    const fromSel = document.getElementById('fx-from') as HTMLSelectElement | null;
+    const toSel = document.getElementById('fx-to') as HTMLSelectElement | null;
+    const swapBtn = document.getElementById('btn-swap-currency');
+
+    const resultDisplay = document.getElementById('fx-converted-val');
+  const rateDisplay = document.getElementById('fx-rate-sub');
+
+  const fromInput = document.querySelector('input[name="fx-from"]') as HTMLInputElement | null;
+  const toInput = document.querySelector('input[name="fx-to"]') as HTMLInputElement | null;
+
+    const rateDisplay = document.getElementById('fx-rate-sub');
+
+    function update() {
+      const from = fromSel?.value || 'USD';
+      const to = toSel?.value || 'EUR';
+      const amount = parseNumberInput(amountIn?.value, 100);
+
+      const res = convertCurrency(amount, from, to);
+      if (resultDisplay) resultDisplay.textContent = `${formatNumber(res.convertedAmount, 2)} ${to}`;
+      if (rateDisplay) rateDisplay.textContent = `1 ${from} = ${res.exchangeRate} ${to}`;
+    }
+
+    swapBtn?.addEventListener('click', () => {
+      if (!fromSel || !toSel) return;
+      const tmp = fromSel.value;
+      fromSel.value = toSel.value;
+      toSel.value = tmp;
+      update();
+    });
+
+    [amountIn, fromSel, toSel].forEach(el => {
+      el?.addEventListener('input', update);
+      el?.addEventListener('change', update);
+    });
+
+    update();
+  }
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initCurrency);
+  } else {
+    initCurrency();
+  }
+</script>

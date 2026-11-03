@@ -1,0 +1,331 @@
+---
+/**
+ * Count Loft — Scientific Calculator
+ * Interactive keypad with trigonometry, logarithms, powers, and roots.
+ */
+import ToolShell from '@components/tool/ToolShell.astro';
+import FaqAccordion from '@components/tool/FaqAccordion.astro';
+import JsonLd from '@components/seo/JsonLd.astro';
+import { buildBreadcrumbs } from '@lib/format/breadcrumbs';
+import { generateWebApplicationJsonLd, generateFaqJsonLd, generateBreadcrumbJsonLd } from '@lib/seo/jsonld';
+
+const breadcrumbs = buildBreadcrumbs([
+  { label: 'Math', href: '/math' },
+  { label: 'Scientific Calculator' }
+]);
+
+const faqs = [
+  {
+    question: 'How do I switch between Degrees and Radians?',
+    answer: 'Use the Deg/Rad toggle button on the keypad. Degrees are typically used in navigation and everyday geometry, while radians are standard in calculus and advanced physics.'
+  },
+  {
+    question: 'What is the difference between log and ln?',
+    answer: 'The "log" button evaluates common logarithms to base 10 (log₁₀), whereas "ln" evaluates the natural logarithm to base e ≈ 2.71828 (logₑ).'
+  },
+  {
+    question: 'Does this calculator follow standard Order of Operations (PEMDAS)?',
+    answer: 'Yes. Calculations respect standard mathematical precedence: Parentheses, Exponents, Multiplication & Division (left to right), and Addition & Subtraction (left to right).'
+  },
+  {
+    question: 'What is the maximum factorial this tool can compute?',
+    answer: 'The calculator can compute exact integers up to 170! (approximately 7.25 × 10³⁰⁶), beyond which numbers exceed standard IEEE 754 floating-point limits.'
+  },
+  {
+    question: 'Can I use keyboard shortcuts on desktop?',
+    answer: 'Yes. You can type numbers 0–9, basic operators (+, -, *, /), Enter for equal, and Backspace to delete.'
+  }
+];
+
+const webAppSchema = generateWebApplicationJsonLd({
+  name: 'Scientific Calculator — Count Loft',
+  description: 'Free scientific calculator online. Solve algebra, trigonometry, logarithms, roots, and exponents with keyboard and touch keypad.',
+  url: 'https://count-loft.com/math/scientific-calculator',
+  category: 'EducationalApplication'
+});
+---
+
+<ToolShell
+  title="Scientific Calculator"
+  description="Free online scientific calculator. Perform trigonometric functions, logarithms, natural logs, roots, exponents, factorials, and algebraic equations."
+  category="math"
+  breadcrumbs={breadcrumbs}
+  author="Count Loft Team"
+  lastUpdated="2026-10-31"
+>
+  <div slot="inputs">
+    <div class="sci-calc-card">
+      <div class="sci-display">
+        <div class="sci-expression" id="sci-expr">&nbsp;</div>
+        <div class="sci-current" id="sci-curr">0</div>
+      </div>
+
+      <div class="sci-controls-bar">
+        <button type="button" id="btn-deg-rad" class="btn btn-ghost btn-sm">DEG</button>
+        <span class="sci-mode-indicator" id="sci-mode-lbl">Degree Mode</span>
+      </div>
+
+      <div class="sci-keypad">
+        <button type="button" class="btn btn-ghost sci-key" data-fn="sin">sin</button>
+        <button type="button" class="btn btn-ghost sci-key" data-fn="cos">cos</button>
+        <button type="button" class="btn btn-ghost sci-key" data-fn="tan">tan</button>
+        <button type="button" class="btn btn-secondary sci-key" data-action="clear">AC</button>
+        <button type="button" class="btn btn-secondary sci-key" data-action="backspace">⌫</button>
+
+        <button type="button" class="btn btn-ghost sci-key" data-fn="sqrt">√</button>
+        <button type="button" class="btn btn-ghost sci-key" data-fn="log">log</button>
+        <button type="button" class="btn btn-ghost sci-key" data-fn="ln">ln</button>
+        <button type="button" class="btn btn-ghost sci-key" data-op="/">÷</button>
+        <button type="button" class="btn btn-ghost sci-key" data-op="*">×</button>
+
+        <button type="button" class="btn btn-ghost sci-key" data-fn="factorial">n!</button>
+        <button type="button" class="btn btn-ghost sci-key num-key" data-num="7">7</button>
+        <button type="button" class="btn btn-ghost sci-key num-key" data-num="8">8</button>
+        <button type="button" class="btn btn-ghost sci-key num-key" data-num="9">9</button>
+        <button type="button" class="btn btn-ghost sci-key" data-op="-">−</button>
+
+        <button type="button" class="btn btn-ghost sci-key" data-fn="pi">π</button>
+        <button type="button" class="btn btn-ghost sci-key num-key" data-num="4">4</button>
+        <button type="button" class="btn btn-ghost sci-key num-key" data-num="5">5</button>
+        <button type="button" class="btn btn-ghost sci-key num-key" data-num="6">6</button>
+        <button type="button" class="btn btn-ghost sci-key" data-op="+">+</button>
+
+        <button type="button" class="btn btn-ghost sci-key" data-fn="exp">e</button>
+        <button type="button" class="btn btn-ghost sci-key num-key" data-num="1">1</button>
+        <button type="button" class="btn btn-ghost sci-key num-key" data-num="2">2</button>
+        <button type="button" class="btn btn-ghost sci-key num-key" data-num="3">3</button>
+        <button type="button" class="btn btn-primary sci-key key-equals" data-action="equals" rowspan="2">=</button>
+
+        <button type="button" class="btn btn-ghost sci-key" data-num="00">00</button>
+        <button type="button" class="btn btn-ghost sci-key num-key key-zero" data-num="0">0</button>
+        <button type="button" class="btn btn-ghost sci-key" data-num=".">.</button>
+      </div>
+    </div>
+  </div>
+
+  <div slot="results">
+    <div class="card result-card">
+      <span class="result-hero-label">Calculation Result</span>
+      <div class="result-hero-value" id="sci-result-val">0</div>
+      <p class="form-helper" style="margin-top: var(--space-2);">
+        Supports keyboard input (numbers, +, -, *, /, Enter).
+      </p>
+    </div>
+  </div>
+
+  <div slot="how-to">
+    <ol>
+      <li><strong>Select Angle Mode:</strong> Toggle DEG (degrees) or RAD (radians) for trigonometry.</li>
+      <li><strong>Enter Expressions:</strong> Click buttons or use your physical keyboard to enter formulas.</li>
+      <li><strong>Execute:</strong> Press = or Enter to view the evaluation.</li>
+    </ol>
+  </div>
+
+  <div slot="formula">
+    <pre><code>π ≈ 3.1415926535
+e ≈ 2.7182818284
+sin²(θ) + cos²(θ) = 1</code></pre>
+  </div>
+
+  <div slot="examples-table">
+    <table class="data-table">
+      <thead>
+        <tr>
+          <th>Expression</th>
+          <th>Mode</th>
+          <th>Output</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr><td>sin(30)</td><td>Degree</td><td>0.5</td></tr>
+        <tr><td>cos(0)</td><td>Degree</td><td>1.0</td></tr>
+        <tr><td>log(100)</td><td>—</td><td>2.0</td></tr>
+        <tr><td>5!</td><td>—</td><td>120</td></tr>
+        <tr><td>√(144)</td><td>—</td><td>12</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div slot="faq">
+    <FaqAccordion items={faqs} />
+  </div>
+
+  <div slot="related-tools">
+    <div class="related-tools-grid">
+      <a href="/math/fraction-calculator" class="card related-tool-card">
+        <h3>Fraction Calculator</h3>
+        <p>Add, subtract, and reduce fractions step-by-step.</p>
+      </a>
+      <a href="/math/percentage-calculator" class="card related-tool-card">
+        <h3>Percentage Calculator</h3>
+        <p>Find percentages, proportions, and percentage change.</p>
+      </a>
+    </div>
+  </div>
+</ToolShell>
+
+<JsonLd schema={[webAppSchema, generateFaqJsonLd(faqs), generateBreadcrumbJsonLd([{ name: 'Home', item: '/' }, { name: 'Math', item: '/math' }, { name: 'Scientific Calculator', item: '/math/scientific-calculator' }])]} />
+
+<style>
+  .sci-calc-card {
+    background-color: var(--color-surface);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-md);
+    padding: var(--space-4);
+  }
+
+  .sci-display {
+    background-color: var(--color-surface-muted);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-sm);
+    padding: var(--space-3);
+    text-align: right;
+    margin-bottom: var(--space-3);
+  }
+
+  .sci-expression {
+    font-size: var(--text-xs);
+    color: var(--color-text-muted);
+    min-height: 1.25rem;
+  }
+
+  .sci-current {
+    font-size: 1.75rem;
+    font-weight: var(--font-weight-bold);
+    color: var(--color-text);
+    font-variant-numeric: tabular-nums;
+    overflow-x: auto;
+  }
+
+  .sci-controls-bar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: var(--space-3);
+  }
+
+  .sci-mode-indicator {
+    font-size: var(--text-xs);
+    color: var(--color-text-muted);
+  }
+
+  .sci-keypad {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: var(--space-2);
+  }
+
+  .sci-key {
+    min-height: 44px;
+    font-size: var(--text-sm);
+    font-weight: var(--font-weight-medium);
+    padding: var(--space-2);
+  }
+
+  .num-key {
+    font-weight: var(--font-weight-bold);
+  }
+
+  .key-equals {
+    grid-column: span 2;
+  }
+</style>
+
+<script>
+  import { evaluateScientificFunction } from '@lib/calc/scientific';
+
+  function initScientific() {
+    let currentInput = '0';
+    let previousValue: number | null = null;
+    let pendingOp: string | null = null;
+    let isDegreeMode = true;
+
+    const currDisplay = document.getElementById('sci-curr');
+    const exprDisplay = document.getElementById('sci-expr');
+    const resultDisplay = document.getElementById('sci-result-val');
+    const degRadBtn = document.getElementById('btn-deg-rad');
+    const modeLbl = document.getElementById('sci-mode-lbl');
+
+    function updateDisplay() {
+      if (currDisplay) currDisplay.textContent = currentInput;
+      if (resultDisplay) resultDisplay.textContent = currentInput;
+    }
+
+    degRadBtn?.addEventListener('click', () => {
+      isDegreeMode = !isDegreeMode;
+      if (degRadBtn) degRadBtn.textContent = isDegreeMode ? 'DEG' : 'RAD';
+      if (modeLbl) modeLbl.textContent = isDegreeMode ? 'Degree Mode' : 'Radian Mode';
+    });
+
+    document.querySelectorAll('.sci-key').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const num = btn.getAttribute('data-num');
+        const op = btn.getAttribute('data-op');
+        const fn = btn.getAttribute('data-fn');
+        const action = btn.getAttribute('data-action');
+
+        if (num !== null) {
+          if (currentInput === '0' && num !== '.') {
+            currentInput = num;
+          } else {
+            if (num === '.' && currentInput.includes('.')) return;
+            currentInput += num;
+          }
+          updateDisplay();
+        } else if (op) {
+          previousValue = parseFloat(currentInput);
+          pendingOp = op;
+          if (exprDisplay) exprDisplay.textContent = `${previousValue} ${op}`;
+          currentInput = '0';
+          updateDisplay();
+        } else if (fn) {
+          const val = parseFloat(currentInput);
+          if (fn === 'pi') {
+            currentInput = String(Math.PI);
+          } else if (fn === 'exp') {
+            currentInput = String(Math.E);
+          } else {
+            const evaluated = evaluateScientificFunction(fn, val, isDegreeMode);
+            currentInput = Number.isFinite(evaluated) ? String(evaluated) : 'Error';
+          }
+          updateDisplay();
+        } else if (action === 'clear') {
+          currentInput = '0';
+          previousValue = null;
+          pendingOp = null;
+          if (exprDisplay) exprDisplay.textContent = ' ';
+          updateDisplay();
+        } else if (action === 'backspace') {
+          if (currentInput.length > 1) {
+            currentInput = currentInput.slice(0, -1);
+          } else {
+            currentInput = '0';
+          }
+          updateDisplay();
+        } else if (action === 'equals') {
+          if (previousValue !== null && pendingOp) {
+            const currentVal = parseFloat(currentInput);
+            let res = 0;
+            switch (pendingOp) {
+              case '+': res = previousValue + currentVal; break;
+              case '-': res = previousValue - currentVal; break;
+              case '*': res = previousValue * currentVal; break;
+              case '/': res = currentVal !== 0 ? previousValue / currentVal : NaN; break;
+            }
+            if (exprDisplay) exprDisplay.textContent = `${previousValue} ${pendingOp} ${currentVal} =`;
+            currentInput = Number.isFinite(res) ? String(Math.round(res * 1e10) / 1e10) : 'Error';
+            previousValue = null;
+            pendingOp = null;
+            updateDisplay();
+          }
+        }
+      });
+    });
+  }
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initScientific);
+  } else {
+    initScientific();
+  }
+</script>

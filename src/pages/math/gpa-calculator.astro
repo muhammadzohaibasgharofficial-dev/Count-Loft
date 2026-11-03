@@ -1,0 +1,269 @@
+---
+/**
+ * Count Loft — GPA Calculator
+ * Compute cumulative & semester GPA on 4.0 scale with Honors/AP weighting.
+ */
+import ToolShell from '@components/tool/ToolShell.astro';
+import FaqAccordion from '@components/tool/FaqAccordion.astro';
+import JsonLd from '@components/seo/JsonLd.astro';
+import { buildBreadcrumbs } from '@lib/format/breadcrumbs';
+import { generateWebApplicationJsonLd, generateFaqJsonLd, generateBreadcrumbJsonLd } from '@lib/seo/jsonld';
+
+const breadcrumbs = buildBreadcrumbs([
+  { label: 'Math', href: '/math' },
+  { label: 'GPA Calculator' }
+]);
+
+const faqs = [
+  {
+    question: 'How is Grade Point Average (GPA) calculated?',
+    answer: 'Each letter grade is assigned grade points (e.g. A = 4.0, B = 3.0). Multiply each grade point value by the course credit hours, sum them up, and divide by total credit hours attempted.'
+  },
+  {
+    question: 'What is the difference between weighted and unweighted GPA?',
+    answer: 'Unweighted GPA caps all courses at 4.0 regardless of difficulty. Weighted GPA adds an extra 0.5 points for Honors courses and 1.0 point for Advanced Placement (AP) or International Baccalaureate (IB) courses.'
+  },
+  {
+    question: 'How do plus/minus grades affect GPA?',
+    answer: 'Most universities count an A- as 3.7, a B+ as 3.3, and a B- as 2.7, allowing for finer differentiation than flat letter scales.'
+  },
+  {
+    question: 'Do pass/fail or withdrawal grades affect GPA?',
+    answer: 'Usually, courses taken Pass/Fail or marks of "W" (Withdrawn) earn credits (if passed) but are excluded from the GPA denominator.'
+  },
+  {
+    question: 'What is considered a good college GPA?',
+    answer: 'A GPA of 3.0 (a "B" average) is typically the benchmark for good academic standing, while 3.5 or higher is standard for Dean’s List honors and competitive graduate school admissions.'
+  }
+];
+
+const webAppSchema = generateWebApplicationJsonLd({
+  name: 'GPA Calculator — Count Loft',
+  description: 'Calculate your college or high school GPA on standard 4.0 and weighted 5.0 scales.',
+  url: 'https://count-loft.com/math/gpa-calculator',
+  category: 'EducationalApplication'
+});
+---
+
+<ToolShell
+  title="GPA Calculator"
+  description="Calculate your semester or cumulative Grade Point Average (GPA) on standard 4.0 unweighted and weighted (Honors/AP) scales."
+  category="math"
+  breadcrumbs={breadcrumbs}
+  author="Count Loft Team"
+  lastUpdated="2026-10-31"
+>
+  <div slot="inputs">
+    <div class="gpa-table-wrapper">
+      <table class="gpa-inputs-table" id="gpa-table">
+        <thead>
+          <tr>
+            <th>Course Name</th>
+            <th>Grade</th>
+            <th>Credits</th>
+            <th>Type</th>
+          </tr>
+        </thead>
+        <tbody id="gpa-rows-body">
+          <tr class="gpa-row">
+            <td><input type="text" class="form-input course-name" value="English" /></td>
+            <td>
+              <select class="form-select course-grade">
+                <option value="A" selected>A (4.0)</option>
+                <option value="A-">A- (3.7)</option>
+                <option value="B+">B+ (3.3)</option>
+                <option value="B">B (3.0)</option>
+                <option value="B-">B- (2.7)</option>
+                <option value="C+">C+ (2.3)</option>
+                <option value="C">C (2.0)</option>
+                <option value="D">D (1.0)</option>
+                <option value="F">F (0.0)</option>
+              </select>
+            </td>
+            <td><input type="number" class="form-input course-credits" value="3" min="1" max="10" /></td>
+            <td>
+              <select class="form-select course-type">
+                <option value="regular" selected>Regular</option>
+                <option value="honors">Honors (+0.5)</option>
+                <option value="ap">AP/IB (+1.0)</option>
+              </select>
+            </td>
+          </tr>
+          <tr class="gpa-row">
+            <td><input type="text" class="form-input course-name" value="Calculus" /></td>
+            <td>
+              <select class="form-select course-grade">
+                <option value="A">A (4.0)</option>
+                <option value="A-">A- (3.7)</option>
+                <option value="B+" selected>B+ (3.3)</option>
+                <option value="B">B (3.0)</option>
+                <option value="B-">B- (2.7)</option>
+                <option value="C">C (2.0)</option>
+                <option value="F">F (0.0)</option>
+              </select>
+            </td>
+            <td><input type="number" class="form-input course-credits" value="4" min="1" max="10" /></td>
+            <td>
+              <select class="form-select course-type">
+                <option value="regular">Regular</option>
+                <option value="honors">Honors (+0.5)</option>
+                <option value="ap" selected>AP/IB (+1.0)</option>
+              </select>
+            </td>
+          </tr>
+          <tr class="gpa-row">
+            <td><input type="text" class="form-input course-name" value="Physics" /></td>
+            <td>
+              <select class="form-select course-grade">
+                <option value="A" selected>A (4.0)</option>
+                <option value="B">B (3.0)</option>
+                <option value="C">C (2.0)</option>
+                <option value="F">F (0.0)</option>
+              </select>
+            </td>
+            <td><input type="number" class="form-input course-credits" value="4" min="1" max="10" /></td>
+            <td>
+              <select class="form-select course-type">
+                <option value="regular" selected>Regular</option>
+                <option value="honors">Honors (+0.5)</option>
+                <option value="ap">AP/IB (+1.0)</option>
+              </select>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <div slot="results">
+    <div class="result-hero">
+      <span class="result-hero-label">Calculated GPA</span>
+      <span class="result-hero-value" id="gpa-val">3.84</span>
+      <span class="result-hero-subtext" id="gpa-sub">11 Total Credit Hours</span>
+    </div>
+  </div>
+
+  <div slot="how-to">
+    <ol>
+      <li><strong>List your courses:</strong> Enter each class name.</li>
+      <li><strong>Select Letter Grade and Credits:</strong> Assign the credit hours (typically 3 or 4 per class).</li>
+      <li><strong>Mark Honors or AP:</strong> Include academic weighting if applicable.</li>
+    </ol>
+  </div>
+
+  <div slot="formula">
+    <pre><code>GPA = Σ (Grade Points × Credits) ÷ Σ (Credits)</code></pre>
+  </div>
+
+  <div slot="examples-table">
+    <table class="data-table">
+      <thead>
+        <tr>
+          <th>Letter Grade</th>
+          <th>Standard (4.0)</th>
+          <th>Honors (+0.5)</th>
+          <th>AP / IB (+1.0)</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr><td>A / A+</td><td>4.0</td><td>4.5</td><td>5.0</td></tr>
+        <tr><td>A-</td><td>3.7</td><td>4.2</td><td>4.7</td></tr>
+        <tr><td>B+</td><td>3.3</td><td>3.8</td><td>4.3</td></tr>
+        <tr><td>B</td><td>3.0</td><td>3.5</td><td>4.0</td></tr>
+        <tr><td>B-</td><td>2.7</td><td>3.2</td><td>3.7</td></tr>
+        <tr><td>C+</td><td>2.3</td><td>2.8</td><td>3.3</td></tr>
+        <tr><td>C</td><td>2.0</td><td>2.5</td><td>3.0</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div slot="faq">
+    <FaqAccordion items={faqs} />
+  </div>
+
+  <div slot="related-tools">
+    <div class="related-tools-grid">
+      <a href="/math/grade-calculator" class="card related-tool-card">
+        <h3>Grade / Test Calculator</h3>
+        <p>Calculate test grades and required final exam scores.</p>
+      </a>
+      <a href="/math/percentage-calculator" class="card related-tool-card">
+        <h3>Percentage Calculator</h3>
+        <p>Convert scores and points into standard percentages.</p>
+      </a>
+    </div>
+  </div>
+</ToolShell>
+
+<JsonLd schema={[webAppSchema, generateFaqJsonLd(faqs), generateBreadcrumbJsonLd([{ name: 'Home', item: '/' }, { name: 'Math', item: '/math' }, { name: 'GPA Calculator', item: '/math/gpa-calculator' }])]} />
+
+<style>
+  .gpa-table-wrapper {
+    overflow-x: auto;
+    background-color: var(--color-surface);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-md);
+    padding: var(--space-3);
+  }
+
+  .gpa-inputs-table {
+    width: 100%;
+    border-collapse: collapse;
+  }
+
+  .gpa-inputs-table th,
+  .gpa-inputs-table td {
+    padding: var(--space-2);
+  }
+
+  .gpa-inputs-table th {
+    text-align: left;
+    font-size: var(--text-sm);
+    color: var(--color-text-muted);
+  }
+
+  .course-credits {
+    width: 70px;
+  }
+</style>
+
+<script>
+  import { calculateGpa, type CourseGrade } from '@lib/calc/gpa';
+  import { parseNumberInput } from '@lib/format/number';
+
+  function initGpa() {
+    const rows = document.querySelectorAll('.gpa-row');
+    const gpaVal = document.getElementById('gpa-val');
+    const gpaSub = document.getElementById('gpa-sub');
+
+    function update() {
+      const courses: CourseGrade[] = [];
+
+      rows.forEach(r => {
+        const name = (r.querySelector('.course-name') as HTMLInputElement)?.value || '';
+        const grade = (r.querySelector('.course-grade') as HTMLSelectElement)?.value || 'A';
+        const credits = parseNumberInput((r.querySelector('.course-credits') as HTMLInputElement)?.value, 3);
+        const courseType = (r.querySelector('.course-type') as HTMLSelectElement)?.value as 'regular' | 'honors' | 'ap';
+
+        courses.push({ name, grade, credits, courseType });
+      });
+
+      const res = calculateGpa(courses);
+      if (gpaVal) gpaVal.textContent = res.gpa.toFixed(2);
+      if (gpaSub) gpaSub.textContent = `${res.totalCredits} Total Credit Hours`;
+    }
+
+    document.querySelectorAll('.gpa-inputs-table select, .gpa-inputs-table input').forEach(el => {
+      el.addEventListener('input', update);
+      el.addEventListener('change', update);
+    });
+
+    update();
+  }
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initGpa);
+  } else {
+    initGpa();
+  }
+</script>

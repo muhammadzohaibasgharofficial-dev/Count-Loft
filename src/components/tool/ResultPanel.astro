@@ -1,0 +1,102 @@
+---
+/**
+ * Count Loft — ResultPanel Component
+ * Accessible, prominent result display with hero metric, breakdown items, and action bar.
+ */
+import CopyButton from '@components/tool/CopyButton.astro';
+import ShareButton from '@components/tool/ShareButton.astro';
+
+export interface BreakdownRow {
+  label: string;
+  value: string;
+  subtext?: string;
+}
+
+export interface Props {
+  heroLabel: string;
+  heroValue: string;
+  heroSubtext?: string;
+  breakdown?: BreakdownRow[];
+  calculatorTitle?: string;
+}
+
+const {
+  heroLabel,
+  heroValue,
+  heroSubtext,
+  breakdown = [],
+  calculatorTitle
+} = Astro.props;
+---
+
+<div class="result-panel-container" role="region" aria-live="polite" aria-atomic="true">
+  <div class="result-hero" id="result-hero-box">
+    <span class="result-hero-label">{heroLabel}</span>
+    <span class="result-hero-value" id="result-hero-display">{heroValue}</span>
+    {heroSubtext && <span class="result-hero-subtext">{heroSubtext}</span>}
+  </div>
+
+  {breakdown.length > 0 && (
+    <div class="result-breakdown-list">
+      {breakdown.map((row) => (
+        <div class="breakdown-row">
+          <span class="breakdown-label">{row.label}</span>
+          <span class="breakdown-value">{row.value}</span>
+        </div>
+      ))}
+    </div>
+  )}
+
+  <div class="result-actions-bar">
+    <CopyButton targetId="result-hero-box" label="Copy Result" />
+    <ShareButton title={calculatorTitle} label="Share" />
+  </div>
+</div>
+
+<style>
+  .result-panel-container {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-4);
+  }
+
+  .result-hero-subtext {
+    font-size: var(--text-xs);
+    color: var(--color-text-muted);
+    margin-top: var(--space-1);
+  }
+
+  .result-breakdown-list {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-2);
+    padding: var(--space-3) 0;
+    border-top: 1px solid var(--color-border);
+    border-bottom: 1px solid var(--color-border);
+  }
+
+  .breakdown-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: var(--text-sm);
+  }
+
+  .breakdown-label {
+    color: var(--color-text-muted);
+  }
+
+  .breakdown-value {
+    font-weight: var(--font-weight-semibold);
+    color: var(--color-text);
+    font-variant-numeric: tabular-nums;
+  }
+
+  .result-actions-bar {
+    display: flex;
+    gap: var(--space-3);
+    align-items: center;
+    flex-wrap: wrap;
+    padding-top: var(--space-2);
+  }
+</style>

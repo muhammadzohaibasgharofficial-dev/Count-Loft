@@ -1,0 +1,238 @@
+---
+import ToolShell from '@components/tool/ToolShell.astro';
+import FaqAccordion from '@components/tool/FaqAccordion.astro';
+import JsonLd from '@components/seo/JsonLd.astro';
+import { buildBreadcrumbs } from '@lib/format/breadcrumbs';
+import { generateWebApplicationJsonLd, generateFaqJsonLd, generateBreadcrumbJsonLd } from '@lib/seo/jsonld';
+import taxData from '@data/pk-tax-slabs.json';
+
+const breadcrumbs = buildBreadcrumbs([
+  { label: 'Pakistan', href: '/pakistan' },
+  { label: 'Income Tax Calculator (FBR)' }
+]);
+
+const faqs = [
+  {
+    question: 'What is the salary tax threshold in Pakistan for Tax Year 2026-27?',
+    answer: 'Salaried individuals earning up to Rs. 600,000 annually (Rs. 50,000 per month) are completely exempt from income tax under the FBR Finance Act.'
+  },
+  {
+    question: 'How is income tax calculated on salary above Rs. 600,000?',
+    answer: 'Income between Rs. 600,001 and Rs. 1,200,000 is taxed at 5% of the amount exceeding Rs. 600,000. For higher brackets, a fixed base tax plus progressive marginal rates of 15%, 25%, 30%, and 35% apply.'
+  },
+  {
+    question: 'What is the high-earner surcharge in Pakistan?',
+    answer: 'A 10% super-tax surcharge is levied on total income tax payable by individuals whose annual taxable income exceeds Rs. 10 million.'
+  },
+  {
+    question: 'Is tax deducted monthly or annually?',
+    answer: 'Employers in Pakistan deduct income tax at source (Withholding Tax under Section 149) on an equated monthly basis from the employee\'s paycheck.'
+  },
+  {
+    question: 'How do I claim tax credits for donations or health insurance?',
+    answer: 'Employees can claim tax rebates on eligible charitable donations to approved institutions (Section 61) and health insurance premiums when filing their annual tax return via the FBR Iris portal.'
+  }
+];
+
+const webAppSchema = generateWebApplicationJsonLd({
+  name: 'Pakistan Income Tax Calculator (FBR 2026-27) — Count Loft',
+  description: 'Calculate salary income tax, monthly deductions, net take-home pay, and FBR slabs for salaried individuals in Pakistan.',
+  url: 'https://count-loft.com/pakistan/income-tax-calculator',
+  category: 'FinanceApplication'
+});
+---
+
+<ToolShell
+  title="Pakistan Income Tax Calculator (FBR 2026-27)"
+  description="Calculate monthly salary tax deductions, net take-home pay, and annual tax liability based on the latest Federal Board of Revenue (FBR) Finance Act slabs."
+  category="pakistan"
+  breadcrumbs={breadcrumbs}
+  author="Count Loft Team"
+  lastUpdated="2026-10-31"
+>
+  <div slot="inputs">
+    <div class="data-badge-notice">
+      Official Source: {taxData.source} (Tax Year {taxData.taxYear}) • Verified: {taxData.lastVerified}
+    </div>
+
+    <form id="pk-tax-form" novalidate onsubmit="return false;">
+      <div class="form-group">
+        <label for="pk-tax-monthly" class="form-label">Monthly Gross Salary (PKR)</label>
+        <input type="number" id="pk-tax-monthly" class="form-input" value="150000" min="0" step="5000" />
+      </div>
+
+      <div class="form-group">
+        <label for="pk-tax-annual-inp" class="form-label">Or Annual Gross Salary (PKR)</label>
+        <input type="number" id="pk-tax-annual-inp" class="form-input" value="1800000" min="0" step="50000" />
+      </div>
+    </form>
+  </div>
+
+  <div slot="results">
+    <div class="result-hero">
+      <span class="result-hero-label">Net Monthly Take-Home Pay</span>
+      <span class="result-hero-value" id="pk-takehome-val">Rs 139,997</span>
+      <span class="result-hero-subtext" id="pk-monthly-tax">Monthly Tax Deduction: Rs 10,000</span>
+    </div>
+
+    <div class="pk-breakdown-table">
+      <div class="breakdown-row">
+        <span>Annual Gross Salary:</span>
+        <strong id="pk-annual-gross">Rs 1,800,000</strong>
+      </div>
+      <div class="breakdown-row">
+        <span>Total Annual Income Tax:</span>
+        <strong id="pk-annual-tax">Rs 120,000</strong>
+      </div>
+      <div class="breakdown-row">
+        <span>Effective Tax Rate:</span>
+        <strong id="pk-effective-rate">6.7%</strong>
+      </div>
+      <div class="breakdown-row">
+        <span>Applied FBR Tax Slab:</span>
+        <strong id="pk-slab-disp">Rs. 30,000 + 15% on excess over Rs. 1,200,000</strong>
+      </div>
+    </div>
+  </div>
+
+  <div slot="how-to">
+    <ol>
+      <li><strong>Enter monthly or annual salary:</strong> Type your monthly paycheck; the annual salary syncs automatically.</li>
+      <li><strong>Review monthly tax deduction:</strong> See the exact withholding tax your employer deducts each month.</li>
+      <li><strong>Compare FBR slabs:</strong> Check which progressive slab your income bracket falls into.</li>
+    </ol>
+  </div>
+
+  <div slot="formula">
+    <pre><code>FBR Tax Slabs (Salaried Individuals 2026-27):
+• Up to Rs. 600,000: 0%
+• Rs. 600,001 – 1,200,000: 5% of amount exceeding Rs. 600,000
+• Rs. 1,200,001 – 2,200,000: Rs. 30,000 + 15% of amount exceeding Rs. 1,200,000
+• Rs. 2,200,001 – 3,200,000: Rs. 180,000 + 25% of amount exceeding Rs. 2,200,000
+• Rs. 3,200,001 – 4,100,000: Rs. 430,000 + 30% of amount exceeding Rs. 3,200,000
+• Above Rs. 4,100,000: Rs. 700,000 + 35% of amount exceeding Rs. 4,100,000
+* Income above Rs. 10M: +10% High-Earner Surcharge</code></pre>
+  </div>
+
+  <div slot="examples-table">
+    <table class="data-table">
+      <thead>
+        <tr>
+          <th>Monthly Salary</th>
+          <th>Annual Gross</th>
+          <th>Annual Tax</th>
+          <th>Monthly Tax</th>
+          <th>Effective Rate</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr><td>Rs 50,000</td><td>Rs 600,000</td><td>Rs 0</td><td>Rs 0</td><td>0.0%</td></tr>
+        <tr><td>Rs 100,000</td><td>Rs 1,200,000</td><td>Rs 30,000</td><td>Rs 2,500</td><td>2.5%</td></tr>
+        <tr><td>Rs 150,000</td><td>Rs 1,800,000</td><td>Rs 120,000</td><td>Rs 10,000</td><td>6.7%</td></tr>
+        <tr><td>Rs 250,000</td><td>Rs 3,000,000</td><td>Rs 380,000</td><td>Rs 31,667</td><td>12.7%</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div slot="faq">
+    <FaqAccordion items={faqs} />
+  </div>
+
+  <div slot="related-tools">
+    <div class="related-tools-grid">
+      <a href="/pakistan/electricity-bill-calculator" class="card related-tool-card">
+        <h3>Pakistan Electricity Bill Calculator</h3>
+        <p>Calculate LESCO, IESCO, K-Electric bills with uniform NEPRA slabs and FPA.</p>
+      </a>
+      <a href="/islamic/zakat-calculator" class="card related-tool-card">
+        <h3>Zakat Calculator</h3>
+        <p>Calculate zakat at 2.5% on qualifying wealth above current Nisab.</p>
+      </a>
+    </div>
+  </div>
+</ToolShell>
+
+<JsonLd schema={[webAppSchema, generateFaqJsonLd(faqs), generateBreadcrumbJsonLd([{ name: 'Home', item: '/' }, { name: 'Pakistan', item: '/pakistan' }, { name: 'Income Tax Calculator', item: '/pakistan/income-tax-calculator' }])]} />
+
+<style>
+  .data-badge-notice {
+    font-size: var(--text-xs);
+    background-color: var(--color-bg-subtle);
+    padding: var(--space-2) var(--space-3);
+    border-radius: var(--radius-sm);
+    margin-bottom: var(--space-4);
+    border: 1px solid var(--color-border);
+    color: var(--color-text-muted);
+  }
+
+  .pk-breakdown-table {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-2);
+    padding: var(--space-4) 0;
+    border-top: 1px solid var(--color-border);
+    margin-top: var(--space-4);
+    font-size: var(--text-sm);
+  }
+
+  .breakdown-row {
+    display: flex;
+    justify-content: space-between;
+  }
+</style>
+
+<script>
+  import { calculatePkTax } from '@lib/calc/pk-tax';
+  import { parseNumberInput } from '@lib/format/number';
+
+  function initPkTax() {
+    const monthlyIn = document.getElementById('pk-tax-monthly') as HTMLInputElement | null;
+    const annualIn = document.getElementById('pk-tax-annual-inp') as HTMLInputElement | null;
+
+    const takehomeDisplay = document.getElementById('pk-takehome-val');
+    const monthlyTaxDisplay = document.getElementById('pk-monthly-tax');
+    const annualGrossDisplay = document.getElementById('pk-annual-gross');
+    const annualTaxDisplay = document.getElementById('pk-annual-tax');
+    const effectiveDisplay = document.getElementById('pk-effective-rate');
+    const slabDisplay = document.getElementById('pk-slab-disp');
+
+    function formatPkr(val: number): string {
+      return `Rs ${Math.round(val).toLocaleString()}`;
+    }
+
+    function updateFromMonthly() {
+      const monthly = parseNumberInput(monthlyIn?.value, 150000);
+      if (annualIn) annualIn.value = String(monthly * 12);
+      render(monthly);
+    }
+
+    function updateFromAnnual() {
+      const annual = parseNumberInput(annualIn?.value, 1800000);
+      const monthly = Math.round(annual / 12);
+      if (monthlyIn) monthlyIn.value = String(monthly);
+      render(monthly);
+    }
+
+    function render(monthly: number) {
+      const res = calculatePkTax(monthly);
+
+      if (takehomeDisplay) takehomeDisplay.textContent = formatPkr(res.netMonthlySalary);
+      if (monthlyTaxDisplay) monthlyTaxDisplay.textContent = `Monthly Tax Deduction: ${formatPkr(res.monthlyTax)}`;
+      if (annualGrossDisplay) annualGrossDisplay.textContent = formatPkr(res.annualSalary);
+      if (annualTaxDisplay) annualTaxDisplay.textContent = formatPkr(res.annualTax);
+      if (effectiveDisplay) effectiveDisplay.textContent = `${res.effectiveRate}%`;
+      if (slabDisplay) slabDisplay.textContent = res.slabApplied;
+    }
+
+    monthlyIn?.addEventListener('input', updateFromMonthly);
+    annualIn?.addEventListener('input', updateFromAnnual);
+
+    updateFromMonthly();
+  }
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initPkTax);
+  } else {
+    initPkTax();
+  }
+</script>

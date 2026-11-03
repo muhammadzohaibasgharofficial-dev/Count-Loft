@@ -1,0 +1,254 @@
+---
+import ToolShell from '@components/tool/ToolShell.astro';
+import FaqAccordion from '@components/tool/FaqAccordion.astro';
+import JsonLd from '@components/seo/JsonLd.astro';
+import { buildBreadcrumbs } from '@lib/format/breadcrumbs';
+import { generateWebApplicationJsonLd, generateFaqJsonLd, generateBreadcrumbJsonLd } from '@lib/seo/jsonld';
+
+const breadcrumbs = buildBreadcrumbs([
+  { label: 'Converters', href: '/converters' },
+  { label: 'Weight Converter' }
+]);
+
+const faqs = [
+  {
+    question: 'How many pounds are in a kilogram?',
+    answer: 'There are exactly 2.20462262 pounds in 1 kilogram. For quick mental estimates, multiply kilograms by 2.2.'
+  },
+  {
+    question: 'How many grams are in an ounce?',
+    answer: 'One international avoirdupois ounce equals approximately 28.3495 grams.'
+  },
+  {
+    question: 'What is a stone?',
+    answer: 'A stone (st) is an imperial unit of mass widely used in the UK and Ireland for human body weight. One stone equals exactly 14 pounds (approx. 6.35029 kg).'
+  },
+  {
+    question: 'What is the difference between mass and weight?',
+    answer: 'Mass is the intrinsic amount of matter in an object (measured in kilograms). Weight is the downward force exerted on that mass by gravity (W = m × g).'
+  },
+  {
+    question: 'How many pounds are in a metric ton?',
+    answer: 'One metric ton (1,000 kilograms) equals approximately 2,204.62 pounds. An imperial short ton is 2,000 pounds.'
+  }
+];
+
+const webAppSchema = generateWebApplicationJsonLd({
+  name: 'Weight Converter — Count Loft',
+  description: 'Convert between kilograms, pounds, ounces, grams, milligrams, stones, and metric tons.',
+  url: 'https://count-loft.com/converters/weight-converter',
+  category: 'WebApplication'
+});
+---
+
+<ToolShell
+  title="Weight Converter"
+  description="Convert mass and weight between metric and imperial systems including kilograms, pounds, grams, ounces, and stones."
+  category="converters"
+  breadcrumbs={breadcrumbs}
+  author="Count Loft Team"
+  lastUpdated="2026-10-31"
+>
+  <div slot="inputs">
+    <form id="wt-form" novalidate onsubmit="return false;">
+      <div class="form-group">
+        <label for="wt-input-val" class="form-label">Value to Convert</label>
+        <input type="number" id="wt-input-val" class="form-input" value="70" step="any" />
+      </div>
+
+      <div class="form-row-2">
+        <div class="form-group">
+          <label for="wt-from-unit" class="form-label">From Unit</label>
+          <select id="wt-from-unit" class="form-input">
+            <option value="kilogram" selected>Kilograms (kg)</option>
+            <option value="pound">Pounds (lb)</option>
+            <option value="gram">Grams (g)</option>
+            <option value="ounce">Ounces (oz)</option>
+            <option value="stone">Stones (st)</option>
+            <option value="metric_ton">Metric Tons (t)</option>
+            <option value="milligram">Milligrams (mg)</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label for="wt-to-unit" class="form-label">To Unit</label>
+          <select id="wt-to-unit" class="form-input">
+            <option value="kilogram">Kilograms (kg)</option>
+            <option value="pound" selected>Pounds (lb)</option>
+            <option value="gram">Grams (g)</option>
+            <option value="ounce">Ounces (oz)</option>
+            <option value="stone">Stones (st)</option>
+            <option value="metric_ton">Metric Tons (t)</option>
+            <option value="milligram">Milligrams (mg)</option>
+          </select>
+        </div>
+      </div>
+    </form>
+  </div>
+
+  <div slot="results">
+    <div class="result-hero">
+      <span class="result-hero-label">Converted Weight</span>
+      <span class="result-hero-value" id="wt-result-val">154.3236 lb</span>
+      <span class="result-hero-subtext" id="wt-formula-val">70 kg = 154.3236 lb</span>
+    </div>
+
+    <div class="wt-breakdown-table">
+      <div class="breakdown-row">
+        <span>In Grams:</span>
+        <strong id="wt-g-val">70,000 g</strong>
+      </div>
+      <div class="breakdown-row">
+        <span>In Ounces:</span>
+        <strong id="wt-oz-val">2,469.177 oz</strong>
+      </div>
+      <div class="breakdown-row">
+        <span>In Stones:</span>
+        <strong id="wt-st-val">11.023 st</strong>
+      </div>
+      <div class="breakdown-row">
+        <span>In Metric Tons:</span>
+        <strong id="wt-t-val">0.07 t</strong>
+      </div>
+    </div>
+  </div>
+
+  <div slot="how-to">
+    <ol>
+      <li><strong>Enter mass quantity:</strong> Input the numeric value you want to convert.</li>
+      <li><strong>Select source and target units:</strong> Choose from standard metric or imperial mass designations.</li>
+      <li><strong>Compare cross-equivalents:</strong> Instantly view simultaneous conversions across all common scales.</li>
+    </ol>
+  </div>
+
+  <div slot="formula">
+    <pre><code>Base Unit: 1 Kilogram (kg)
+1 Pound (lb) = 0.45359237 kg
+1 Ounce (oz) = 0.02834952 kg
+1 Stone (st) = 6.35029318 kg
+1 Ton (t)    = 1,000 kg</code></pre>
+  </div>
+
+  <div slot="examples-table">
+    <table class="data-table">
+      <thead>
+        <tr>
+          <th>Kilograms (kg)</th>
+          <th>Pounds (lb)</th>
+          <th>Stones & Pounds</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr><td>50 kg</td><td>110.23 lb</td><td>7 st 12 lb</td></tr>
+        <tr><td>60 kg</td><td>132.28 lb</td><td>9 st 6 lb</td></tr>
+        <tr><td>70 kg</td><td>154.32 lb</td><td>11 st 0 lb</td></tr>
+        <tr><td>80 kg</td><td>176.37 lb</td><td>12 st 8 lb</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div slot="faq">
+    <FaqAccordion items={faqs} />
+  </div>
+
+  <div slot="related-tools">
+    <div class="related-tools-grid">
+      <a href="/converters/length-converter" class="card related-tool-card">
+        <h3>Length Converter</h3>
+        <p>Convert meters, feet, inches, kilometers, and miles.</p>
+      </a>
+      <a href="/health/bmi-calculator" class="card related-tool-card">
+        <h3>BMI Calculator</h3>
+        <p>Evaluate healthy weight ranges using height and body mass.</p>
+      </a>
+    </div>
+  </div>
+</ToolShell>
+
+<JsonLd schema={[webAppSchema, generateFaqJsonLd(faqs), generateBreadcrumbJsonLd([{ name: 'Home', item: '/' }, { name: 'Converters', item: '/converters' }, { name: 'Weight Converter', item: '/converters/weight-converter' }])]} />
+
+<style>
+  .form-row-2 {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: var(--space-4);
+  }
+
+  @media (min-width: 640px) {
+    .form-row-2 {
+      grid-template-columns: 1fr 1fr;
+    }
+  }
+
+  .wt-breakdown-table {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-2);
+    padding: var(--space-4) 0;
+    border-top: 1px solid var(--color-border);
+    margin-top: var(--space-4);
+    font-size: var(--text-sm);
+  }
+
+  .breakdown-row {
+    display: flex;
+    justify-content: space-between;
+  }
+</style>
+
+<script>
+  import { convertWeight } from '@lib/calc/units';
+  import { parseNumberInput } from '@lib/format/number';
+
+  function initWeight() {
+    const valIn = document.getElementById('wt-input-val') as HTMLInputElement | null;
+    const fromIn = document.getElementById('wt-from-unit') as HTMLSelectElement | null;
+    const toIn = document.getElementById('wt-to-unit') as HTMLSelectElement | null;
+
+    const resDisplay = document.getElementById('wt-result-val');
+    const formDisplay = document.getElementById('wt-formula-val');
+    const gDisplay = document.getElementById('wt-g-val');
+    const ozDisplay = document.getElementById('wt-oz-val');
+    const stDisplay = document.getElementById('wt-st-val');
+    const tDisplay = document.getElementById('wt-t-val');
+
+    const unitSymbols: Record<string, string> = {
+      kilogram: 'kg',
+      pound: 'lb',
+      gram: 'g',
+      ounce: 'oz',
+      stone: 'st',
+      metric_ton: 't',
+      milligram: 'mg'
+    };
+
+    function update() {
+      const val = parseNumberInput(valIn?.value, 70);
+      const from = fromIn?.value || 'kilogram';
+      const to = toIn?.value || 'pound';
+
+      const result = convertWeight(val, from, to);
+      const toSym = unitSymbols[to] || to;
+      const fromSym = unitSymbols[from] || from;
+
+      if (resDisplay) resDisplay.textContent = `${result} ${toSym}`;
+      if (formDisplay) formDisplay.textContent = `${val} ${fromSym} = ${result} ${toSym}`;
+
+      if (gDisplay) gDisplay.textContent = `${convertWeight(val, from, 'gram')} g`;
+      if (ozDisplay) ozDisplay.textContent = `${convertWeight(val, from, 'ounce')} oz`;
+      if (stDisplay) stDisplay.textContent = `${convertWeight(val, from, 'stone')} st`;
+      if (tDisplay) tDisplay.textContent = `${convertWeight(val, from, 'metric_ton')} t`;
+    }
+
+    [valIn, fromIn, toIn].forEach(i => {
+      i?.addEventListener('input', update);
+      i?.addEventListener('change', update);
+    });
+    update();
+  }
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initWeight);
+  } else {
+    initWeight();
+  }
+</script>

@@ -1,0 +1,99 @@
+---
+/**
+ * Count Loft — Contact Page
+ * Truthful contact instructions per owner decision #4 (no fabricated addresses or phone numbers).
+ */
+import BaseLayout from '@components/layout/BaseLayout.astro';
+import Breadcrumbs from '@components/seo/Breadcrumbs.astro';
+import { buildBreadcrumbs } from '@lib/format/breadcrumbs';
+
+const breadcrumbs = buildBreadcrumbs([
+  { label: 'Contact Us' }
+]);
+---
+
+<BaseLayout
+  title="Contact Count Loft — Feedback and Inquiries"
+  description="Contact the Count Loft team for technical support, feedback, calculator suggestions, and general inquiries."
+>
+  <div class="container article-page-container">
+    <Breadcrumbs items={breadcrumbs} />
+
+    <header class="page-header">
+      <h1>Contact Us</h1>
+      <p class="lead-text">
+        Have a question, suggestion, or calculation request? We would love to hear from you.
+      </p>
+    </header>
+
+    <article class="article-content">
+      <div class="card contact-card">
+        <h2>Direct Email Inquiries</h2>
+        <p>
+          For general inquiries, bug reports, and feedback, please email our support team directly at:
+        </p>
+        <p class="contact-email">
+          <strong>contact@count-loft.com</strong>
+        </p>
+        <p class="helper-note">
+          We review messages regularly and aim to respond to constructive technical queries within 48 business hours.
+        </p>
+      </div>
+
+      <h2>Reporting a Calculation Issue</h2>
+      <p>
+        If you suspect a formula discrepancy or have found an edge case where a tool yields unexpected numbers, please provide:
+      </p>
+      <ul>
+        <li>The specific calculator name and URL.</li>
+        <li>The exact input values entered.</li>
+        <li>The expected result along with your mathematical source or authority.</li>
+      </ul>
+      <p>
+        You can also use our dedicated <a href="/corrections">Corrections and Feedback page</a> for submitting factual adjustments.
+      </p>
+    </article>
+  </div>
+</BaseLayout>
+
+<style>
+  .article-page-container {
+    padding-top: var(--space-6);
+    padding-bottom: var(--space-8);
+  }
+
+  .page-header {
+    margin-bottom: var(--space-6);
+  }
+
+  .lead-text {
+    font-size: var(--text-h3);
+    color: var(--color-text-muted);
+    margin-top: var(--space-2);
+  }
+
+  .contact-card {
+    padding: var(--space-5);
+    margin-bottom: var(--space-6);
+    background-color: var(--color-surface);
+  }
+
+  .contact-card h2 {
+    margin-top: 0;
+  }
+
+  .contact-email {
+    font-size: 1.25rem;
+    color: var(--color-primary);
+    padding: var(--space-3);
+    background-color: var(--color-surface-muted);
+    border-radius: var(--radius-md);
+    display: inline-block;
+  }
+
+  .helper-note {
+    font-size: var(--text-sm);
+    color: var(--color-text-muted);
+    margin-top: var(--space-3);
+  }
+</style>

@@ -1,0 +1,83 @@
+---
+/**
+ * Count Loft — Corrections and Feedback Page
+ * Dedicated channel for reporting factual errors, formula updates, and tool requests.
+ */
+import BaseLayout from '@components/layout/BaseLayout.astro';
+import Breadcrumbs from '@components/seo/Breadcrumbs.astro';
+import { buildBreadcrumbs } from '@lib/format/breadcrumbs';
+
+const breadcrumbs = buildBreadcrumbs([
+  { label: 'Corrections & Feedback' }
+]);
+---
+
+<BaseLayout
+  title="Corrections & Feedback — Count Loft"
+  description="Submit factual updates, formula corrections, tariff changes, or tool suggestions to the Count Loft engineering team."
+>
+  <div class="container article-page-container">
+    <Breadcrumbs items={breadcrumbs} />
+
+    <header class="page-header">
+      <h1>Corrections & Feedback</h1>
+      <p class="lead-text">
+        We strive for 100% mathematical and factual accuracy. If you notice an error or an outdated tax slab, help us fix it.
+      </p>
+    </header>
+
+    <article class="article-content">
+      <div class="card policy-card">
+        <h2>Our Factual Correction Policy</h2>
+        <p>
+          Count Loft regularly audits and updates volatile reference data (such as income tax brackets, electricity tariffs, and conversion factors). Every time-sensitive calculator displays a visible <em>"Last verified"</em> timestamp and cited source.
+        </p>
+        <p>
+          When errors or newly notified official government rates are submitted with primary evidence, our team prioritizes making immediate updates.
+        </p>
+      </div>
+
+      <h2>How to Submit a Correction</h2>
+      <p>
+        To ensure prompt review, please send an email to <strong>contact@count-loft.com</strong> with the subject line <code>[Correction] Calculator Name</code> and include:
+      </p>
+      <ol>
+        <li><strong>Tool URL:</strong> The link to the calculator in question.</li>
+        <li><strong>Specific Value or Formula:</strong> The exact parameter or calculation you believe is inaccurate.</li>
+        <li><strong>Official Source Citation:</strong> A link to the official government notification, tax schedule, or published scientific standard supporting the adjustment.</li>
+        <li><strong>Sample Test Vector:</strong> An input and expected output hand-calculated with the updated rule.</li>
+      </ol>
+
+      <h2>Requesting New Calculators</h2>
+      <p>
+        Is there a tool you need that we don't have yet? Send us your suggestions! We continually expand our calculator library based on community demand.
+      </p>
+    </article>
+  </div>
+</BaseLayout>
+
+<style>
+  .article-page-container {
+    padding-top: var(--space-6);
+    padding-bottom: var(--space-8);
+  }
+
+  .page-header {
+    margin-bottom: var(--space-6);
+  }
+
+  .lead-text {
+    font-size: var(--text-h3);
+    color: var(--color-text-muted);
+    margin-top: var(--space-2);
+  }
+
+  .policy-card {
+    padding: var(--space-5);
+    margin-bottom: var(--space-6);
+  }
+
+  .policy-card h2 {
+    margin-top: 0;
+  }
+</style>

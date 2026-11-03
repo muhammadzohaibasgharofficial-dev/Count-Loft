@@ -1,0 +1,268 @@
+---
+import ToolShell from '@components/tool/ToolShell.astro';
+import FaqAccordion from '@components/tool/FaqAccordion.astro';
+import JsonLd from '@components/seo/JsonLd.astro';
+import { buildBreadcrumbs } from '@lib/format/breadcrumbs';
+import { generateWebApplicationJsonLd, generateFaqJsonLd, generateBreadcrumbJsonLd } from '@lib/seo/jsonld';
+import { HIJRI_MONTH_NAMES } from '@lib/calc/hijri';
+
+const breadcrumbs = buildBreadcrumbs([
+  { label: 'Islamic', href: '/islamic' },
+  { label: 'Hijri-Gregorian Converter' }
+]);
+
+const faqs = [
+  {
+    question: 'How does the Islamic (Hijri) calendar differ from the Gregorian calendar?',
+    answer: 'The Hijri calendar is strictly lunar, consisting of 12 lunar months of 29 or 30 days, totaling roughly 354 or 355 days per year. Because it is approximately 10 to 11 days shorter than the solar Gregorian year, Islamic dates cycle backward through the solar seasons every 33 years.'
+  },
+  {
+    question: 'When did the Islamic Hijri calendar begin?',
+    answer: 'The calendar begins from the Hijrah (migration) of the Prophet Muhammad (peace be upon him) from Makkah to Madinah in 622 CE, designated as Year 1 AH (Anno Hegirae).'
+  },
+  {
+    question: 'Can calculated Hijri dates differ by 1 day from local sightings?',
+    answer: 'Yes. Algorithmic calendars (such as the Umm al-Qura astronomical standard) calculate theoretical new moon conjunctions. Actual religious observance in specific countries depends upon physical visual crescent moon sightings (Ruet-e-Hilal).'
+  },
+  {
+    question: 'How do I use this converter to calculate my Hawl for Zakat?',
+    answer: 'Zakat is due once one full lunar year (354 days) elapses on qualifying wealth above Nisab. Use this tool to match your Gregorian financial milestone to its exact Hijri date.'
+  },
+  {
+    question: 'What are the four sacred months in the Islamic calendar?',
+    answer: 'The four sacred months (Al-Ashhur Al-Hurum) mentioned in the Quran are Dhu al-Qi\'dah, Dhu al-Hijjah, Muharram, and Rajab.'
+  }
+];
+
+const webAppSchema = generateWebApplicationJsonLd({
+  name: 'Hijri-Gregorian Date Converter — Count Loft',
+  description: 'Convert dates accurately between the Islamic Hijri (AH) and Gregorian (CE) calendars with astronomical algorithms.',
+  url: 'https://count-loft.com/islamic/hijri-gregorian-converter',
+  category: 'WebApplication'
+});
+---
+
+<ToolShell
+  title="Hijri-Gregorian Date Converter"
+  description="Convert dates bidirectionally between the Islamic lunar calendar (AH) and the Gregorian solar calendar (CE) using standard astronomical Julian Day algorithms."
+  category="islamic"
+  breadcrumbs={breadcrumbs}
+  author="Count Loft Team"
+  lastUpdated="2026-10-31"
+>
+  <div slot="inputs">
+    <form id="hijri-form" novalidate onsubmit="return false;">
+      <div class="form-group">
+        <label for="hij-greg-date" class="form-label">Select Gregorian Date (CE)</label>
+        <input type="date" id="hij-greg-date" class="form-input" />
+      </div>
+
+      <div class="divider-text">OR CONVERT FROM HIJRI DATE</div>
+
+      <div class="form-row-3">
+        <div class="form-group">
+          <label for="hij-day" class="form-label">Hijri Day</label>
+          <input type="number" id="hij-day" class="form-input" value="1" min="1" max="30" />
+        </div>
+        <div class="form-group">
+          <label for="hij-month" class="form-label">Hijri Month</label>
+          <select id="hij-month" class="form-input">
+            {HIJRI_MONTH_NAMES.map((m, idx) => (
+              <option value={idx + 1}>{idx + 1} — {m}</option>
+            ))}
+          </select>
+        </div>
+        <div class="form-group">
+          <label for="hij-year" class="form-label">Hijri Year (AH)</label>
+          <input type="number" id="hij-year" class="form-input" value="1447" min="1" max="1700" />
+        </div>
+      </div>
+    </form>
+  </div>
+
+  <div slot="results">
+    <div class="result-hero">
+      <span class="result-hero-label">Islamic Hijri Date Equivalent</span>
+      <span class="result-hero-value" id="hij-result-val">—</span>
+      <span class="result-hero-subtext" id="hij-greg-back-val">—</span>
+    </div>
+
+    <div class="hij-breakdown-table">
+      <div class="breakdown-row">
+        <span>Hijri Year:</span>
+        <strong id="hij-yr-disp">—</strong>
+      </div>
+      <div class="breakdown-row">
+        <span>Hijri Month:</span>
+        <strong id="hij-mo-disp">—</strong>
+      </div>
+      <div class="breakdown-row">
+        <span>Hijri Day:</span>
+        <strong id="hij-day-disp">—</strong>
+      </div>
+      <div class="breakdown-row">
+        <span>Crescent Sighting Note:</span>
+        <span>Local moon visibility may vary by ±1 day</span>
+      </div>
+    </div>
+  </div>
+
+  <div slot="how-to">
+    <ol>
+      <li><strong>Select a Gregorian date:</strong> Choose any date from the calendar to view its corresponding Islamic date.</li>
+      <li><strong>Or input a Hijri date:</strong> Select day, Islamic month, and year (AH) to calculate the corresponding Gregorian day.</li>
+      <li><strong>Track religious milestones:</strong> Use accurate lunar calculations for Ramadan, Zakat hawl, and Eid scheduling.</li>
+    </ol>
+  </div>
+
+  <div slot="formula">
+    <pre><code>Astronomical Julian Day Number (JDN) Algorithmic Mapping:
+Gregorian Date  ⇄  Julian Day Number (JDN)  ⇄  Islamic Hijri Date
+Lunar Year Duration = ~354.367 Days
+Solar Year Duration = ~365.242 Days</code></pre>
+  </div>
+
+  <div slot="examples-table">
+    <table class="data-table">
+      <thead>
+        <tr>
+          <th>Islamic Month</th>
+          <th>Order</th>
+          <th>Significance</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr><td>Muharram</td><td>1st</td><td>Sacred month, Day of Ashura (10th)</td></tr>
+        <tr><td>Rabi al-Awwal</td><td>3rd</td><td>Mawlid un-Nabi (12th)</td></tr>
+        <tr><td>Rajab</td><td>7th</td><td>Sacred month, Isra and Mi'raj (27th)</td></tr>
+        <tr><td>Sha'ban</td><td>8th</td><td>Shab-e-Barat / 15th Sha'ban</td></tr>
+        <tr><td>Ramadan</td><td>9th</td><td>Obligatory Fasting & Revelation of Quran</td></tr>
+        <tr><td>Shawwal</td><td>10th</td><td>Eid al-Fitr (1st)</td></tr>
+        <tr><td>Dhu al-Hijjah</td><td>12th</td><td>Sacred month, Hajj pilgrimage & Eid al-Adha</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div slot="faq">
+    <FaqAccordion items={faqs} />
+  </div>
+
+  <div slot="related-tools">
+    <div class="related-tools-grid">
+      <a href="/islamic/zakat-calculator" class="card related-tool-card">
+        <h3>Zakat Calculator</h3>
+        <p>Calculate your annual religious dues based on lunar Hawl anniversary.</p>
+      </a>
+      <a href="/math/date-difference-calculator" class="card related-tool-card">
+        <h3>Date Difference Calculator</h3>
+        <p>Calculate elapsed days, weeks, months, and years between two dates.</p>
+      </a>
+    </div>
+  </div>
+</ToolShell>
+
+<JsonLd schema={[webAppSchema, generateFaqJsonLd(faqs), generateBreadcrumbJsonLd([{ name: 'Home', item: '/' }, { name: 'Islamic', item: '/islamic' }, { name: 'Hijri-Gregorian Converter', item: '/islamic/hijri-gregorian-converter' }])]} />
+
+<style>
+  .divider-text {
+    font-size: var(--text-xs);
+    font-weight: var(--font-semibold);
+    color: var(--color-text-muted);
+    text-align: center;
+    margin: var(--space-4) 0;
+    letter-spacing: 0.05em;
+  }
+
+  .form-row-3 {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: var(--space-3);
+  }
+
+  @media (min-width: 640px) {
+    .form-row-3 {
+      grid-template-columns: 1fr 2fr 1fr;
+    }
+  }
+
+  .hij-breakdown-table {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-2);
+    padding: var(--space-4) 0;
+    border-top: 1px solid var(--color-border);
+    margin-top: var(--space-4);
+    font-size: var(--text-sm);
+  }
+
+  .breakdown-row {
+    display: flex;
+    justify-content: space-between;
+  }
+</style>
+
+<script>
+  import { convertGregorianToHijri, convertHijriToGregorian } from '@lib/calc/hijri';
+  import { parseNumberInput } from '@lib/format/number';
+
+  function initHijri() {
+    const gregIn = document.getElementById('hij-greg-date') as HTMLInputElement | null;
+    const hDayIn = document.getElementById('hij-day') as HTMLInputElement | null;
+    const hMonthIn = document.getElementById('hij-month') as HTMLSelectElement | null;
+    const hYearIn = document.getElementById('hij-year') as HTMLInputElement | null;
+
+    const resultDisplay = document.getElementById('hij-result-val');
+    const gregBackDisplay = document.getElementById('hij-greg-back-val');
+    const yrDisplay = document.getElementById('hij-yr-disp');
+    const moDisplay = document.getElementById('hij-mo-disp');
+    const dayDisplay = document.getElementById('hij-day-disp');
+
+    // Default to today
+    if (gregIn && !gregIn.value) {
+      gregIn.value = new Date().toISOString().split('T')[0] || '2026-10-31';
+    }
+
+    function updateFromGregorian() {
+      const dateStr = gregIn?.value || '2026-10-31';
+      const hij = convertGregorianToHijri(dateStr);
+
+      if (resultDisplay) resultDisplay.textContent = hij.formatted;
+      const d = new Date(dateStr);
+      if (gregBackDisplay) {
+        gregBackDisplay.textContent = `Corresponding Gregorian: ${d.toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}`;
+      }
+      if (yrDisplay) yrDisplay.textContent = `${hij.year} AH`;
+      if (moDisplay) moDisplay.textContent = hij.monthName;
+      if (dayDisplay) dayDisplay.textContent = String(hij.day);
+
+      // Sync Hijri inputs without triggering infinite loop
+      if (hDayIn) hDayIn.value = String(hij.day);
+      if (hMonthIn) hMonthIn.value = String(hij.month);
+      if (hYearIn) hYearIn.value = String(hij.year);
+    }
+
+    function updateFromHijri() {
+      const y = parseNumberInput(hYearIn?.value, 1447);
+      const m = parseNumberInput(hMonthIn?.value, 9);
+      const d = parseNumberInput(hDayIn?.value, 1);
+
+      const greg = convertHijriToGregorian(y, m, d);
+      if (gregIn) gregIn.value = greg.formatted;
+      updateFromGregorian();
+    }
+
+    gregIn?.addEventListener('input', updateFromGregorian);
+    [hDayIn, hMonthIn, hYearIn].forEach(i => {
+      i?.addEventListener('input', updateFromHijri);
+      i?.addEventListener('change', updateFromHijri);
+    });
+
+    updateFromGregorian();
+  }
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initHijri);
+  } else {
+    initHijri();
+  }
+</script>

@@ -1,0 +1,15 @@
+{
+  "name": "pk-gold-rates",
+  "source": "All Pakistan Sarafa Gems and Jewellers Association (APSGJA) benchmark",
+  "lastVerified": "2026-10-31",
+  "currency": "PKR",
+  "gramsPerTola": 11.6638,
+  "rattiPerTola": 96,
+  "mashaPerTola": 12,
+  "rates": {
+    "24k": { "tola": 295000, "gram": 25292 },
+    "22k": { "tola": 270417, "gram": 23184 },
+    "21k": { "tola": 258125, "gram": 22130 },
+    "18k": { "tola": 221250, "gram": 18969 }
+  }
+}

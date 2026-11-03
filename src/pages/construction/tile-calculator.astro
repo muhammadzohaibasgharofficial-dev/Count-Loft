@@ -1,0 +1,255 @@
+---
+import ToolShell from '@components/tool/ToolShell.astro';
+import FaqAccordion from '@components/tool/FaqAccordion.astro';
+import JsonLd from '@components/seo/JsonLd.astro';
+import { buildBreadcrumbs } from '@lib/format/breadcrumbs';
+import { generateWebApplicationJsonLd, generateFaqJsonLd, generateBreadcrumbJsonLd } from '@lib/seo/jsonld';
+
+const breadcrumbs = buildBreadcrumbs([
+  { label: 'Construction', href: '/construction' },
+  { label: 'Tile Calculator' }
+]);
+
+const faqs = [
+  {
+    question: 'How do you calculate the number of tiles needed?',
+    answer: 'Calculate the total room area in square feet, divide by the area of a single tile in square feet (Length × Width ÷ 144), and add a 10% to 15% waste allowance for cuts and edge trimming.'
+  },
+  {
+    question: 'Why should I add waste allowance for tiles?',
+    answer: 'Cutting tiles to fit against walls, corners, plumbing fixtures, and baseboards generates scrap that cannot be reused. Additionally, keeping a box of surplus tiles guarantees exact color dye-lot matches for future repairs.'
+  },
+  {
+    question: 'How much waste should I add for diagonal or herringbone tile layouts?',
+    answer: 'Standard straight grid layouts require 10% waste. Diagonal or herringbone patterns produce substantially more corner triangles and cut waste, requiring 15% to 20% margin.'
+  },
+  {
+    question: 'How many tiles come in a box?',
+    answer: 'Box counts vary by tile size. Standard 12" × 12" tiles typically come in cartons of 10 to 15 pieces (10–15 sq ft), while large format 12" × 24" tiles often come in boxes of 6 to 8 pieces.'
+  },
+  {
+    question: 'Does this calculation include grout lines?',
+    answer: 'For standard tiles 6" or larger with 1/16" or 1/8" joints, grout lines make up less than 1% to 2% of total area and are absorbed into standard cutting waste factors.'
+  }
+];
+
+const webAppSchema = generateWebApplicationJsonLd({
+  name: 'Tile Calculator — Count Loft',
+  description: 'Calculate the number of floor or wall tiles and boxes needed for any room dimensions.',
+  url: 'https://count-loft.com/construction/tile-calculator',
+  category: 'WebApplication'
+});
+---
+
+<ToolShell
+  title="Tile Calculator"
+  description="Estimate total tiles and boxes required for floor, wall, and backsplash projects with customizable cut waste allowances."
+  category="construction"
+  breadcrumbs={breadcrumbs}
+  author="Count Loft Team"
+  lastUpdated="2026-10-31"
+>
+  <div slot="inputs">
+    <form id="tile-form" novalidate onsubmit="return false;">
+      <div class="form-row-2">
+        <div class="form-group">
+          <label for="tile-room-len" class="form-label">Room Length (Feet)</label>
+          <input type="number" id="tile-room-len" class="form-input" value="12" min="1" step="0.5" />
+        </div>
+        <div class="form-group">
+          <label for="tile-room-wid" class="form-label">Room Width (Feet)</label>
+          <input type="number" id="tile-room-wid" class="form-input" value="10" min="1" step="0.5" />
+        </div>
+      </div>
+
+      <div class="form-row-2">
+        <div class="form-group">
+          <label for="tile-len-in" class="form-label">Tile Length (Inches)</label>
+          <input type="number" id="tile-len-in" class="form-input" value="12" min="1" max="48" />
+        </div>
+        <div class="form-group">
+          <label for="tile-wid-in" class="form-label">Tile Width (Inches)</label>
+          <input type="number" id="tile-wid-in" class="form-input" value="12" min="1" max="48" />
+        </div>
+      </div>
+
+      <div class="form-row-2">
+        <div class="form-group">
+          <label for="tile-waste" class="form-label">Cutting Waste Margin</label>
+          <select id="tile-waste" class="form-input">
+            <option value="5">5% (Simple Square Room)</option>
+            <option value="10" selected>10% (Standard Straight Grid)</option>
+            <option value="15">15% (Diagonal / Many Corners)</option>
+            <option value="20">20% (Herringbone / Complex)</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label for="tile-box-count" class="form-label">Tiles per Box / Carton</label>
+          <input type="number" id="tile-box-count" class="form-input" value="10" min="1" max="50" />
+        </div>
+      </div>
+    </form>
+  </div>
+
+  <div slot="results">
+    <div class="result-hero">
+      <span class="result-hero-label">Total Tiles Required</span>
+      <span class="result-hero-value" id="tile-total-val">132 Tiles</span>
+      <span class="result-hero-subtext" id="tile-boxes-val">14 Boxes needed</span>
+    </div>
+
+    <div class="tile-breakdown-table">
+      <div class="breakdown-row">
+        <span>Room Surface Area:</span>
+        <strong id="tile-room-area">120 sq ft</strong>
+      </div>
+      <div class="breakdown-row">
+        <span>Single Tile Coverage:</span>
+        <strong id="tile-single-area">1.00 sq ft</strong>
+      </div>
+      <div class="breakdown-row">
+        <span>Exact Tile Count (No Waste):</span>
+        <strong id="tile-exact-val">120 Tiles</strong>
+      </div>
+      <div class="breakdown-row">
+        <span>Waste Factor Allowance:</span>
+        <strong id="tile-waste-qty">+12 Tiles (10%)</strong>
+      </div>
+    </div>
+  </div>
+
+  <div slot="how-to">
+    <ol>
+      <li><strong>Enter room footprint:</strong> Measure floor length and width in feet.</li>
+      <li><strong>Input tile dimensions:</strong> Enter the nominal size of your chosen tile in inches (e.g. 12" × 12" or 12" × 24").</li>
+      <li><strong>Select waste percentage:</strong> Add 10% for grid installations or 15% for diagonal layouts.</li>
+    </ol>
+  </div>
+
+  <div slot="formula">
+    <pre><code>Room Area (sq ft)    = Length (ft) × Width (ft)
+Tile Area (sq ft)    = (Tile Length (in) × Tile Width (in)) ÷ 144
+Exact Tiles Needed   = Room Area ÷ Tile Area
+Tiles with Waste     = ⌈ Exact Tiles × (1 + Waste% ÷ 100) ⌉
+Boxes to Purchase    = ⌈ Tiles with Waste ÷ Tiles per Box ⌉</code></pre>
+  </div>
+
+  <div slot="examples-table">
+    <table class="data-table">
+      <thead>
+        <tr>
+          <th>Room Size</th>
+          <th>Tile Size</th>
+          <th>Exact Tiles</th>
+          <th>With 10% Waste</th>
+          <th>Boxes (10/box)</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr><td>6 ft × 8 ft (Powder Room)</td><td>12" × 12"</td><td>48</td><td>53</td><td>6 Boxes</td></tr>
+        <tr><td>10 ft × 12 ft (Kitchen)</td><td>12" × 12"</td><td>120</td><td>132</td><td>14 Boxes</td></tr>
+        <tr><td>12 ft × 15 ft (Master Bath)</td><td>12" × 24"</td><td>90</td><td>99</td><td>13 Boxes (8/box)</td></tr>
+        <tr><td>16 ft × 20 ft (Basement)</td><td>12" × 12"</td><td>320</td><td>352</td><td>36 Boxes</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div slot="faq">
+    <FaqAccordion items={faqs} />
+  </div>
+
+  <div slot="related-tools">
+    <div class="related-tools-grid">
+      <a href="/construction/square-footage-calculator" class="card related-tool-card">
+        <h3>Square Footage Calculator</h3>
+        <p>Measure floor plans, wall areas, and material cost allocations.</p>
+      </a>
+      <a href="/construction/paint-calculator" class="card related-tool-card">
+        <h3>Paint Calculator</h3>
+        <p>Calculate interior paint gallons and surface area coverage.</p>
+      </a>
+    </div>
+  </div>
+</ToolShell>
+
+<JsonLd schema={[webAppSchema, generateFaqJsonLd(faqs), generateBreadcrumbJsonLd([{ name: 'Home', item: '/' }, { name: 'Construction', item: '/construction' }, { name: 'Tile Calculator', item: '/construction/tile-calculator' }])]} />
+
+<style>
+  .form-row-2 {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: var(--space-4);
+  }
+
+  @media (min-width: 640px) {
+    .form-row-2 {
+      grid-template-columns: 1fr 1fr;
+    }
+  }
+
+  .tile-breakdown-table {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-2);
+    padding: var(--space-4) 0;
+    border-top: 1px solid var(--color-border);
+    margin-top: var(--space-4);
+    font-size: var(--text-sm);
+  }
+
+  .breakdown-row {
+    display: flex;
+    justify-content: space-between;
+  }
+</style>
+
+<script>
+  import { calculateTiles } from '@lib/calc/construction';
+  import { parseNumberInput } from '@lib/format/number';
+
+  function initTiles() {
+    const rLenIn = document.getElementById('tile-room-len') as HTMLInputElement | null;
+    const rWidIn = document.getElementById('tile-room-wid') as HTMLInputElement | null;
+    const tLenIn = document.getElementById('tile-len-in') as HTMLInputElement | null;
+    const tWidIn = document.getElementById('tile-wid-in') as HTMLInputElement | null;
+    const wasteIn = document.getElementById('tile-waste') as HTMLSelectElement | null;
+    const boxIn = document.getElementById('tile-box-count') as HTMLInputElement | null;
+
+    const totalDisplay = document.getElementById('tile-total-val');
+    const boxesDisplay = document.getElementById('tile-boxes-val');
+    const roomAreaDisplay = document.getElementById('tile-room-area');
+    const singleAreaDisplay = document.getElementById('tile-single-area');
+    const exactDisplay = document.getElementById('tile-exact-val');
+    const wasteQtyDisplay = document.getElementById('tile-waste-qty');
+
+    function update() {
+      const roomLen = parseNumberInput(rLenIn?.value, 12);
+      const roomWid = parseNumberInput(rWidIn?.value, 10);
+      const tileLen = parseNumberInput(tLenIn?.value, 12);
+      const tileWid = parseNumberInput(tWidIn?.value, 12);
+      const wastePct = parseNumberInput(wasteIn?.value, 10);
+      const boxCount = parseNumberInput(boxIn?.value, 10);
+
+      const res = calculateTiles(roomLen, roomWid, tileLen, tileWid, wastePct, boxCount);
+
+      if (totalDisplay) totalDisplay.textContent = `${res.tilesWithWaste} Tiles`;
+      if (boxesDisplay) boxesDisplay.textContent = `${res.boxesNeeded} Boxes needed`;
+      if (roomAreaDisplay) roomAreaDisplay.textContent = `${res.roomAreaSqFt} sq ft`;
+      if (singleAreaDisplay) singleAreaDisplay.textContent = `${res.tileAreaSqFt} sq ft`;
+      if (exactDisplay) exactDisplay.textContent = `${res.tilesNeeded} Tiles`;
+      if (wasteQtyDisplay) wasteQtyDisplay.textContent = `+${res.tilesWithWaste - res.tilesNeeded} Tiles (${wastePct}%)`;
+    }
+
+    [rLenIn, rWidIn, tLenIn, tWidIn, wasteIn, boxIn].forEach(i => {
+      i?.addEventListener('input', update);
+      i?.addEventListener('change', update);
+    });
+    update();
+  }
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initTiles);
+  } else {
+    initTiles();
+  }
+</script>

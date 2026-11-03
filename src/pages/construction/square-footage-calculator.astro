@@ -1,0 +1,232 @@
+---
+import ToolShell from '@components/tool/ToolShell.astro';
+import FaqAccordion from '@components/tool/FaqAccordion.astro';
+import JsonLd from '@components/seo/JsonLd.astro';
+import { buildBreadcrumbs } from '@lib/format/breadcrumbs';
+import { generateWebApplicationJsonLd, generateFaqJsonLd, generateBreadcrumbJsonLd } from '@lib/seo/jsonld';
+
+const breadcrumbs = buildBreadcrumbs([
+  { label: 'Construction', href: '/construction' },
+  { label: 'Square Footage Calculator' }
+]);
+
+const faqs = [
+  {
+    question: 'How do you calculate square footage?',
+    answer: 'Multiply the length of the room or area in feet by the width in feet: Length (ft) × Width (ft) = Area (sq ft).'
+  },
+  {
+    question: 'How do you convert square feet to square meters?',
+    answer: 'Multiply square feet by 0.092903, or divide square feet by 10.764. For example, 100 sq ft is approximately 9.29 sq meters.'
+  },
+  {
+    question: 'How do I calculate square footage of an L-shaped room?',
+    answer: 'Divide the L-shaped space into two separate rectangular sections. Calculate the square footage of each section individually, then add the two totals together.'
+  },
+  {
+    question: 'What is the standard waste factor for flooring materials?',
+    answer: 'Most contractors recommend adding 10% for standard rectangular rooms, or 15% for rooms with angled walls, closets, or diagonal tile patterns.'
+  },
+  {
+    question: 'How do you calculate total material cost from square footage?',
+    answer: 'Multiply the total square footage (including waste allowance) by the unit price per square foot of your selected flooring, turf, or drywall.'
+  }
+];
+
+const webAppSchema = generateWebApplicationJsonLd({
+  name: 'Square Footage Calculator — Count Loft',
+  description: 'Calculate room square footage, square meters, material cost, and waste allowance for construction and remodeling.',
+  url: 'https://count-loft.com/construction/square-footage-calculator',
+  category: 'WebApplication'
+});
+---
+
+<ToolShell
+  title="Square Footage Calculator"
+  description="Calculate square footage, square meters, waste allowance, and estimated material costs for any room or outdoor space."
+  category="construction"
+  breadcrumbs={breadcrumbs}
+  author="Count Loft Team"
+  lastUpdated="2026-10-31"
+>
+  <div slot="inputs">
+    <form id="sqft-form" novalidate onsubmit="return false;">
+      <div class="form-row-2">
+        <div class="form-group">
+          <label for="sqft-length" class="form-label">Length (Feet)</label>
+          <input type="number" id="sqft-length" class="form-input" value="20" min="0" step="0.5" />
+        </div>
+        <div class="form-group">
+          <label for="sqft-width" class="form-label">Width (Feet)</label>
+          <input type="number" id="sqft-width" class="form-input" value="15" min="0" step="0.5" />
+        </div>
+      </div>
+
+      <div class="form-row-2">
+        <div class="form-group">
+          <label for="sqft-price" class="form-label">Cost per Sq Ft ($, Optional)</label>
+          <input type="number" id="sqft-price" class="form-input" value="4.50" min="0" step="0.25" />
+        </div>
+        <div class="form-group">
+          <label for="sqft-waste" class="form-label">Waste Allowance (%)</label>
+          <select id="sqft-waste" class="form-input">
+            <option value="0">0% (Exact Area)</option>
+            <option value="5">5% (Simple Rectangles)</option>
+            <option value="10" selected>10% (Standard Flooring)</option>
+            <option value="15">15% (Angled / Tile Patterns)</option>
+          </select>
+        </div>
+      </div>
+    </form>
+  </div>
+
+  <div slot="results">
+    <div class="result-hero">
+      <span class="result-hero-label">Total Room Area</span>
+      <span class="result-hero-value" id="sqft-area-val">300 sq ft</span>
+      <span class="result-hero-subtext" id="sqft-meters-val">27.87 m²</span>
+    </div>
+
+    <div class="sqft-breakdown-table">
+      <div class="breakdown-row">
+        <span>With Waste Allowance:</span>
+        <strong id="sqft-with-waste">330 sq ft</strong>
+      </div>
+      <div class="breakdown-row">
+        <span>Estimated Material Cost:</span>
+        <strong id="sqft-cost-val">$1,485.00</strong>
+      </div>
+      <div class="breakdown-row">
+        <span>Unit Conversion:</span>
+        <strong>1 m² = 10.764 sq ft</strong>
+      </div>
+    </div>
+  </div>
+
+  <div slot="how-to">
+    <ol>
+      <li><strong>Measure the room boundaries:</strong> Use a tape measure to record length and width in feet.</li>
+      <li><strong>Select waste percentage:</strong> Add 10% for flooring cuts, seams, and trimming waste.</li>
+      <li><strong>Optional material pricing:</strong> Input unit cost per square foot to see total material purchase estimates.</li>
+    </ol>
+  </div>
+
+  <div slot="formula">
+    <pre><code>Area (sq ft)      = Length (ft) × Width (ft)
+Area (m²)         = Area (sq ft) × 0.092903
+Total with Waste  = Area (sq ft) × (1 + Waste% ÷ 100)
+Estimated Cost    = Total with Waste × Cost per Sq Ft</code></pre>
+  </div>
+
+  <div slot="examples-table">
+    <table class="data-table">
+      <thead>
+        <tr>
+          <th>Dimensions</th>
+          <th>Square Footage</th>
+          <th>Square Meters</th>
+          <th>With 10% Waste</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr><td>10 ft × 10 ft</td><td>100 sq ft</td><td>9.29 m²</td><td>110 sq ft</td></tr>
+        <tr><td>12 ft × 14 ft</td><td>168 sq ft</td><td>15.61 m²</td><td>185 sq ft</td></tr>
+        <tr><td>15 ft × 20 ft</td><td>300 sq ft</td><td>27.87 m²</td><td>330 sq ft</td></tr>
+        <tr><td>20 ft × 25 ft</td><td>500 sq ft</td><td>46.45 m²</td><td>550 sq ft</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div slot="faq">
+    <FaqAccordion items={faqs} />
+  </div>
+
+  <div slot="related-tools">
+    <div class="related-tools-grid">
+      <a href="/construction/tile-calculator" class="card related-tool-card">
+        <h3>Tile Calculator</h3>
+        <p>Calculate exact tile counts and boxes required for floors and backsplashes.</p>
+      </a>
+      <a href="/construction/paint-calculator" class="card related-tool-card">
+        <h3>Paint Calculator</h3>
+        <p>Estimate paint gallons and wall surface coverage for any interior room.</p>
+      </a>
+    </div>
+  </div>
+</ToolShell>
+
+<JsonLd schema={[webAppSchema, generateFaqJsonLd(faqs), generateBreadcrumbJsonLd([{ name: 'Home', item: '/' }, { name: 'Construction', item: '/construction' }, { name: 'Square Footage Calculator', item: '/construction/square-footage-calculator' }])]} />
+
+<style>
+  .form-row-2 {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: var(--space-4);
+  }
+
+  @media (min-width: 640px) {
+    .form-row-2 {
+      grid-template-columns: 1fr 1fr;
+    }
+  }
+
+  .sqft-breakdown-table {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-2);
+    padding: var(--space-4) 0;
+    border-top: 1px solid var(--color-border);
+    margin-top: var(--space-4);
+    font-size: var(--text-sm);
+  }
+
+  .breakdown-row {
+    display: flex;
+    justify-content: space-between;
+  }
+</style>
+
+<script>
+  import { calculateSquareFootage } from '@lib/calc/construction';
+  import { formatCurrency, parseNumberInput } from '@lib/format/number';
+
+  function initSqFt() {
+    const lenIn = document.getElementById('sqft-length') as HTMLInputElement | null;
+    const widIn = document.getElementById('sqft-width') as HTMLInputElement | null;
+    const priceIn = document.getElementById('sqft-price') as HTMLInputElement | null;
+    const wasteIn = document.getElementById('sqft-waste') as HTMLSelectElement | null;
+
+    const areaDisplay = document.getElementById('sqft-area-val');
+    const metersDisplay = document.getElementById('sqft-meters-val');
+    const wasteDisplay = document.getElementById('sqft-with-waste');
+    const costDisplay = document.getElementById('sqft-cost-val');
+
+    function update() {
+      const length = parseNumberInput(lenIn?.value, 20);
+      const width = parseNumberInput(widIn?.value, 15);
+      const price = parseNumberInput(priceIn?.value, 4.5);
+      const wastePct = parseNumberInput(wasteIn?.value, 10);
+
+      const res = calculateSquareFootage(length, width);
+      const totalWasteSqFt = Math.round(res.sqFt * (1 + wastePct / 100) * 10) / 10;
+      const totalCost = totalWasteSqFt * price;
+
+      if (areaDisplay) areaDisplay.textContent = `${res.sqFt.toLocaleString()} sq ft`;
+      if (metersDisplay) metersDisplay.textContent = `${res.sqMeters.toLocaleString()} m²`;
+      if (wasteDisplay) wasteDisplay.textContent = `${totalWasteSqFt.toLocaleString()} sq ft`;
+      if (costDisplay) costDisplay.textContent = formatCurrency(totalCost);
+    }
+
+    [lenIn, widIn, priceIn, wasteIn].forEach(i => {
+      i?.addEventListener('input', update);
+      i?.addEventListener('change', update);
+    });
+    update();
+  }
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initSqFt);
+  } else {
+    initSqFt();
+  }
+</script>

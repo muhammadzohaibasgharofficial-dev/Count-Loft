@@ -1,0 +1,238 @@
+---
+import ToolShell from '@components/tool/ToolShell.astro';
+import FaqAccordion from '@components/tool/FaqAccordion.astro';
+import JsonLd from '@components/seo/JsonLd.astro';
+import { buildBreadcrumbs } from '@lib/format/breadcrumbs';
+import { generateWebApplicationJsonLd, generateFaqJsonLd, generateBreadcrumbJsonLd } from '@lib/seo/jsonld';
+
+const breadcrumbs = buildBreadcrumbs([
+  { label: 'Math', href: '/math' },
+  { label: 'Time & Work Hours Calculator' }
+]);
+
+const faqs = [
+  {
+    question: 'How do you convert minutes into decimal hours?',
+    answer: 'Divide the number of minutes by 60. For example, 30 minutes is 30 ÷ 60 = 0.50 hours; 45 minutes is 45 ÷ 60 = 0.75 hours.'
+  },
+  {
+    question: 'How does this calculator handle overnight shifts across midnight?',
+    answer: 'If the end time is numerically earlier than the start time (for example, starting at 10:00 PM and ending at 6:00 AM), the calculator automatically detects that the shift crosses midnight and adds 24 hours.'
+  },
+  {
+    question: 'Why do employers require decimal hours for payroll?',
+    answer: 'Payroll software multiplies hourly wage directly by hours worked. Standard minutes (base 60) must be converted into decimal fractions (base 10) so multiplication yields accurate monetary amounts.'
+  },
+  {
+    question: 'Are lunch breaks typically paid or unpaid?',
+    answer: 'Under most labor laws, bona fide meal breaks lasting 30 minutes or longer where the employee is completely relieved of duty are unpaid and deducted from total work hours.'
+  },
+  {
+    question: 'How do you calculate overtime pay?',
+    answer: 'Standard overtime is paid at 1.5 times the regular hourly rate (time and a half) for hours worked beyond 40 hours in a standard workweek.'
+  }
+];
+
+const webAppSchema = generateWebApplicationJsonLd({
+  name: 'Time & Work Hours Calculator — Count Loft',
+  description: 'Calculate work shift duration, unpaid break deductions, decimal hours, and total gross payroll earnings.',
+  url: 'https://count-loft.com/math/time-hours-calculator',
+  category: 'WebApplication'
+});
+---
+
+<ToolShell
+  title="Time & Work Hours Calculator"
+  description="Calculate net work shift duration, subtract unpaid lunch breaks, convert minutes to decimal hours, and compute gross paycheck earnings."
+  category="math"
+  breadcrumbs={breadcrumbs}
+  author="Count Loft Team"
+  lastUpdated="2026-10-31"
+>
+  <div slot="inputs">
+    <form id="time-form" novalidate onsubmit="return false;">
+      <div class="form-row-2">
+        <div class="form-group">
+          <label for="th-start-time" class="form-label">Shift Start Time</label>
+          <input type="time" id="th-start-time" class="form-input" value="09:00" />
+        </div>
+        <div class="form-group">
+          <label for="th-end-time" class="form-label">Shift End Time</label>
+          <input type="time" id="th-end-time" class="form-input" value="17:30" />
+        </div>
+      </div>
+
+      <div class="form-row-2">
+        <div class="form-group">
+          <label for="th-break-mins" class="form-label">Unpaid Break (Minutes)</label>
+          <input type="number" id="th-break-mins" class="form-input" value="30" min="0" max="300" step="5" />
+        </div>
+        <div class="form-group">
+          <label for="th-hourly-rate" class="form-label">Hourly Pay Rate ($ / hr, Optional)</label>
+          <input type="number" id="th-hourly-rate" class="form-input" value="25.00" min="0" step="0.50" />
+        </div>
+      </div>
+    </form>
+  </div>
+
+  <div slot="results">
+    <div class="result-hero">
+      <span class="result-hero-label">Total Net Working Hours</span>
+      <span class="result-hero-value" id="th-duration-val">8 hrs 0 mins</span>
+      <span class="result-hero-subtext" id="th-decimal-val">8.00 Decimal Hours</span>
+    </div>
+
+    <div class="time-breakdown-table">
+      <div class="breakdown-row">
+        <span>Estimated Shift Earnings:</span>
+        <strong id="th-earnings-val">$200.00</strong>
+      </div>
+      <div class="breakdown-row">
+        <span>Total Net Minutes:</span>
+        <strong id="th-minutes-val">480 minutes</strong>
+      </div>
+      <div class="breakdown-row">
+        <span>Gross Duration (Before Break):</span>
+        <strong id="th-gross-duration">8 hrs 30 mins</strong>
+      </div>
+      <div class="breakdown-row">
+        <span>Break Deduction:</span>
+        <strong id="th-break-disp">30 minutes</strong>
+      </div>
+    </div>
+  </div>
+
+  <div slot="how-to">
+    <ol>
+      <li><strong>Select shift start and end times:</strong> Use standard 12-hour or 24-hour time selectors.</li>
+      <li><strong>Input unpaid break duration:</strong> Enter lunch or rest breaks in minutes to deduct non-working time.</li>
+      <li><strong>Add optional hourly rate:</strong> See immediate gross pay calculations based on exact decimal hours.</li>
+    </ol>
+  </div>
+
+  <div slot="formula">
+    <pre><code>Elapsed Minutes = (End Time − Start Time) in minutes
+Net Minutes     = Elapsed Minutes − Break Minutes
+Decimal Hours   = Net Minutes ÷ 60
+Gross Earnings  = Decimal Hours × Hourly Rate</code></pre>
+  </div>
+
+  <div slot="examples-table">
+    <table class="data-table">
+      <thead>
+        <tr>
+          <th>Minutes</th>
+          <th>Fraction of Hour</th>
+          <th>Decimal Hours</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr><td>15 Minutes</td><td>1/4 hour</td><td>0.25 hrs</td></tr>
+        <tr><td>30 Minutes</td><td>1/2 hour</td><td>0.50 hrs</td></tr>
+        <tr><td>45 Minutes</td><td>3/4 hour</td><td>0.75 hrs</td></tr>
+        <tr><td>60 Minutes</td><td>1 full hour</td><td>1.00 hrs</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div slot="faq">
+    <FaqAccordion items={faqs} />
+  </div>
+
+  <div slot="related-tools">
+    <div class="related-tools-grid">
+      <a href="/finance/salary-to-hourly-calculator" class="card related-tool-card">
+        <h3>Salary to Hourly Calculator</h3>
+        <p>Convert annual compensation to equivalent hourly, weekly, and daily rates.</p>
+      </a>
+      <a href="/math/date-difference-calculator" class="card related-tool-card">
+        <h3>Date Difference Calculator</h3>
+        <p>Calculate elapsed days and calendar weeks between two dates.</p>
+      </a>
+    </div>
+  </div>
+</ToolShell>
+
+<JsonLd schema={[webAppSchema, generateFaqJsonLd(faqs), generateBreadcrumbJsonLd([{ name: 'Home', item: '/' }, { name: 'Math', item: '/math' }, { name: 'Time & Work Hours Calculator', item: '/math/time-hours-calculator' }])]} />
+
+<style>
+  .form-row-2 {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: var(--space-4);
+  }
+
+  @media (min-width: 640px) {
+    .form-row-2 {
+      grid-template-columns: 1fr 1fr;
+    }
+  }
+
+  .time-breakdown-table {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-2);
+    padding: var(--space-4) 0;
+    border-top: 1px solid var(--color-border);
+    margin-top: var(--space-4);
+    font-size: var(--text-sm);
+  }
+
+  .breakdown-row {
+    display: flex;
+    justify-content: space-between;
+  }
+</style>
+
+<script>
+  import { calculateTimeHours } from '@lib/calc/time-hours';
+  import { formatCurrency, parseNumberInput } from '@lib/format/number';
+
+  function initTimeHours() {
+    const startIn = document.getElementById('th-start-time') as HTMLInputElement | null;
+    const endIn = document.getElementById('th-end-time') as HTMLInputElement | null;
+    const breakIn = document.getElementById('th-break-mins') as HTMLInputElement | null;
+    const rateIn = document.getElementById('th-hourly-rate') as HTMLInputElement | null;
+
+    const durationDisplay = document.getElementById('th-duration-val');
+    const decimalDisplay = document.getElementById('th-decimal-val');
+    const earningsDisplay = document.getElementById('th-earnings-val');
+    const minutesDisplay = document.getElementById('th-minutes-val');
+    const grossDisplay = document.getElementById('th-gross-duration');
+    const breakDisplay = document.getElementById('th-break-disp');
+
+    function update() {
+      const startTime = startIn?.value || '09:00';
+      const endTime = endIn?.value || '17:30';
+      const breakMinutes = parseNumberInput(breakIn?.value, 30);
+      const hourlyRate = parseNumberInput(rateIn?.value, 25);
+
+      const res = calculateTimeHours({
+        startTime,
+        endTime,
+        breakMinutes,
+        hourlyRate
+      });
+
+      if (durationDisplay) durationDisplay.textContent = res.formattedDuration;
+      if (decimalDisplay) decimalDisplay.textContent = `${res.decimalHours} Decimal Hours`;
+      if (earningsDisplay) earningsDisplay.textContent = res.grossPay !== undefined ? formatCurrency(res.grossPay) : '—';
+      if (minutesDisplay) minutesDisplay.textContent = `${res.totalMinutes} minutes`;
+      if (breakDisplay) breakDisplay.textContent = `${breakMinutes} minutes`;
+
+      const grossMins = res.totalMinutes + breakMinutes;
+      const gH = Math.floor(grossMins / 60);
+      const gM = grossMins % 60;
+      if (grossDisplay) grossDisplay.textContent = `${gH} hr${gH !== 1 ? 's' : ''} ${gM} min${gM !== 1 ? 's' : ''}`;
+    }
+
+    [startIn, endIn, breakIn, rateIn].forEach(i => i?.addEventListener('input', update));
+    update();
+  }
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initTimeHours);
+  } else {
+    initTimeHours();
+  }
+</script>

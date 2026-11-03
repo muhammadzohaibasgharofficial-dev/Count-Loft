@@ -1,0 +1,252 @@
+---
+import ToolShell from '@components/tool/ToolShell.astro';
+import FaqAccordion from '@components/tool/FaqAccordion.astro';
+import JsonLd from '@components/seo/JsonLd.astro';
+import { buildBreadcrumbs } from '@lib/format/breadcrumbs';
+import { generateWebApplicationJsonLd, generateFaqJsonLd, generateBreadcrumbJsonLd } from '@lib/seo/jsonld';
+import zakatData from '@data/zakat-nisab.json';
+
+const breadcrumbs = buildBreadcrumbs([
+  { label: 'Islamic', href: '/islamic' },
+  { label: 'Silver & Gold Zakat Calculator' }
+]);
+
+const faqs = [
+  {
+    question: 'What is the Nisab for silver in grams and tolas?',
+    answer: 'The Nisab for silver is 52.5 tolas, which equals exactly 612.36 grams according to standard Islamic metric weight conversion.'
+  },
+  {
+    question: 'How much Zakat is owed on silver?',
+    answer: 'If you own silver meeting or exceeding 612.36 grams (held for one lunar year), the obligatory Zakat is 2.5% (or 1/40th) of the total weight or its current monetary equivalent.'
+  },
+  {
+    question: 'Can I pay Zakat on silver in cash rather than silver metal?',
+    answer: 'Yes. Most contemporary scholars agree that paying the monetary cash equivalent of 2.5% of your silver\'s market value is completely valid and often more practical for the poor.'
+  },
+  {
+    question: 'Do I pay Zakat on silver utensils or decorative items?',
+    answer: 'Yes. Silver utensils, ornamental vessels, ingots, coins, and unworn silver artifacts held as stores of wealth are subject to Zakat once the Nisab is reached.'
+  },
+  {
+    question: 'What if I own both gold and silver together, but neither reaches its individual Nisab?',
+    answer: 'According to the Hanafi school of jurisprudence, when a person owns small quantities of both gold and silver, their monetary values are combined. If the combined total value equals or exceeds the Silver Nisab, Zakat is due.'
+  }
+];
+
+const webAppSchema = generateWebApplicationJsonLd({
+  name: 'Silver & Gold Zakat Calculator — Count Loft',
+  description: 'Calculate Zakat on silver bullion, jewelry, and gold holdings based on weight in grams and tolas.',
+  url: 'https://count-loft.com/islamic/silver-zakat-calculator',
+  category: 'WebApplication'
+});
+---
+
+<ToolShell
+  title="Silver & Gold Zakat Calculator"
+  description="Calculate Zakat obligation specifically on silver and precious metal holdings by weight in grams or tolas against the 52.5 tola Nisab threshold."
+  category="islamic"
+  breadcrumbs={breadcrumbs}
+  author="Count Loft Team"
+  lastUpdated="2026-10-31"
+>
+  <div slot="inputs">
+    <div class="data-badge-notice">
+      Nisab Standard: {zakatData.silverNisabTolas} Tolas ({zakatData.silverNisabGrams}g) • Notified Ramadan Benchmark: Rs {zakatData.notifiedSilverNisabPkr.toLocaleString()}
+    </div>
+
+    <form id="silver-zak-form" novalidate onsubmit="return false;">
+      <div class="form-row-2">
+        <div class="form-group">
+          <label for="sz-weight" class="form-label">Silver Weight</label>
+          <input type="number" id="sz-weight" class="form-input" value="700" min="0" step="10" />
+        </div>
+        <div class="form-group">
+          <label for="sz-unit" class="form-label">Weight Unit</label>
+          <select id="sz-unit" class="form-input">
+            <option value="gram" selected>Grams (g)</option>
+            <option value="tola">Tolas (11.66g)</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label for="sz-rate-gram" class="form-label">Silver Market Rate per Gram (PKR)</label>
+        <input type="number" id="sz-rate-gram" class="form-input" value="822" min="10" step="1" />
+      </div>
+    </form>
+  </div>
+
+  <div slot="results">
+    <div class="result-hero">
+      <span class="result-hero-label">Obligatory Silver Zakat</span>
+      <span class="result-hero-value" id="sz-pkr-val">Rs 14,385</span>
+      <span class="result-hero-subtext" id="sz-metal-val">Or 17.5 Grams of Pure Silver</span>
+    </div>
+
+    <div class="silver-breakdown-table">
+      <div class="breakdown-row">
+        <span>Total Silver Value:</span>
+        <strong id="sz-total-val">Rs 575,400</strong>
+      </div>
+      <div class="breakdown-row">
+        <span>Nisab Threshold Status:</span>
+        <strong id="sz-status-val">Above Nisab (612.36g) — Zakat Due</strong>
+      </div>
+      <div class="breakdown-row">
+        <span>Zakat Rate:</span>
+        <strong>2.5% (1/40th of total weight)</strong>
+      </div>
+      <div class="breakdown-row">
+        <span>Silver Nisab in Tolas:</span>
+        <strong>52.5 Tolas</strong>
+      </div>
+    </div>
+  </div>
+
+  <div slot="how-to">
+    <ol>
+      <li><strong>Input silver weight:</strong> Enter the cumulative weight of silver coins, jewelry, or bars.</li>
+      <li><strong>Confirm current market rate:</strong> Adjust the price per gram according to today\'s spot bullion quotes.</li>
+      <li><strong>Check Nisab threshold:</strong> The calculator verifies if your holding exceeds 612.36g before computing the 2.5% religious due.</li>
+    </ol>
+  </div>
+
+  <div slot="formula">
+    <pre><code>Silver Nisab = 612.36 Grams (52.5 Tolas)
+If Weight ≥ 612.36 Grams:
+    Zakat in Grams = Total Grams × 0.025
+    Zakat in Cash  = (Total Grams × Rate per Gram) × 0.025</code></pre>
+  </div>
+
+  <div slot="examples-table">
+    <table class="data-table">
+      <thead>
+        <tr>
+          <th>Silver Weight</th>
+          <th>Nisab Status</th>
+          <th>Zakat in Grams</th>
+          <th>Zakat in PKR (@ Rs 822/g)</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr><td>500 Grams</td><td>Below Nisab</td><td>0 g</td><td>Rs 0</td></tr>
+        <tr><td>612.36 Grams (Nisab)</td><td>Meets Nisab</td><td>15.31 g</td><td>Rs 12,588</td></tr>
+        <tr><td>1,000 Grams (1 kg)</td><td>Above Nisab</td><td>25.00 g</td><td>Rs 20,550</td></tr>
+        <tr><td>100 Tolas (1,166g)</td><td>Above Nisab</td><td>29.16 g</td><td>Rs 23,970</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div slot="faq">
+    <FaqAccordion items={faqs} />
+  </div>
+
+  <div slot="related-tools">
+    <div class="related-tools-grid">
+      <a href="/islamic/zakat-calculator" class="card related-tool-card">
+        <h3>Comprehensive Zakat Calculator</h3>
+        <p>Calculate Zakat across bank cash, gold, trade goods, and equities.</p>
+      </a>
+      <a href="/pakistan/gold-price-calculator" class="card related-tool-card">
+        <h3>Gold Price Calculator</h3>
+        <p>Convert tolas, grams, and karats with daily sarafa benchmark rates.</p>
+      </a>
+    </div>
+  </div>
+</ToolShell>
+
+<JsonLd schema={[webAppSchema, generateFaqJsonLd(faqs), generateBreadcrumbJsonLd([{ name: 'Home', item: '/' }, { name: 'Islamic', item: '/islamic' }, { name: 'Silver Zakat Calculator', item: '/islamic/silver-zakat-calculator' }])]} />
+
+<style>
+  .data-badge-notice {
+    font-size: var(--text-xs);
+    background-color: var(--color-bg-subtle);
+    padding: var(--space-2) var(--space-3);
+    border-radius: var(--radius-sm);
+    margin-bottom: var(--space-4);
+    border: 1px solid var(--color-border);
+    color: var(--color-text-muted);
+  }
+
+  .form-row-2 {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: var(--space-4);
+  }
+
+  @media (min-width: 640px) {
+    .form-row-2 {
+      grid-template-columns: 1fr 1fr;
+    }
+  }
+
+  .silver-breakdown-table {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-2);
+    padding: var(--space-4) 0;
+    border-top: 1px solid var(--color-border);
+    margin-top: var(--space-4);
+    font-size: var(--text-sm);
+  }
+
+  .breakdown-row {
+    display: flex;
+    justify-content: space-between;
+  }
+</style>
+
+<script>
+  import { calculateSilverZakat } from '@lib/calc/zakat';
+  import { parseNumberInput } from '@lib/format/number';
+
+  function initSilverZakat() {
+    const wtIn = document.getElementById('sz-weight') as HTMLInputElement | null;
+    const unitIn = document.getElementById('sz-unit') as HTMLSelectElement | null;
+    const rateIn = document.getElementById('sz-rate-gram') as HTMLInputElement | null;
+
+    const pkrDisplay = document.getElementById('sz-pkr-val');
+    const metalDisplay = document.getElementById('sz-metal-val');
+    const totalDisplay = document.getElementById('sz-total-val');
+    const statusDisplay = document.getElementById('sz-status-val');
+
+    function formatPkr(val: number): string {
+      return `Rs ${Math.round(val).toLocaleString()}`;
+    }
+
+    function update() {
+      const rawWeight = parseNumberInput(wtIn?.value, 700);
+      const isTola = unitIn?.value === 'tola';
+      const weightInGrams = isTola ? rawWeight * 11.6638 : rawWeight;
+      const rate = parseNumberInput(rateIn?.value, 822);
+
+      const res = calculateSilverZakat(weightInGrams, rate);
+
+      if (pkrDisplay) pkrDisplay.textContent = formatPkr(res.zakatPkr);
+      if (metalDisplay) {
+        metalDisplay.textContent = res.isAboveNisab
+          ? `Or ${res.zakatGrams} Grams of Pure Silver`
+          : 'Wealth is below Nisab (Exempt)';
+      }
+      if (totalDisplay) totalDisplay.textContent = formatPkr(res.totalValue);
+      if (statusDisplay) {
+        statusDisplay.textContent = res.isAboveNisab
+          ? 'Above Nisab (612.36g) — Zakat Due'
+          : 'Below Nisab (612.36g) — No Zakat Due';
+      }
+    }
+
+    [wtIn, unitIn, rateIn].forEach(i => {
+      i?.addEventListener('input', update);
+      i?.addEventListener('change', update);
+    });
+    update();
+  }
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initSilverZakat);
+  } else {
+    initSilverZakat();
+  }
+</script>

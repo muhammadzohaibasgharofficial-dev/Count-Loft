@@ -1,0 +1,275 @@
+---
+import ToolShell from '@components/tool/ToolShell.astro';
+import FaqAccordion from '@components/tool/FaqAccordion.astro';
+import JsonLd from '@components/seo/JsonLd.astro';
+import { buildBreadcrumbs } from '@lib/format/breadcrumbs';
+import { generateWebApplicationJsonLd, generateFaqJsonLd, generateBreadcrumbJsonLd } from '@lib/seo/jsonld';
+import goldData from '@data/pk-gold-rates.json';
+
+const breadcrumbs = buildBreadcrumbs([
+  { label: 'Pakistan', href: '/pakistan' },
+  { label: 'Gold Price Calculator' }
+]);
+
+const faqs = [
+  {
+    question: 'How many grams are in 1 tola of gold in Pakistan?',
+    answer: 'In the Pakistani gold bullion and sarafa market, 1 tola is traditionally standardized to exactly 11.6638 grams.'
+  },
+  {
+    question: 'What is the difference between 24K and 22K gold?',
+    answer: '24 Karat gold is 99.9% pure bullion. 22 Karat gold contains 91.6% pure gold alloyed with 8.4% copper or silver to provide structural durability required for wearable jewelry.'
+  },
+  {
+    question: 'What are gold making charges (ujrat)?',
+    answer: 'Making charges represent the jeweler\'s labor and craftsmanship fee for crafting raw gold bullion into finished jewelry pieces. In Pakistan, making charges typically range between 5% and 15% of the gold metal value.'
+  },
+  {
+    question: 'How many ratti and masha are in 1 tola?',
+    answer: 'Traditional sarafa units define 1 tola as 12 masha, or 96 ratti (1 masha = 8 ratti).'
+  },
+  {
+    question: 'Who sets gold benchmark rates in Pakistan?',
+    answer: 'The All Pakistan Sarafa Gems and Jewellers Association (APSGJA) notifies official benchmark rates twice daily based on international spot bullion prices and open-market PKR currency exchange rates.'
+  }
+];
+
+const webAppSchema = generateWebApplicationJsonLd({
+  name: 'Gold Price Calculator (Pakistan) — Count Loft',
+  description: 'Calculate gold jewelry prices in Pakistan by tola, gram, ratti, and masha across 24K, 22K, and 21K with making charges.',
+  url: 'https://count-loft.com/pakistan/gold-price-calculator',
+  category: 'WebApplication'
+});
+---
+
+<ToolShell
+  title="Gold Price Calculator (Pakistan)"
+  description="Calculate gold jewelry prices in Pakistan across tolas, grams, ratti, and masha for 24K, 22K, 21K, and 18K purities with craftsmanship making charges."
+  category="pakistan"
+  breadcrumbs={breadcrumbs}
+  author="Count Loft Team"
+  lastUpdated="2026-10-31"
+>
+  <div slot="inputs">
+    <div class="data-badge-notice">
+      Sarafa Benchmark: {goldData.source} • Verified: {goldData.lastVerified}
+    </div>
+
+    <form id="gold-form" novalidate onsubmit="return false;">
+      <div class="form-row-2">
+        <div class="form-group">
+          <label for="gold-weight" class="form-label">Weight Quantity</label>
+          <input type="number" id="gold-weight" class="form-input" value="1" min="0.01" step="0.1" />
+        </div>
+        <div class="form-group">
+          <label for="gold-unit" class="form-label">Measurement Unit</label>
+          <select id="gold-unit" class="form-input">
+            <option value="tola" selected>Tola (11.66g)</option>
+            <option value="gram">Grams (g)</option>
+            <option value="masha">Masha (0.97g)</option>
+            <option value="ratti">Ratti (0.12g)</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="form-row-2">
+        <div class="form-group">
+          <label for="gold-karat" class="form-label">Gold Purity (Karat)</label>
+          <select id="gold-karat" class="form-input">
+            <option value="24k" selected>24K (99.9% Pure Bullion)</option>
+            <option value="22k">22K (91.6% Fine Jewelry)</option>
+            <option value="21k">21K (87.5% Standard)</option>
+            <option value="18k">18K (75.0% Diamond Setting)</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label for="gold-making" class="form-label">Making Charges (%)</label>
+          <input type="number" id="gold-making" class="form-input" value="5" min="0" max="30" step="1" />
+        </div>
+      </div>
+    </form>
+  </div>
+
+  <div slot="results">
+    <div class="result-hero">
+      <span class="result-hero-label">Total Estimated Jewelry Price</span>
+      <span class="result-hero-value" id="gold-total-val">Rs 309,750</span>
+      <span class="result-hero-subtext" id="gold-net-val">Net Gold Cost: Rs 295,000</span>
+    </div>
+
+    <div class="gold-breakdown-table">
+      <div class="breakdown-row">
+        <span>Equivalent Grams:</span>
+        <strong id="gold-grams-disp">11.664 g</strong>
+      </div>
+      <div class="breakdown-row">
+        <span>Equivalent Tolas:</span>
+        <strong id="gold-tolas-disp">1.000 Tola</strong>
+      </div>
+      <div class="breakdown-row">
+        <span>Rate per Tola:</span>
+        <strong id="gold-tola-rate">Rs 295,000</strong>
+      </div>
+      <div class="breakdown-row">
+        <span>Rate per Gram:</span>
+        <strong id="gold-gram-rate">Rs 25,292</strong>
+      </div>
+      <div class="breakdown-row">
+        <span>Craftsmanship / Making Charges:</span>
+        <strong id="gold-making-disp">Rs 14,750 (5%)</strong>
+      </div>
+    </div>
+  </div>
+
+  <div slot="how-to">
+    <ol>
+      <li><strong>Enter weight and select unit:</strong> Use tolas, grams, masha, or ratti according to your receipt.</li>
+      <li><strong>Select gold karat:</strong> Choose 24K for investment bars, or 22K/21K for bridal necklaces and bangles.</li>
+      <li><strong>Add making charges:</strong> Enter the jeweler\'s percentage fee to see the complete invoice amount.</li>
+    </ol>
+  </div>
+
+  <div slot="formula">
+    <pre><code>Sarafa Conversions:
+1 Tola  = 11.6638 Grams = 12 Masha = 96 Ratti
+Gold Cost   = Weight (Tolas) × Rate per Tola
+Making Fee  = Gold Cost × (Making% ÷ 100)
+Total Price = Gold Cost + Making Fee</code></pre>
+  </div>
+
+  <div slot="examples-table">
+    <table class="data-table">
+      <thead>
+        <tr>
+          <th>Purity</th>
+          <th>Gold Content</th>
+          <th>Rate per Tola</th>
+          <th>Rate per 10g</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr><td>24K</td><td>99.9%</td><td>Rs 295,000</td><td>Rs 252,920</td></tr>
+        <tr><td>22K</td><td>91.6%</td><td>Rs 270,417</td><td>Rs 231,840</td></tr>
+        <tr><td>21K</td><td>87.5%</td><td>Rs 258,125</td><td>Rs 221,300</td></tr>
+        <tr><td>18K</td><td>75.0%</td><td>Rs 221,250</td><td>Rs 189,690</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div slot="faq">
+    <FaqAccordion items={faqs} />
+  </div>
+
+  <div slot="related-tools">
+    <div class="related-tools-grid">
+      <a href="/islamic/zakat-calculator" class="card related-tool-card">
+        <h3>Zakat Calculator</h3>
+        <p>Calculate annual zakat obligation on gold and personal wealth.</p>
+      </a>
+      <a href="/islamic/silver-zakat-calculator" class="card related-tool-card">
+        <h3>Silver / Zakat on Gold Calculator</h3>
+        <p>Evaluate precious metal holdings against Islamic Nisab limits.</p>
+      </a>
+    </div>
+  </div>
+</ToolShell>
+
+<JsonLd schema={[webAppSchema, generateFaqJsonLd(faqs), generateBreadcrumbJsonLd([{ name: 'Home', item: '/' }, { name: 'Pakistan', item: '/pakistan' }, { name: 'Gold Price Calculator', item: '/pakistan/gold-price-calculator' }])]} />
+
+<style>
+  .data-badge-notice {
+    font-size: var(--text-xs);
+    background-color: var(--color-bg-subtle);
+    padding: var(--space-2) var(--space-3);
+    border-radius: var(--radius-sm);
+    margin-bottom: var(--space-4);
+    border: 1px solid var(--color-border);
+    color: var(--color-text-muted);
+  }
+
+  .form-row-2 {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: var(--space-4);
+  }
+
+  @media (min-width: 640px) {
+    .form-row-2 {
+      grid-template-columns: 1fr 1fr;
+    }
+  }
+
+  .gold-breakdown-table {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-2);
+    padding: var(--space-4) 0;
+    border-top: 1px solid var(--color-border);
+    margin-top: var(--space-4);
+    font-size: var(--text-sm);
+  }
+
+  .breakdown-row {
+    display: flex;
+    justify-content: space-between;
+  }
+</style>
+
+<script>
+  import { calculateGoldPrice } from '@lib/calc/gold-price';
+  import type { GoldUnit, GoldKarat } from '@lib/calc/gold-price';
+  import { parseNumberInput } from '@lib/format/number';
+
+  function initGold() {
+    const wtIn = document.getElementById('gold-weight') as HTMLInputElement | null;
+    const unitIn = document.getElementById('gold-unit') as HTMLSelectElement | null;
+    const karatIn = document.getElementById('gold-karat') as HTMLSelectElement | null;
+    const makingIn = document.getElementById('gold-making') as HTMLInputElement | null;
+
+    const totalDisplay = document.getElementById('gold-total-val');
+    const netDisplay = document.getElementById('gold-net-val');
+    const gramsDisplay = document.getElementById('gold-grams-disp');
+    const tolasDisplay = document.getElementById('gold-tolas-disp');
+    const tolaRateDisplay = document.getElementById('gold-tola-rate');
+    const gramRateDisplay = document.getElementById('gold-gram-rate');
+    const makingDisplay = document.getElementById('gold-making-disp');
+
+    function formatPkr(val: number): string {
+      return `Rs ${Math.round(val).toLocaleString()}`;
+    }
+
+    function update() {
+      const weight = parseNumberInput(wtIn?.value, 1);
+      const unit = (unitIn?.value as GoldUnit) || 'tola';
+      const karat = (karatIn?.value as GoldKarat) || '24k';
+      const makingPct = parseNumberInput(makingIn?.value, 5);
+
+      const res = calculateGoldPrice({
+        weight,
+        unit,
+        karat,
+        makingChargesPercent: makingPct
+      });
+
+      if (totalDisplay) totalDisplay.textContent = formatPkr(res.totalCost);
+      if (netDisplay) netDisplay.textContent = `Net Gold Cost: ${formatPkr(res.baseGoldCost)}`;
+      if (gramsDisplay) gramsDisplay.textContent = `${res.weightInGrams} g`;
+      if (tolasDisplay) tolasDisplay.textContent = `${res.weightInTolas} Tola`;
+      if (tolaRateDisplay) tolaRateDisplay.textContent = formatPkr(res.ratePerTola);
+      if (gramRateDisplay) gramRateDisplay.textContent = formatPkr(res.ratePerGram);
+      if (makingDisplay) makingDisplay.textContent = `${formatPkr(res.makingChargesCost)} (${makingPct}%)`;
+    }
+
+    [wtIn, unitIn, karatIn, makingIn].forEach(i => {
+      i?.addEventListener('input', update);
+      i?.addEventListener('change', update);
+    });
+    update();
+  }
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initGold);
+  } else {
+    initGold();
+  }
+</script>

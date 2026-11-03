@@ -1,0 +1,226 @@
+---
+import ToolShell from '@components/tool/ToolShell.astro';
+import FaqAccordion from '@components/tool/FaqAccordion.astro';
+import JsonLd from '@components/seo/JsonLd.astro';
+import { buildBreadcrumbs } from '@lib/format/breadcrumbs';
+import { generateWebApplicationJsonLd, generateFaqJsonLd, generateBreadcrumbJsonLd } from '@lib/seo/jsonld';
+
+const breadcrumbs = buildBreadcrumbs([
+  { label: 'Math', href: '/math' },
+  { label: 'Date Difference Calculator' }
+]);
+
+const faqs = [
+  {
+    question: 'How do you calculate the exact number of days between two dates?',
+    answer: 'Convert both dates to their UTC timestamps in milliseconds, calculate the absolute difference, and divide by the number of milliseconds in a standard day (86,400,000 ms).'
+  },
+  {
+    question: 'Does this calculator include leap years?',
+    answer: 'Yes. All leap year days (February 29) occurring within the designated calendar span are accounted for automatically.'
+  },
+  {
+    question: 'What is the difference between elapsed calendar months and 30-day blocks?',
+    answer: 'Calendar months account for the varying lengths of individual Gregorian months (28, 29, 30, or 31 days). A simple 30-day assumption drifts by several days over long horizons.'
+  },
+  {
+    question: 'Can I calculate date differences into the future?',
+    answer: 'Yes. You can measure elapsed historical durations or calculate countdown days remaining until a future deadline, holiday, or event.'
+  },
+  {
+    question: 'How many weeks are between two dates?',
+    answer: 'Divide the total days between the dates by 7. The whole quotient represents full weeks, and the remainder represents remaining days.'
+  }
+];
+
+const webAppSchema = generateWebApplicationJsonLd({
+  name: 'Date Difference Calculator — Count Loft',
+  description: 'Calculate days, weeks, months, and years between two dates with leap year precision.',
+  url: 'https://count-loft.com/math/date-difference-calculator',
+  category: 'WebApplication'
+});
+---
+
+<ToolShell
+  title="Date Difference Calculator"
+  description="Calculate the exact time span between two calendar dates in total days, weeks, months, years, and elapsed hours."
+  category="math"
+  breadcrumbs={breadcrumbs}
+  author="Count Loft Team"
+  lastUpdated="2026-10-31"
+>
+  <div slot="inputs">
+    <form id="date-diff-form" novalidate onsubmit="return false;">
+      <div class="form-row-2">
+        <div class="form-group">
+          <label for="dd-start-date" class="form-label">Start Date</label>
+          <input type="date" id="dd-start-date" class="form-input" />
+        </div>
+        <div class="form-group">
+          <label for="dd-end-date" class="form-label">End Date</label>
+          <input type="date" id="dd-end-date" class="form-input" />
+        </div>
+      </div>
+    </form>
+  </div>
+
+  <div slot="results">
+    <div class="result-hero">
+      <span class="result-hero-label">Total Days Between Dates</span>
+      <span class="result-hero-value" id="dd-total-days-val">59 Days</span>
+      <span class="result-hero-subtext" id="dd-summary-val">2 months</span>
+    </div>
+
+    <div class="dd-breakdown-table">
+      <div class="breakdown-row">
+        <span>Calendar Breakdown:</span>
+        <strong id="dd-ymd-val">0 years, 2 months, 0 days</strong>
+      </div>
+      <div class="breakdown-row">
+        <span>Total Weeks:</span>
+        <strong id="dd-weeks-val">8 weeks and 3 days</strong>
+      </div>
+      <div class="breakdown-row">
+        <span>Total Elapsed Hours:</span>
+        <strong id="dd-hours-val">1,416 hours</strong>
+      </div>
+      <div class="breakdown-row">
+        <span>Percent of Year:</span>
+        <strong id="dd-year-pct">16.16% of a 365-day year</strong>
+      </div>
+    </div>
+  </div>
+
+  <div slot="how-to">
+    <ol>
+      <li><strong>Select start and end dates:</strong> Pick any two dates from the date picker.</li>
+      <li><strong>Automatic chronological ordering:</strong> Whether start date is before or after end date, the tool computes the positive duration.</li>
+      <li><strong>Analyze across multiple time units:</strong> View total days, equivalent weeks, calendar months, and total hours.</li>
+    </ol>
+  </div>
+
+  <div slot="formula">
+    <pre><code>Total Elapsed Days = (End Timestamp − Start Timestamp) ÷ 86,400,000 ms
+Total Weeks        = ⌊ Total Days ÷ 7 ⌋
+Remaining Days     = Total Days mod 7
+Total Hours        = Total Days × 24</code></pre>
+  </div>
+
+  <div slot="examples-table">
+    <table class="data-table">
+      <thead>
+        <tr>
+          <th>Span</th>
+          <th>Total Days</th>
+          <th>Full Weeks</th>
+          <th>Calendar Months</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr><td>Jan 1 – Mar 1 (Non-Leap)</td><td>59 Days</td><td>8 Weeks</td><td>2 Months</td></tr>
+        <tr><td>Jan 1 – Mar 1 (Leap Year)</td><td>60 Days</td><td>8 Weeks</td><td>2 Months</td></tr>
+        <tr><td>Jan 1 – Jul 1</td><td>181 Days</td><td>25 Weeks</td><td>6 Months</td></tr>
+        <tr><td>Jan 1 – Dec 31</td><td>364 Days</td><td>52 Weeks</td><td>11 Mos 30 Days</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div slot="faq">
+    <FaqAccordion items={faqs} />
+  </div>
+
+  <div slot="related-tools">
+    <div class="related-tools-grid">
+      <a href="/math/age-calculator" class="card related-tool-card">
+        <h3>Age Calculator</h3>
+        <p>Calculate exact chronological age from date of birth.</p>
+      </a>
+      <a href="/math/time-hours-calculator" class="card related-tool-card">
+        <h3>Time & Work Hours Calculator</h3>
+        <p>Calculate elapsed work shift hours and gross pay.</p>
+      </a>
+    </div>
+  </div>
+</ToolShell>
+
+<JsonLd schema={[webAppSchema, generateFaqJsonLd(faqs), generateBreadcrumbJsonLd([{ name: 'Home', item: '/' }, { name: 'Math', item: '/math' }, { name: 'Date Difference Calculator', item: '/math/date-difference-calculator' }])]} />
+
+<style>
+  .form-row-2 {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: var(--space-4);
+  }
+
+  @media (min-width: 640px) {
+    .form-row-2 {
+      grid-template-columns: 1fr 1fr;
+    }
+  }
+
+  .dd-breakdown-table {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-2);
+    padding: var(--space-4) 0;
+    border-top: 1px solid var(--color-border);
+    margin-top: var(--space-4);
+    font-size: var(--text-sm);
+  }
+
+  .breakdown-row {
+    display: flex;
+    justify-content: space-between;
+  }
+</style>
+
+<script>
+  import { calculateDateDifference } from '@lib/calc/date-difference';
+
+  function initDateDiff() {
+    const startIn = document.getElementById('dd-start-date') as HTMLInputElement | null;
+    const endIn = document.getElementById('dd-end-date') as HTMLInputElement | null;
+
+    const daysDisplay = document.getElementById('dd-total-days-val');
+    const summaryDisplay = document.getElementById('dd-summary-val');
+    const ymdDisplay = document.getElementById('dd-ymd-val');
+    const weeksDisplay = document.getElementById('dd-weeks-val');
+    const hoursDisplay = document.getElementById('dd-hours-val');
+    const yearPctDisplay = document.getElementById('dd-year-pct');
+
+    // Default dates
+    if (startIn && !startIn.value) {
+      startIn.value = '2026-01-01';
+    }
+    if (endIn && !endIn.value) {
+      endIn.value = '2026-03-01';
+    }
+
+    function update() {
+      const startStr = startIn?.value || '2026-01-01';
+      const endStr = endIn?.value || '2026-03-01';
+
+      const res = calculateDateDifference(startStr, endStr);
+
+      if (daysDisplay) daysDisplay.textContent = `${res.totalDays.toLocaleString()} Days`;
+      if (summaryDisplay) summaryDisplay.textContent = res.formattedSummary;
+      if (ymdDisplay) ymdDisplay.textContent = `${res.years} year${res.years !== 1 ? 's' : ''}, ${res.months} month${res.months !== 1 ? 's' : ''}, ${res.days} day${res.days !== 1 ? 's' : ''}`;
+      if (weeksDisplay) weeksDisplay.textContent = `${res.totalWeeks} week${res.totalWeeks !== 1 ? 's' : ''} and ${res.remainingDays} day${res.remainingDays !== 1 ? 's' : ''}`;
+      if (hoursDisplay) hoursDisplay.textContent = `${res.totalHours.toLocaleString()} hours`;
+      if (yearPctDisplay) {
+        const pct = Math.round((res.totalDays / 365) * 10000) / 100;
+        yearPctDisplay.textContent = `${pct}% of a 365-day year`;
+      }
+    }
+
+    startIn?.addEventListener('input', update);
+    endIn?.addEventListener('input', update);
+    update();
+  }
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initDateDiff);
+  } else {
+    initDateDiff();
+  }
+</script>

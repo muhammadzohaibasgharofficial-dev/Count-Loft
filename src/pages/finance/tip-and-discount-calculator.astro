@@ -1,0 +1,356 @@
+---
+/**
+ * Count Loft — Tip & Discount Calculator
+ * Dual-mode calculator for restaurant gratuity splitting and retail sale discounts.
+ */
+import ToolShell from '@components/tool/ToolShell.astro';
+import FaqAccordion from '@components/tool/FaqAccordion.astro';
+import JsonLd from '@components/seo/JsonLd.astro';
+import { buildBreadcrumbs } from '@lib/format/breadcrumbs';
+import { generateWebApplicationJsonLd, generateFaqJsonLd, generateBreadcrumbJsonLd } from '@lib/seo/jsonld';
+
+const breadcrumbs = buildBreadcrumbs([
+  { label: 'Finance', href: '/finance' },
+  { label: 'Tip & Discount Calculator' }
+]);
+
+const faqs = [
+  {
+    question: 'What is a standard restaurant tip percentage in the United States?',
+    answer: 'In the US, 15% is standard for adequate service, 18%–20% is customary for good service, and 22%+ is common for exceptional dining experiences.'
+  },
+  {
+    question: 'How do you calculate tip before or after tax?',
+    answer: 'Standard etiquette recommends tipping on the pre-tax subtotal of food and drinks, though many point-of-sale terminals calculate suggestions on post-tax totals.'
+  },
+  {
+    question: 'How do you calculate a percentage discount on an item?',
+    answer: 'Multiply the original price by the discount percentage divided by 100, then subtract that amount from the original price: Sale Price = Original × (1 - Discount / 100).'
+  },
+  {
+    question: 'Is sales tax applied before or after a store discount?',
+    answer: 'In most jurisdictions, sales tax is legally applied to the discounted sale price rather than the original manufacturer price.'
+  },
+  {
+    question: 'How do you calculate a split bill evenly among a party?',
+    answer: 'Divide the total bill (subtotal + tax + tip) by the total number of people paying.'
+  }
+];
+
+const webAppSchema = generateWebApplicationJsonLd({
+  name: 'Tip & Discount Calculator — Count Loft',
+  description: 'Calculate restaurant tips, split bills among dining guests, and calculate retail sale discounts with sales tax.',
+  url: 'https://count-loft.com/finance/tip-and-discount-calculator',
+  category: 'FinanceApplication'
+});
+---
+
+<ToolShell
+  title="Tip & Discount Calculator"
+  description="Calculate restaurant tips, split dining checks among guests, and compute retail sale discounts with local sales tax."
+  category="finance"
+  breadcrumbs={breadcrumbs}
+  author="Count Loft Team"
+  lastUpdated="2026-10-31"
+>
+  <div slot="inputs">
+    <div class="tab-toggle-row">
+      <button type="button" id="tab-tip" class="btn btn-primary tab-btn active">Tip Calculator</button>
+      <button type="button" id="tab-discount" class="btn btn-ghost tab-btn">Discount Calculator</button>
+    </div>
+
+    <!-- Tip Mode -->
+    <div id="tip-mode-pane">
+      <form id="tip-form" novalidate onsubmit="return false;">
+        <div class="form-group">
+          <label for="bill-amount" class="form-label">Bill Amount ($)</label>
+          <input type="number" id="bill-amount" class="form-input" value="100" min="1" step="5" />
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Tip Percentage (%)</label>
+          <div class="tip-preset-row">
+            <button type="button" class="btn btn-secondary tip-preset" data-pct="15">15%</button>
+            <button type="button" class="btn btn-primary tip-preset" data-pct="18">18%</button>
+            <button type="button" class="btn btn-secondary tip-preset" data-pct="20">20%</button>
+            <input type="number" id="custom-tip" class="form-input custom-tip-input" value="18" min="0" max="100" />
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="split-people" class="form-label">Split Among (Number of People)</label>
+          <input type="number" id="split-people" class="form-input" value="2" min="1" max="50" />
+        </div>
+      </form>
+    </div>
+
+    <!-- Discount Mode -->
+    <div id="discount-mode-pane" hidden>
+      <form id="discount-form" novalidate onsubmit="return false;">
+        <div class="form-group">
+          <label for="orig-price" class="form-label">Original Price ($)</label>
+          <input type="number" id="orig-price" class="form-input" value="80" min="1" step="5" />
+        </div>
+
+        <div class="form-row-2">
+          <div class="form-group">
+            <label for="disc-pct" class="form-label">Discount (%)</label>
+            <input type="number" id="disc-pct" class="form-input" value="25" min="0" max="100" />
+          </div>
+          <div class="form-group">
+            <label for="tax-pct" class="form-label">Sales Tax (%)</label>
+            <input type="number" id="tax-pct" class="form-input" value="8.25" min="0" max="30" step="0.25" />
+          </div>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <div slot="results">
+    <!-- Tip Result -->
+    <div id="tip-result-card">
+      <div class="result-hero">
+        <span class="result-hero-label">Total Per Person</span>
+        <span class="result-hero-value" id="per-person-total">$59.00</span>
+        <span class="result-hero-subtext" id="per-person-tip">$9.00 tip per person</span>
+      </div>
+
+      <div class="mortgage-breakdown-table">
+        <div class="breakdown-row">
+          <span>Total Tip:</span>
+          <strong id="total-tip-val">$18.00</strong>
+        </div>
+        <div class="breakdown-row">
+          <span>Total Bill (with Tip):</span>
+          <strong id="total-bill-val">$118.00</strong>
+        </div>
+      </div>
+    </div>
+
+    <!-- Discount Result -->
+    <div id="discount-result-card" hidden>
+      <div class="result-hero">
+        <span class="result-hero-label">Final Sale Price</span>
+        <span class="result-hero-value" id="final-price-val">$64.95</span>
+        <span class="result-hero-subtext" id="savings-sub">You save $20.00 (25%)</span>
+      </div>
+
+      <div class="mortgage-breakdown-table">
+        <div class="breakdown-row">
+          <span>Discounted Subtotal:</span>
+          <strong id="discounted-sub">$60.00</strong>
+        </div>
+        <div class="breakdown-row">
+          <span>Sales Tax:</span>
+          <strong id="tax-amount-val">$4.95</strong>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div slot="how-to">
+    <ol>
+      <li><strong>Choose Tip or Discount Mode:</strong> Switch modes using the top tabs.</li>
+      <li><strong>Enter Bill or Price:</strong> Input total cost and adjust tip presets or markdown percentage.</li>
+      <li><strong>Split or Apply Tax:</strong> Instantly inspect individual shares or final checkout price.</li>
+    </ol>
+  </div>
+
+  <div slot="formula">
+    <pre><code>Tip Amount = Bill × (Tip% ÷ 100)
+Total Bill = Bill + Tip
+Per Person = Total Bill ÷ People
+Discount Price = Original × (1 - Discount% ÷ 100) + Tax</code></pre>
+  </div>
+
+  <div slot="examples-table">
+    <table class="data-table">
+      <thead>
+        <tr>
+          <th>Bill Amount</th>
+          <th>15% Tip</th>
+          <th>18% Tip</th>
+          <th>20% Tip</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr><td>$25.00</td><td>$3.75</td><td>$4.50</td><td>$5.00</td></tr>
+        <tr><td>$50.00</td><td>$7.50</td><td>$9.00</td><td>$10.00</td></tr>
+        <tr><td>$75.00</td><td>$11.25</td><td>$13.50</td><td>$15.00</td></tr>
+        <tr><td>$100.00</td><td>$15.00</td><td>$18.00</td><td>$20.00</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div slot="faq">
+    <FaqAccordion items={faqs} />
+  </div>
+
+  <div slot="related-tools">
+    <div class="related-tools-grid">
+      <a href="/math/percentage-calculator" class="card related-tool-card">
+        <h3>Percentage Calculator</h3>
+        <p>Calculate ratios, proportions, and percentages.</p>
+      </a>
+      <a href="/finance/salary-to-hourly-calculator" class="card related-tool-card">
+        <h3>Salary to Hourly Calculator</h3>
+        <p>Convert wage and hourly overtime payments.</p>
+      </a>
+    </div>
+  </div>
+</ToolShell>
+
+<JsonLd schema={[webAppSchema, generateFaqJsonLd(faqs), generateBreadcrumbJsonLd([{ name: 'Home', item: '/' }, { name: 'Finance', item: '/finance' }, { name: 'Tip & Discount Calculator', item: '/finance/tip-and-discount-calculator' }])]} />
+
+<style>
+  .tab-toggle-row {
+    display: flex;
+    gap: var(--space-2);
+    margin-bottom: var(--space-4);
+  }
+
+  .tip-preset-row {
+    display: flex;
+    gap: var(--space-2);
+    align-items: center;
+    flex-wrap: wrap;
+  }
+
+  .custom-tip-input {
+    width: 80px;
+  }
+
+  .form-row-2 {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: var(--space-4);
+  }
+
+  @media (min-width: 640px) {
+    .form-row-2 {
+      grid-template-columns: 1fr 1fr;
+    }
+  }
+
+  .mortgage-breakdown-table {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-2);
+    padding: var(--space-4) 0;
+    border-top: 1px solid var(--color-border);
+    margin-top: var(--space-4);
+    font-size: var(--text-sm);
+  }
+
+  .breakdown-row {
+    display: flex;
+    justify-content: space-between;
+  }
+</style>
+
+<script>
+  import { calculateTip, calculateDiscount } from '@lib/calc/tip-discount';
+  import { formatCurrency, parseNumberInput } from '@lib/format/number';
+
+  function initTipDiscount() {
+    let mode: 'tip' | 'discount' = 'tip';
+
+    const tabTip = document.getElementById('tab-tip');
+    const tabDisc = document.getElementById('tab-discount');
+    const tipPane = document.getElementById('tip-mode-pane');
+    const discPane = document.getElementById('discount-mode-pane');
+    const tipResultCard = document.getElementById('tip-result-card');
+    const discResultCard = document.getElementById('discount-result-card');
+
+    // Tip fields
+    const billIn = document.getElementById('bill-amount') as HTMLInputElement | null;
+    const customTip = document.getElementById('custom-tip') as HTMLInputElement | null;
+    const splitIn = document.getElementById('split-people') as HTMLInputElement | null;
+
+    const perPersonTotal = document.getElementById('per-person-total');
+    const perPersonTip = document.getElementById('per-person-tip');
+    const totalTip = document.getElementById('total-tip-val');
+    const totalBill = document.getElementById('total-bill-val');
+
+    // Discount fields
+    const origIn = document.getElementById('orig-price') as HTMLInputElement | null;
+    const discIn = document.getElementById('disc-pct') as HTMLInputElement | null;
+    const taxIn = document.getElementById('tax-pct') as HTMLInputElement | null;
+
+    const finalPriceDisplay = document.getElementById('final-price-val');
+    const savingsDisplay = document.getElementById('savings-sub');
+    const discountedSubDisplay = document.getElementById('discounted-sub');
+    const taxAmountDisplay = document.getElementById('tax-amount-val');
+
+    function update() {
+      if (mode === 'tip') {
+        const res = calculateTip(
+          parseNumberInput(billIn?.value, 100),
+          parseNumberInput(customTip?.value, 18),
+          parseNumberInput(splitIn?.value, 2)
+        );
+
+        if (perPersonTotal) perPersonTotal.textContent = formatCurrency(res.perPersonTotal);
+        if (perPersonTip) perPersonTip.textContent = `${formatCurrency(res.perPersonTip)} tip per person`;
+        if (totalTip) totalTip.textContent = formatCurrency(res.tipAmount);
+        if (totalBill) totalBill.textContent = formatCurrency(res.totalAmount);
+      } else {
+        const res = calculateDiscount(
+          parseNumberInput(origIn?.value, 80),
+          parseNumberInput(discIn?.value, 25),
+          parseNumberInput(taxIn?.value, 8.25)
+        );
+
+        if (finalPriceDisplay) finalPriceDisplay.textContent = formatCurrency(res.finalPriceWithTax);
+        if (savingsDisplay) savingsDisplay.textContent = `You save ${formatCurrency(res.savingsAmount)} (${discIn?.value || 0}%)`;
+        if (discountedSubDisplay) discountedSubDisplay.textContent = formatCurrency(res.salePrice);
+        if (taxAmountDisplay) taxAmountDisplay.textContent = formatCurrency(res.taxAmount);
+      }
+    }
+
+    tabTip?.addEventListener('click', () => {
+      mode = 'tip';
+      tabTip.classList.add('btn-primary');
+      tabTip.classList.remove('btn-ghost');
+      tabDisc?.classList.remove('btn-primary');
+      tabDisc?.classList.add('btn-ghost');
+      tipPane?.removeAttribute('hidden');
+      discPane?.setAttribute('hidden', '');
+      tipResultCard?.removeAttribute('hidden');
+      discResultCard?.setAttribute('hidden', '');
+      update();
+    });
+
+    tabDisc?.addEventListener('click', () => {
+      mode = 'discount';
+      tabDisc.classList.add('btn-primary');
+      tabDisc.classList.remove('btn-ghost');
+      tabTip?.classList.remove('btn-primary');
+      tabTip?.classList.add('btn-ghost');
+      discPane?.removeAttribute('hidden');
+      tipPane?.setAttribute('hidden', '');
+      discResultCard?.removeAttribute('hidden');
+      tipResultCard?.setAttribute('hidden', '');
+      update();
+    });
+
+    document.querySelectorAll('.tip-preset').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const pct = btn.getAttribute('data-pct');
+        if (customTip && pct) {
+          customTip.value = pct;
+          update();
+        }
+      });
+    });
+
+    [billIn, customTip, splitIn, origIn, discIn, taxIn].forEach(el => el?.addEventListener('input', update));
+    update();
+  }
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initTipDiscount);
+  } else {
+    initTipDiscount();
+  }
+</script>

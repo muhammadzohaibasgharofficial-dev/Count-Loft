@@ -1,0 +1,268 @@
+---
+import ToolShell from '@components/tool/ToolShell.astro';
+import FaqAccordion from '@components/tool/FaqAccordion.astro';
+import JsonLd from '@components/seo/JsonLd.astro';
+import { buildBreadcrumbs } from '@lib/format/breadcrumbs';
+import { generateWebApplicationJsonLd, generateFaqJsonLd, generateBreadcrumbJsonLd } from '@lib/seo/jsonld';
+
+const breadcrumbs = buildBreadcrumbs([
+  { label: 'Math', href: '/math' },
+  { label: 'Standard Deviation Calculator' }
+]);
+
+const faqs = [
+  {
+    question: 'What is the difference between sample and population standard deviation?',
+    answer: 'Population standard deviation (σ) divides by N and is used when your data represents every single member of the group. Sample standard deviation (s) uses Bessel\'s correction (dividing by N − 1) to provide an unbiased estimate when using a representative sample subset.'
+  },
+  {
+    question: 'What does standard deviation measure?',
+    answer: 'Standard deviation measures the dispersion or spread of values around the arithmetic mean. A small standard deviation indicates that data points are clustered closely to the average, while a large standard deviation indicates wide variability.'
+  },
+  {
+    question: 'How do variance and standard deviation relate?',
+    answer: 'Standard deviation is the square root of variance: s = √s². Variance is expressed in squared units, while standard deviation is expressed in the original units of measurement.'
+  },
+  {
+    question: 'What is the 68-95-99.7 Empirical Rule?',
+    answer: 'In a normal bell-curve distribution, approximately 68% of all values fall within 1 standard deviation of the mean, 95% fall within 2 standard deviations, and 99.7% fall within 3 standard deviations.'
+  },
+  {
+    question: 'Can standard deviation ever be negative?',
+    answer: 'No. Because differences from the mean are squared before averaging, standard deviation is always greater than or equal to zero. It equals zero only if every single number in the dataset is identical.'
+  }
+];
+
+const webAppSchema = generateWebApplicationJsonLd({
+  name: 'Standard Deviation Calculator — Count Loft',
+  description: 'Calculate sample and population standard deviation, variance, mean, median, and mode for any numerical dataset.',
+  url: 'https://count-loft.com/math/standard-deviation-calculator',
+  category: 'WebApplication'
+});
+---
+
+<ToolShell
+  title="Standard Deviation Calculator"
+  description="Calculate sample and population standard deviation, variance, mean, median, mode, and range from comma-separated or space-separated numbers."
+  category="math"
+  breadcrumbs={breadcrumbs}
+  author="Count Loft Team"
+  lastUpdated="2026-10-31"
+>
+  <div slot="inputs">
+    <form id="stats-form" novalidate onsubmit="return false;">
+      <div class="form-group">
+        <label for="stats-data" class="form-label">Enter Numbers (Separated by commas, spaces, or lines)</label>
+        <textarea id="stats-data" class="form-input" rows="4" style="font-family: monospace;">10, 12, 23, 23, 16, 23, 21, 16</textarea>
+      </div>
+
+      <div class="quick-examples-buttons">
+        <span class="form-label" style="margin-right: var(--space-2);">Quick Presets:</span>
+        <button type="button" class="btn btn-secondary btn-sm" id="preset-test-scores">Test Scores</button>
+        <button type="button" class="btn btn-secondary btn-sm" id="preset-close-cluster">Tight Cluster</button>
+      </div>
+    </form>
+  </div>
+
+  <div slot="results">
+    <div class="result-hero">
+      <span class="result-hero-label">Sample Standard Deviation (s)</span>
+      <span class="result-hero-value" id="stats-sample-sd">5.2372</span>
+      <span class="result-hero-subtext" id="stats-pop-sd">Population (σ): 4.8990</span>
+    </div>
+
+    <div class="stats-breakdown-grid">
+      <div class="breakdown-card">
+        <span class="b-label">Sample Variance (s²)</span>
+        <strong class="b-val" id="stats-sample-var">27.4286</strong>
+      </div>
+      <div class="breakdown-card">
+        <span class="b-label">Population Variance (σ²)</span>
+        <strong class="b-val" id="stats-pop-var">24.0000</strong>
+      </div>
+      <div class="breakdown-card">
+        <span class="b-label">Mean (Average)</span>
+        <strong class="b-val" id="stats-mean">18.0000</strong>
+      </div>
+      <div class="breakdown-card">
+        <span class="b-label">Median</span>
+        <strong class="b-val" id="stats-median">18.5000</strong>
+      </div>
+      <div class="breakdown-card">
+        <span class="b-label">Mode</span>
+        <strong class="b-val" id="stats-mode">23</strong>
+      </div>
+      <div class="breakdown-card">
+        <span class="b-label">Range (Max − Min)</span>
+        <strong class="b-val" id="stats-range">13 (10 to 23)</strong>
+      </div>
+      <div class="breakdown-card">
+        <span class="b-label">Total Count (n)</span>
+        <strong class="b-val" id="stats-count">8 numbers</strong>
+      </div>
+      <div class="breakdown-card">
+        <span class="b-label">Sum</span>
+        <strong class="b-val" id="stats-sum">144</strong>
+      </div>
+    </div>
+  </div>
+
+  <div slot="how-to">
+    <ol>
+      <li><strong>Paste or enter numbers:</strong> Separate values with commas, spaces, or line breaks.</li>
+      <li><strong>Compare sample vs population:</strong> Use Sample Standard Deviation (s) for experiments and surveys; use Population (σ) when analyzing the complete universal set.</li>
+      <li><strong>Review central tendency:</strong> Check mean, median, mode, and variance alongside standard deviation.</li>
+    </ol>
+  </div>
+
+  <div slot="formula">
+    <pre><code>Mean (x̄) = ( Σ xᵢ ) ÷ n
+Sample Variance (s²) = Σ (xᵢ − x̄)² ÷ (n − 1)
+Sample Standard Deviation (s) = √[ Σ (xᵢ − x̄)² ÷ (n − 1) ]
+Population Standard Deviation (σ) = √[ Σ (xᵢ − μ)² ÷ N ]</code></pre>
+  </div>
+
+  <div slot="examples-table">
+    <table class="data-table">
+      <thead>
+        <tr>
+          <th>Dataset</th>
+          <th>Mean</th>
+          <th>Sample SD (s)</th>
+          <th>Spread Interpretation</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr><td>10, 10, 10, 10</td><td>10.0</td><td>0.0000</td><td>Zero variance (all identical)</td></tr>
+        <tr><td>9, 10, 10, 11</td><td>10.0</td><td>0.8165</td><td>Tightly clustered around average</td></tr>
+        <tr><td>1, 5, 15, 19</td><td>10.0</td><td>8.5635</td><td>Wide dispersion across scale</td></tr>
+        <tr><td>10, 12, 16, 23</td><td>15.25</td><td>5.7373</td><td>Moderate natural variance</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div slot="faq">
+    <FaqAccordion items={faqs} />
+  </div>
+
+  <div slot="related-tools">
+    <div class="related-tools-grid">
+      <a href="/math/grade-calculator" class="card related-tool-card">
+        <h3>Grade Calculator</h3>
+        <p>Calculate weighted class averages and required final exam grades.</p>
+      </a>
+      <a href="/math/gpa-calculator" class="card related-tool-card">
+        <h3>GPA Calculator</h3>
+        <p>Calculate high school and college GPA with letter grade weighting.</p>
+      </a>
+    </div>
+  </div>
+</ToolShell>
+
+<JsonLd schema={[webAppSchema, generateFaqJsonLd(faqs), generateBreadcrumbJsonLd([{ name: 'Home', item: '/' }, { name: 'Math', item: '/math' }, { name: 'Standard Deviation Calculator', item: '/math/standard-deviation-calculator' }])]} />
+
+<style>
+  .quick-examples-buttons {
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+    margin-top: var(--space-2);
+  }
+
+  .stats-breakdown-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: var(--space-3);
+    margin-top: var(--space-4);
+  }
+
+  @media (min-width: 640px) {
+    .stats-breakdown-grid {
+      grid-template-columns: 1fr 1fr;
+    }
+  }
+
+  .breakdown-card {
+    background-color: var(--color-bg-subtle);
+    padding: var(--space-3);
+    border-radius: var(--radius-sm);
+    border: 1px solid var(--color-border);
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-1);
+  }
+
+  .b-label {
+    font-size: var(--text-xs);
+    color: var(--color-text-muted);
+  }
+
+  .b-val {
+    font-size: var(--text-base);
+  }
+</style>
+
+<script>
+  import { calculateStatistics } from '@lib/calc/statistics';
+
+  function initStats() {
+    const dataIn = document.getElementById('stats-data') as HTMLTextAreaElement | null;
+    const testPreset = document.getElementById('preset-test-scores');
+    const clusterPreset = document.getElementById('preset-close-cluster');
+
+    const sampleSdDisplay = document.getElementById('stats-sample-sd');
+    const popSdDisplay = document.getElementById('stats-pop-sd');
+    const sampleVarDisplay = document.getElementById('stats-sample-var');
+    const popVarDisplay = document.getElementById('stats-pop-var');
+    const meanDisplay = document.getElementById('stats-mean');
+    const medianDisplay = document.getElementById('stats-median');
+    const modeDisplay = document.getElementById('stats-mode');
+    const rangeDisplay = document.getElementById('stats-range');
+    const countDisplay = document.getElementById('stats-count');
+    const sumDisplay = document.getElementById('stats-sum');
+
+    function parseInput(text: string): number[] {
+      return text
+        .split(/[\s,;\n\t]+/)
+        .map(s => s.trim())
+        .filter(s => s.length > 0)
+        .map(Number)
+        .filter(n => Number.isFinite(n));
+    }
+
+    function update() {
+      const numbers = parseInput(dataIn?.value || '');
+      const res = calculateStatistics(numbers);
+
+      if (sampleSdDisplay) sampleSdDisplay.textContent = String(res.sampleStandardDeviation);
+      if (popSdDisplay) popSdDisplay.textContent = `Population (σ): ${res.populationStandardDeviation}`;
+      if (sampleVarDisplay) sampleVarDisplay.textContent = String(res.sampleVariance);
+      if (popVarDisplay) popVarDisplay.textContent = String(res.populationVariance);
+      if (meanDisplay) meanDisplay.textContent = String(res.mean);
+      if (medianDisplay) medianDisplay.textContent = String(res.median);
+      if (modeDisplay) modeDisplay.textContent = res.modes.length > 0 ? res.modes.join(', ') : 'None';
+      if (rangeDisplay) rangeDisplay.textContent = `${res.range} (${res.min} to ${res.max})`;
+      if (countDisplay) countDisplay.textContent = `${res.count} number${res.count !== 1 ? 's' : ''}`;
+      if (sumDisplay) sumDisplay.textContent = String(res.sum);
+    }
+
+    testPreset?.addEventListener('click', () => {
+      if (dataIn) dataIn.value = '78, 85, 92, 88, 75, 90, 82, 95';
+      update();
+    });
+
+    clusterPreset?.addEventListener('click', () => {
+      if (dataIn) dataIn.value = '50, 51, 49, 50, 52, 48, 50';
+      update();
+    });
+
+    dataIn?.addEventListener('input', update);
+    update();
+  }
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initStats);
+  } else {
+    initStats();
+  }
+</script>

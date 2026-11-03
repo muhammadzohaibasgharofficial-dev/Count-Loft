@@ -1,0 +1,269 @@
+---
+import ToolShell from '@components/tool/ToolShell.astro';
+import FaqAccordion from '@components/tool/FaqAccordion.astro';
+import JsonLd from '@components/seo/JsonLd.astro';
+import { buildBreadcrumbs } from '@lib/format/breadcrumbs';
+import { generateWebApplicationJsonLd, generateFaqJsonLd, generateBreadcrumbJsonLd } from '@lib/seo/jsonld';
+
+const breadcrumbs = buildBreadcrumbs([
+  { label: 'Health', href: '/health' },
+  { label: 'Body Fat Calculator' }
+]);
+
+const faqs = [
+  {
+    question: 'How accurate is the US Navy Body Fat method?',
+    answer: 'The US Navy circumference method is accurate within 3% to 4% for the majority of adults compared to dual-energy X-ray absorptiometry (DEXA) scans, provided measurements are taken consistently.'
+  },
+  {
+    question: 'Where should I measure waist and neck circumferences?',
+    answer: 'Measure your neck horizontally just below the Adam’s apple. Measure waist horizontally at the narrowest point for women or at the level of the navel for men.'
+  },
+  {
+    question: 'Why do women require a hip measurement?',
+    answer: 'Biological females naturally store higher proportions of essential adipose tissue in the lower body, including hips and thighs. Adding hip circumference ensures accurate body fat estimation.'
+  },
+  {
+    question: 'What is considered an ideal body fat percentage?',
+    answer: 'For men, a healthy fitness range is 14% to 17%, while athletes often range from 6% to 13%. For women, fitness ranges from 21% to 24%, while athletes typically measure 14% to 20%.'
+  },
+  {
+    question: 'Can you have too little body fat?',
+    answer: 'Yes. Essential body fat (2% to 5% for men, 10% to 13% for women) is necessary for hormonal regulation, neurological insulation, organ cushioning, and temperature control.'
+  }
+];
+
+const webAppSchema = generateWebApplicationJsonLd({
+  name: 'Body Fat Calculator — Count Loft',
+  description: 'Estimate body fat percentage, fat mass, and lean mass using the US Navy tape measure method.',
+  url: 'https://count-loft.com/health/body-fat-calculator',
+  category: 'HealthApplication'
+});
+---
+
+<ToolShell
+  title="Body Fat Calculator"
+  description="Estimate body fat percentage, lean body mass, and fat mass using the validated US Navy circumference method."
+  category="health"
+  breadcrumbs={breadcrumbs}
+  author="Count Loft Team"
+  lastUpdated="2026-10-31"
+>
+  <div slot="inputs">
+    <form id="bf-form" novalidate onsubmit="return false;">
+      <div class="form-row-2">
+        <div class="form-group">
+          <label for="bf-sex" class="form-label">Biological Sex</label>
+          <select id="bf-sex" class="form-input">
+            <option value="male" selected>Male</option>
+            <option value="female">Female</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label for="bf-height" class="form-label">Height (cm)</label>
+          <input type="number" id="bf-height" class="form-input" value="175" min="100" max="250" />
+        </div>
+      </div>
+
+      <div class="form-row-2">
+        <div class="form-group">
+          <label for="bf-neck" class="form-label">Neck Circumference (cm)</label>
+          <input type="number" id="bf-neck" class="form-input" value="38" min="20" max="70" step="0.5" />
+        </div>
+        <div class="form-group">
+          <label for="bf-waist" class="form-label">Waist Circumference (cm)</label>
+          <input type="number" id="bf-waist" class="form-input" value="85" min="40" max="180" step="0.5" />
+        </div>
+      </div>
+
+      <div class="form-row-2">
+        <div class="form-group" id="bf-hip-container" style="display: none;">
+          <label for="bf-hip" class="form-label">Hip Circumference (cm, Female)</label>
+          <input type="number" id="bf-hip" class="form-input" value="95" min="40" max="180" step="0.5" />
+        </div>
+        <div class="form-group">
+          <label for="bf-weight" class="form-label">Body Weight (kg, Optional)</label>
+          <input type="number" id="bf-weight" class="form-input" value="75" min="30" max="300" step="0.5" />
+        </div>
+      </div>
+    </form>
+  </div>
+
+  <div slot="results">
+    <div class="result-hero">
+      <span class="result-hero-label">Estimated Body Fat</span>
+      <span class="result-hero-value" id="bf-percent-val">17.6%</span>
+      <span class="result-hero-subtext" id="bf-category-val">Fitness Category</span>
+    </div>
+
+    <div class="bf-breakdown-table">
+      <div class="breakdown-row">
+        <span>Fat Mass:</span>
+        <strong id="bf-fat-mass">13.2 kg</strong>
+      </div>
+      <div class="breakdown-row">
+        <span>Lean Body Mass:</span>
+        <strong id="bf-lean-mass">61.8 kg</strong>
+      </div>
+      <div class="breakdown-row">
+        <span>Essential Body Fat Minimum:</span>
+        <strong id="bf-essential-val">2% - 5%</strong>
+      </div>
+    </div>
+  </div>
+
+  <div slot="how-to">
+    <ol>
+      <li><strong>Select biological sex:</strong> The US Navy method uses different logarithmic formulas for men and women.</li>
+      <li><strong>Take tape measurements:</strong> Measure neck circumference just below the larynx, and waist horizontally at the navel.</li>
+      <li><strong>Women measure hips:</strong> For females, measure around the widest part of the buttocks and hips.</li>
+    </ol>
+  </div>
+
+  <div slot="formula">
+    <pre><code>US Navy Formulas:
+Men:   % Body Fat = 495 ÷ [ 1.0324 − 0.19077 × log10(waist − neck) + 0.15456 × log10(height) ] − 450
+Women: % Body Fat = 495 ÷ [ 1.29579 − 0.35004 × log10(waist + hip − neck) + 0.22100 × log10(height) ] − 450</code></pre>
+  </div>
+
+  <div slot="examples-table">
+    <table class="data-table">
+      <thead>
+        <tr>
+          <th>Category</th>
+          <th>Women (% Body Fat)</th>
+          <th>Men (% Body Fat)</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr><td>Essential Fat</td><td>10% – 13%</td><td>2% – 5%</td></tr>
+        <tr><td>Athletes</td><td>14% – 20%</td><td>6% – 13%</td></tr>
+        <tr><td>Fitness</td><td>21% – 24%</td><td>14% – 17%</td></tr>
+        <tr><td>Average</td><td>25% – 31%</td><td>18% – 24%</td></tr>
+        <tr><td>Obese</td><td>32%+</td><td>25%+</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div slot="faq">
+    <FaqAccordion items={faqs} />
+  </div>
+
+  <div slot="related-tools">
+    <div class="related-tools-grid">
+      <a href="/health/bmi-calculator" class="card related-tool-card">
+        <h3>BMI Calculator</h3>
+        <p>Assess weight-to-height classification across global standard ranges.</p>
+      </a>
+      <a href="/health/bmr-calculator" class="card related-tool-card">
+        <h3>BMR Calculator</h3>
+        <p>Calculate your daily resting energy expenditure at complete physical rest.</p>
+      </a>
+    </div>
+  </div>
+</ToolShell>
+
+<JsonLd schema={[webAppSchema, generateFaqJsonLd(faqs), generateBreadcrumbJsonLd([{ name: 'Home', item: '/' }, { name: 'Health', item: '/health' }, { name: 'Body Fat Calculator', item: '/health/body-fat-calculator' }])]} />
+
+<style>
+  .form-row-2 {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: var(--space-4);
+  }
+
+  @media (min-width: 640px) {
+    .form-row-2 {
+      grid-template-columns: 1fr 1fr;
+    }
+  }
+
+  .bf-breakdown-table {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-2);
+    padding: var(--space-4) 0;
+    border-top: 1px solid var(--color-border);
+    margin-top: var(--space-4);
+    font-size: var(--text-sm);
+  }
+
+  .breakdown-row {
+    display: flex;
+    justify-content: space-between;
+  }
+</style>
+
+<script>
+  import { calculateBodyFat } from '@lib/calc/body-fat';
+  import { parseNumberInput } from '@lib/format/number';
+
+  function initBodyFat() {
+    const sexIn = document.getElementById('bf-sex') as HTMLSelectElement | null;
+    const heightIn = document.getElementById('bf-height') as HTMLInputElement | null;
+    const neckIn = document.getElementById('bf-neck') as HTMLInputElement | null;
+    const waistIn = document.getElementById('bf-waist') as HTMLInputElement | null;
+    const hipIn = document.getElementById('bf-hip') as HTMLInputElement | null;
+    const hipContainer = document.getElementById('bf-hip-container');
+    const weightIn = document.getElementById('bf-weight') as HTMLInputElement | null;
+
+    const percentDisplay = document.getElementById('bf-percent-val');
+    const categoryDisplay = document.getElementById('bf-category-val');
+    const fatMassDisplay = document.getElementById('bf-fat-mass');
+    const leanMassDisplay = document.getElementById('bf-lean-mass');
+    const essentialDisplay = document.getElementById('bf-essential-val');
+
+    function toggleSex() {
+      const isFemale = sexIn?.value === 'female';
+      if (hipContainer) {
+        hipContainer.style.display = isFemale ? 'block' : 'none';
+      }
+      if (essentialDisplay) {
+        essentialDisplay.textContent = isFemale ? '10% - 13%' : '2% - 5%';
+      }
+      update();
+    }
+
+    function update() {
+      const sex = (sexIn?.value as 'male' | 'female') || 'male';
+      const heightCm = parseNumberInput(heightIn?.value, 175);
+      const neckCm = parseNumberInput(neckIn?.value, 38);
+      const waistCm = parseNumberInput(waistIn?.value, 85);
+      const hipCm = parseNumberInput(hipIn?.value, 95);
+      const weightKg = parseNumberInput(weightIn?.value, 75);
+
+      const res = calculateBodyFat({
+        sex,
+        heightCm,
+        neckCm,
+        waistCm,
+        hipCm: sex === 'female' ? hipCm : undefined,
+        weightKg
+      });
+
+      if (percentDisplay) percentDisplay.textContent = `${res.bodyFatPercent}%`;
+      if (categoryDisplay) categoryDisplay.textContent = `${res.category} Category`;
+
+      if (weightKg > 0 && res.bodyFatPercent > 0) {
+        const fatKg = Math.round((weightKg * (res.bodyFatPercent / 100)) * 10) / 10;
+        const leanKg = Math.round((weightKg - fatKg) * 10) / 10;
+        if (fatMassDisplay) fatMassDisplay.textContent = `${fatKg} kg`;
+        if (leanMassDisplay) leanMassDisplay.textContent = `${leanKg} kg`;
+      } else {
+        if (fatMassDisplay) fatMassDisplay.textContent = '—';
+        if (leanMassDisplay) leanMassDisplay.textContent = '—';
+      }
+    }
+
+    sexIn?.addEventListener('change', toggleSex);
+    [heightIn, neckIn, waistIn, hipIn, weightIn].forEach(i => i?.addEventListener('input', update));
+
+    toggleSex();
+  }
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initBodyFat);
+  } else {
+    initBodyFat();
+  }
+</script>

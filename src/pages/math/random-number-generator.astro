@@ -1,0 +1,315 @@
+---
+import ToolShell from '@components/tool/ToolShell.astro';
+import FaqAccordion from '@components/tool/FaqAccordion.astro';
+import JsonLd from '@components/seo/JsonLd.astro';
+import { buildBreadcrumbs } from '@lib/format/breadcrumbs';
+import { generateWebApplicationJsonLd, generateFaqJsonLd, generateBreadcrumbJsonLd } from '@lib/seo/jsonld';
+
+const breadcrumbs = buildBreadcrumbs([
+  { label: 'Math', href: '/math' },
+  { label: 'Random Number Generator' }
+]);
+
+const faqs = [
+  {
+    question: 'How are random numbers generated in this tool?',
+    answer: 'This generator uses client-side pseudorandom generation with a uniform probability distribution, ensuring every integer within your specified minimum and maximum bounds has an equal probability of selection.'
+  },
+  {
+    question: 'Can I generate unique numbers without duplicates?',
+    answer: 'Yes. Select the "No Duplicates (Unique)" option to ensure every generated integer is distinct (ideal for lotteries, raffles, and random sampling).'
+  },
+  {
+    question: 'What is the maximum quantity of random numbers I can generate at once?',
+    answer: 'You can generate up to 1,000 random integers simultaneously in a single generation.'
+  },
+  {
+    question: 'Can I generate negative numbers?',
+    answer: 'Yes. You can specify negative integers for both minimum and maximum boundaries (e.g. from −50 to +50).'
+  },
+  {
+    question: 'Are my numbers sent to any remote server?',
+    answer: 'No. Count Loft generates all random numbers entirely in your browser using local JavaScript, upholding our strict "Your numbers never leave your browser" privacy commitment.'
+  }
+];
+
+const webAppSchema = generateWebApplicationJsonLd({
+  name: 'Random Number Generator — Count Loft',
+  description: 'Generate uniformly distributed random integers, unique lottery numbers, and dice rolls with custom bounds.',
+  url: 'https://count-loft.com/math/random-number-generator',
+  category: 'WebApplication'
+});
+---
+
+<ToolShell
+  title="Random Number Generator"
+  description="Generate random integers between any minimum and maximum bounds, with options for unique values, ascending sort, and bulk sets."
+  category="math"
+  breadcrumbs={breadcrumbs}
+  author="Count Loft Team"
+  lastUpdated="2026-10-31"
+>
+  <div slot="inputs">
+    <form id="rng-form" novalidate onsubmit="return false;">
+      <div class="form-row-2">
+        <div class="form-group">
+          <label for="rng-min" class="form-label">Minimum Value</label>
+          <input type="number" id="rng-min" class="form-input" value="1" step="1" />
+        </div>
+        <div class="form-group">
+          <label for="rng-max" class="form-label">Maximum Value</label>
+          <input type="number" id="rng-max" class="form-input" value="100" step="1" />
+        </div>
+      </div>
+
+      <div class="form-row-2">
+        <div class="form-group">
+          <label for="rng-count" class="form-label">How Many Numbers?</label>
+          <input type="number" id="rng-count" class="form-input" value="5" min="1" max="1000" />
+        </div>
+        <div class="form-group">
+          <label for="rng-duplicates" class="form-label">Duplicates</label>
+          <select id="rng-duplicates" class="form-input">
+            <option value="false" selected>No Duplicates (Unique)</option>
+            <option value="true">Allow Duplicates</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label for="rng-sort" class="form-label">Sort Order</label>
+        <select id="rng-sort" class="form-input">
+          <option value="none" selected>Random Order (As Generated)</option>
+          <option value="asc">Ascending (Lowest to Highest)</option>
+          <option value="desc">Descending (Highest to Lowest)</option>
+        </select>
+      </div>
+
+      <button type="button" id="rng-generate-btn" class="btn btn-primary" style="width: 100%; margin-top: var(--space-2);">
+        Generate New Numbers
+      </button>
+    </form>
+  </div>
+
+  <div slot="results">
+    <div class="result-hero">
+      <span class="result-hero-label">Generated Numbers</span>
+      <div class="rng-numbers-badge-container" id="rng-badges-val">
+        <!-- Rendered badges -->
+      </div>
+      <span class="result-hero-subtext" id="rng-count-summary">5 numbers between 1 and 100</span>
+    </div>
+
+    <div class="rng-copy-actions">
+      <button type="button" id="rng-copy-btn" class="btn btn-secondary">
+        Copy Numbers to Clipboard
+      </button>
+    </div>
+
+    <div class="rng-breakdown-table">
+      <div class="breakdown-row">
+        <span>Number Range:</span>
+        <strong id="rng-range-disp">1 to 100 (Span of 100 integers)</strong>
+      </div>
+      <div class="breakdown-row">
+        <span>Uniqueness:</span>
+        <strong id="rng-unique-disp">Unique (No Repetition)</strong>
+      </div>
+      <div class="breakdown-row">
+        <span>Raw String:</span>
+        <code id="rng-raw-str">—</code>
+      </div>
+    </div>
+  </div>
+
+  <div slot="how-to">
+    <ol>
+      <li><strong>Define boundaries:</strong> Input minimum and maximum integer values.</li>
+      <li><strong>Select quantity and uniqueness:</strong> Choose how many integers to draw and whether duplicates are permitted.</li>
+      <li><strong>Click generate:</strong> Click the button to redraw fresh random numbers at any time.</li>
+    </ol>
+  </div>
+
+  <div slot="formula">
+    <pre><code>Uniform Random Integer Generation:
+Random Integer = ⌊ Math.random() × (Max − Min + 1) ⌋ + Min
+Range Size     = Max − Min + 1</code></pre>
+  </div>
+
+  <div slot="examples-table">
+    <table class="data-table">
+      <thead>
+        <tr>
+          <th>Use Case</th>
+          <th>Min</th>
+          <th>Max</th>
+          <th>Count</th>
+          <th>Duplicates</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr><td>Standard 6-Sided Die</td><td>1</td><td>6</td><td>1</td><td>Allowed</td></tr>
+        <tr><td>Coin Flip Equivalent</td><td>0</td><td>1</td><td>1</td><td>Allowed</td></tr>
+        <tr><td>Lottery Quick Pick (6/49)</td><td>1</td><td>49</td><td>6</td><td>Unique</td></tr>
+        <tr><td>Percentile Draw</td><td>1</td><td>100</td><td>1</td><td>Allowed</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div slot="faq">
+    <FaqAccordion items={faqs} />
+  </div>
+
+  <div slot="related-tools">
+    <div class="related-tools-grid">
+      <a href="/math/standard-deviation-calculator" class="card related-tool-card">
+        <h3>Standard Deviation Calculator</h3>
+        <p>Analyze statistical variance and mean of numerical data sets.</p>
+      </a>
+      <a href="/math/scientific-calculator" class="card related-tool-card">
+        <h3>Scientific Calculator</h3>
+        <p>Perform trigonometric, logarithmic, and power functions.</p>
+      </a>
+    </div>
+  </div>
+</ToolShell>
+
+<JsonLd schema={[webAppSchema, generateFaqJsonLd(faqs), generateBreadcrumbJsonLd([{ name: 'Home', item: '/' }, { name: 'Math', item: '/math' }, { name: 'Random Number Generator', item: '/math/random-number-generator' }])]} />
+
+<style>
+  .form-row-2 {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: var(--space-4);
+  }
+
+  @media (min-width: 640px) {
+    .form-row-2 {
+      grid-template-columns: 1fr 1fr;
+    }
+  }
+
+  .rng-numbers-badge-container {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: var(--space-2);
+    margin: var(--space-3) 0;
+  }
+
+  :global(.rng-num-pill) {
+    font-size: var(--text-2xl);
+    font-weight: var(--font-bold);
+    background-color: var(--color-bg-subtle);
+    border: 2px solid var(--color-border);
+    padding: var(--space-2) var(--space-4);
+    border-radius: var(--radius-md);
+    color: var(--color-primary);
+  }
+
+  .rng-copy-actions {
+    display: flex;
+    justify-content: center;
+    margin: var(--space-4) 0;
+  }
+
+  .rng-breakdown-table {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-2);
+    padding: var(--space-4) 0;
+    border-top: 1px solid var(--color-border);
+    margin-top: var(--space-4);
+    font-size: var(--text-sm);
+  }
+
+  .breakdown-row {
+    display: flex;
+    justify-content: space-between;
+  }
+</style>
+
+<script>
+  import { generateRandomNumbers } from '@lib/calc/random-number';
+  import { parseNumberInput } from '@lib/format/number';
+
+  function initRng() {
+    const minIn = document.getElementById('rng-min') as HTMLInputElement | null;
+    const maxIn = document.getElementById('rng-max') as HTMLInputElement | null;
+    const countIn = document.getElementById('rng-count') as HTMLInputElement | null;
+    const dupIn = document.getElementById('rng-duplicates') as HTMLSelectElement | null;
+    const sortIn = document.getElementById('rng-sort') as HTMLSelectElement | null;
+    const genBtn = document.getElementById('rng-generate-btn');
+    const copyBtn = document.getElementById('rng-copy-btn');
+
+    const badgesContainer = document.getElementById('rng-badges-val');
+    const summaryDisplay = document.getElementById('rng-count-summary');
+    const rangeDisplay = document.getElementById('rng-range-disp');
+    const uniqueDisplay = document.getElementById('rng-unique-disp');
+    const rawDisplay = document.getElementById('rng-raw-str');
+
+    let currentNumbers: number[] = [];
+
+    function generate() {
+      const min = parseNumberInput(minIn?.value, 1);
+      const max = parseNumberInput(maxIn?.value, 100);
+      const count = parseNumberInput(countIn?.value, 5);
+      const allowDuplicates = dupIn?.value === 'true';
+      const sortOrder = (sortIn?.value as 'none' | 'asc' | 'desc') || 'none';
+
+      const res = generateRandomNumbers({
+        min,
+        max,
+        count,
+        allowDuplicates,
+        sortOrder
+      });
+
+      currentNumbers = res.numbers;
+
+      if (badgesContainer) {
+        badgesContainer.innerHTML = res.numbers.map(n => `<span class="rng-num-pill">${n}</span>`).join('');
+      }
+
+      if (summaryDisplay) {
+        summaryDisplay.textContent = `${res.count} number${res.count > 1 ? 's' : ''} between ${res.min} and ${res.max}`;
+      }
+
+      if (rangeDisplay) {
+        rangeDisplay.textContent = `${res.min} to ${res.max} (Span of ${res.max - res.min + 1} integers)`;
+      }
+
+      if (uniqueDisplay) {
+        uniqueDisplay.textContent = allowDuplicates ? 'Duplicates Allowed' : 'Unique (No Repetition)';
+      }
+
+      if (rawDisplay) {
+        rawDisplay.textContent = res.numbers.join(', ');
+      }
+    }
+
+    genBtn?.addEventListener('click', generate);
+    [minIn, maxIn, countIn, dupIn, sortIn].forEach(i => {
+      i?.addEventListener('change', generate);
+    });
+
+    copyBtn?.addEventListener('click', () => {
+      if (currentNumbers.length > 0) {
+        navigator.clipboard.writeText(currentNumbers.join(', '));
+        const originalText = copyBtn.textContent;
+        copyBtn.textContent = 'Copied to Clipboard!';
+        setTimeout(() => {
+          copyBtn.textContent = originalText;
+        }, 2000);
+      }
+    });
+
+    generate();
+  }
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initRng);
+  } else {
+    initRng();
+  }
+</script>

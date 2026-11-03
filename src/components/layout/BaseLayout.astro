@@ -1,0 +1,95 @@
+---
+/**
+ * Count Loft — Base Layout Component
+ * Root HTML shell managing metadata, theme initialization, navigation landmarks, and global styling.
+ */
+import '../../styles/global.css';
+import '../../styles/print.css';
+
+import SEOHead from '@components/seo/SEOHead.astro';
+import Header from '@components/layout/Header.astro';
+import MobileNav from '@components/layout/MobileNav.astro';
+import Footer from '@components/layout/Footer.astro';
+import Toast from '@components/ui/Toast.astro';
+
+export interface Props {
+  title: string;
+  description: string;
+  canonicalUrl?: string;
+  robots?: string;
+  ogType?: 'website' | 'article';
+}
+
+const {
+  title,
+  description,
+  canonicalUrl,
+  robots,
+  ogType
+} = Astro.props;
+---
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <SEOHead
+      title={title}
+      description={description}
+      canonicalUrl={canonicalUrl}
+      robots={robots}
+      ogType={ogType}
+    />
+
+    <!-- Synchronous inline script to prevent Flash of Unstyled Content (FOUC).
+         Follows identical canonical hierarchy to src/lib/storage/theme.ts:
+           1. Explicit user selection (localStorage 'theme' if 'light' | 'dark')
+           2. OS preference (window.matchMedia prefers-color-scheme: dark)
+           3. Safe fallback ('light') -->
+    <script is:inline>
+      (function () {
+        try {
+          var saved = null;
+          try {
+            if (typeof localStorage !== 'undefined') {
+              var val = localStorage.getItem('theme');
+              if (val === 'light' || val === 'dark') {
+                saved = val;
+              }
+            }
+          } catch (storageErr) {}
+
+          var theme = saved;
+          if (!theme) {
+            try {
+              if (typeof window !== 'undefined' && typeof window.matchMedia === 'function') {
+                theme = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+              }
+            } catch (mediaErr) {}
+          }
+          if (!theme) {
+            theme = 'light';
+          }
+
+          document.documentElement.setAttribute('data-theme', theme);
+          document.documentElement.style.colorScheme = theme;
+        } catch (e) {
+          document.documentElement.setAttribute('data-theme', 'light');
+          document.documentElement.style.colorScheme = 'light';
+        }
+      })();
+    </script>
+  </head>
+  <body>
+    <a href="#main" class="skip-link">Skip to main content</a>
+    <Header />
+    <MobileNav />
+    <main id="main">
+      <slot />
+    </main>
+    <Footer />
+    <Toast />
+  </body>
+</html>

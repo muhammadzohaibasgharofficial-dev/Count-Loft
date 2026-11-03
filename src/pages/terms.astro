@@ -1,0 +1,73 @@
+---
+/**
+ * Count Loft — Terms of Service Page
+ * Legal disclaimer regarding informational estimates, educational usage, and liability.
+ */
+import BaseLayout from '@components/layout/BaseLayout.astro';
+import Breadcrumbs from '@components/seo/Breadcrumbs.astro';
+import { buildBreadcrumbs } from '@lib/format/breadcrumbs';
+
+const breadcrumbs = buildBreadcrumbs([
+  { label: 'Terms of Service' }
+]);
+---
+
+<BaseLayout
+  title="Terms of Service — Count Loft"
+  description="Terms and conditions governing the use of Count Loft calculators, estimates, and informational tools."
+>
+  <div class="container article-page-container">
+    <Breadcrumbs items={breadcrumbs} />
+
+    <header class="page-header">
+      <h1>Terms of Service</h1>
+      <p class="lead-text">
+        Last updated: October 31, 2026
+      </p>
+    </header>
+
+    <article class="article-content">
+      <h2>1. Acceptance of Terms</h2>
+      <p>
+        By accessing and using Count Loft ("the Website"), you agree to comply with and be bound by these Terms of Service. If you do not agree to these terms, please do not use the Website.
+      </p>
+
+      <h2>2. Nature of Calculators and Information</h2>
+      <p>
+        <strong>Estimates Only, Not Professional Advice:</strong> The calculations, formulas, projections, and lookup tables provided on Count Loft are designed solely for general educational, estimation, and informational purposes.
+      </p>
+      <ul>
+        <li><strong>Finance:</strong> Calculations do not constitute certified financial, mortgage, tax, or investment advice. Always consult a licensed financial advisor, CPA, or official lender before entering into financial agreements.</li>
+        <li><strong>Health:</strong> Tools such as BMI and calorie calculators do not provide medical diagnosis, treatment, or dietary prescriptions. Consult a licensed healthcare professional for medical concerns.</li>
+        <li><strong>Construction & Engineering:</strong> Material estimates (concrete, paint, tile) are theoretical calculations and do not account for site-specific conditions, waste factors, or structural requirements.</li>
+      </ul>
+
+      <h2>3. Limitation of Liability</h2>
+      <p>
+        Count Loft, its creators, and its contributors make no express or implied warranties regarding the accuracy, completeness, or reliability of any tool results. Under no circumstances shall Count Loft be held liable for any financial losses, personal injuries, or commercial decisions resulting from the use of our calculators.
+      </p>
+
+      <h2>4. Intellectual Property</h2>
+      <p>
+        While mathematical algorithms and formulas are in the public domain, the layout, software architecture, custom code, written content, and visual branding of Count Loft are the copyrighted property of Count Loft.
+      </p>
+    </article>
+  </div>
+</BaseLayout>
+
+<style>
+  .article-page-container {
+    padding-top: var(--space-6);
+    padding-bottom: var(--space-8);
+  }
+
+  .page-header {
+    margin-bottom: var(--space-6);
+  }
+
+  .lead-text {
+    font-size: var(--text-sm);
+    color: var(--color-text-muted);
+    margin-top: var(--space-1);
+  }
+</style>

@@ -1,0 +1,258 @@
+---
+import ToolShell from '@components/tool/ToolShell.astro';
+import FaqAccordion from '@components/tool/FaqAccordion.astro';
+import JsonLd from '@components/seo/JsonLd.astro';
+import { buildBreadcrumbs } from '@lib/format/breadcrumbs';
+import { generateWebApplicationJsonLd, generateFaqJsonLd, generateBreadcrumbJsonLd } from '@lib/seo/jsonld';
+
+const breadcrumbs = buildBreadcrumbs([
+  { label: 'Pakistan', href: '/pakistan' },
+  { label: 'AC Tonnage Calculator' }
+]);
+
+const faqs = [
+  {
+    question: 'How do you calculate AC tonnage for a room in Pakistan?',
+    answer: 'In Pakistan\'s severe summer climate (temperatures often reaching 42°C to 48°C), cooling demand requires approximately 60 to 70 BTU per square foot for standard insulated rooms, plus adjustments for top floor roof heat, window sun exposure, and occupants.'
+  },
+  {
+    question: 'How many BTU make 1 Ton of air conditioning?',
+    answer: 'One ton of refrigeration equals exactly 12,000 BTU/hr (British Thermal Units per hour). A 1.5-ton split AC provides 18,000 BTU/hr, while a 2.0-ton AC provides 24,000 BTU/hr.'
+  },
+  {
+    question: 'Why does a top-floor room require a larger AC?',
+    answer: 'Concrete rooftops in South Asia absorb intense solar radiation throughout the day, creating thermal mass that continuously radiates heat downward into top-floor rooms, increasing cooling load by 15% to 20%.'
+  },
+  {
+    question: 'What happens if I install an undersized AC?',
+    answer: 'An undersized AC runs continuously at maximum compressor frequency without ever reaching the set temperature. This wastes immense electricity, shortens compressor lifespan, and fails to cool during peak afternoon heat.'
+  },
+  {
+    question: 'Are inverter ACs better for Pakistan\'s electricity bills?',
+    answer: 'Yes. Inverter split ACs adjust compressor motor speed dynamically rather than switching on/off abruptly, saving 30% to 50% electricity once the target temperature is stabilized.'
+  }
+];
+
+const webAppSchema = generateWebApplicationJsonLd({
+  name: 'AC Tonnage Calculator (Pakistan) — Count Loft',
+  description: 'Calculate split and inverter AC tonnage and BTU requirements based on room dimensions, top floor exposure, and sun orientation.',
+  url: 'https://count-loft.com/pakistan/ac-tonnage-calculator',
+  category: 'WebApplication'
+});
+---
+
+<ToolShell
+  title="AC Tonnage Calculator (Pakistan)"
+  description="Calculate the ideal split or inverter air conditioner tonnage and BTU requirements for your room, factoring in top-floor heat, sun exposure, and high summer temperatures."
+  category="pakistan"
+  breadcrumbs={breadcrumbs}
+  author="Count Loft Team"
+  lastUpdated="2026-10-31"
+>
+  <div slot="inputs">
+    <form id="ac-form" novalidate onsubmit="return false;">
+      <div class="form-row-2">
+        <div class="form-group">
+          <label for="ac-len" class="form-label">Room Length (Feet)</label>
+          <input type="number" id="ac-len" class="form-input" value="14" min="6" max="60" step="0.5" />
+        </div>
+        <div class="form-group">
+          <label for="ac-wid" class="form-label">Room Width (Feet)</label>
+          <input type="number" id="ac-wid" class="form-input" value="12" min="6" max="60" step="0.5" />
+        </div>
+      </div>
+
+      <div class="form-row-2">
+        <div class="form-group">
+          <label for="ac-height" class="form-label">Ceiling Height (Feet)</label>
+          <input type="number" id="ac-height" class="form-input" value="10" min="8" max="20" step="0.5" />
+        </div>
+        <div class="form-group">
+          <label for="ac-occupants" class="form-label">Regular Occupants</label>
+          <input type="number" id="ac-occupants" class="form-input" value="2" min="1" max="20" />
+        </div>
+      </div>
+
+      <div class="form-row-2">
+        <div class="form-group">
+          <label for="ac-floor-level" class="form-label">Floor Position</label>
+          <select id="ac-floor-level" class="form-input">
+            <option value="middle" selected>Ground / Middle Floor (Shaded Roof)</option>
+            <option value="top">Top Floor (Direct Sun on Roof +15%)</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label for="ac-sunlight" class="form-label">Window Sunlight Exposure</label>
+          <select id="ac-sunlight" class="form-input">
+            <option value="normal" selected>Normal / Shaded Windows</option>
+            <option value="direct">Direct Afternoon Sun (West/South Facing +10%)</option>
+          </select>
+        </div>
+      </div>
+    </form>
+  </div>
+
+  <div slot="results">
+    <div class="result-hero">
+      <span class="result-hero-label">Recommended AC Size</span>
+      <span class="result-hero-value" id="ac-rec-tons">1.5 Ton</span>
+      <span class="result-hero-subtext" id="ac-rec-unit">18,000 BTU Inverter Split AC</span>
+    </div>
+
+    <div class="ac-breakdown-table">
+      <div class="breakdown-row">
+        <span>Room Floor Area:</span>
+        <strong id="ac-area-disp">168 sq ft</strong>
+      </div>
+      <div class="breakdown-row">
+        <span>Total Required Cooling Capacity:</span>
+        <strong id="ac-btu-disp">10,920 BTU/hr</strong>
+      </div>
+      <div class="breakdown-row">
+        <span>Climate Sizing Standard:</span>
+        <strong>65 BTU / sq ft (Pakistan Summer 45°C)</strong>
+      </div>
+      <div class="breakdown-row">
+        <span>Energy Saving Recommendation:</span>
+        <strong>T3 Tropical Inverter (DC Inverter)</strong>
+      </div>
+    </div>
+  </div>
+
+  <div slot="how-to">
+    <ol>
+      <li><strong>Enter room dimensions:</strong> Measure room length, width, and ceiling height in feet.</li>
+      <li><strong>Select room conditions:</strong> Identify whether the room sits under an uninsulated concrete roof or catches afternoon sun.</li>
+      <li><strong>Purchase correct tonnage:</strong> Avoid undersizing or oversizing to achieve optimal energy efficiency and humidity control.</li>
+    </ol>
+  </div>
+
+  <div slot="formula">
+    <pre><code>Base Cooling (BTU)  = Floor Area (sq ft) × 65 BTU/sq ft
+Roof Surcharge      = +15% if Top Floor
+Sunlight Surcharge  = +10% if Facing Afternoon Sun
+Occupants Addition  = (Occupants − 2) × 500 BTU
+Required Tonnage    = Total BTU ÷ 12,000 (Rounded to nearest 0.5 Ton)</code></pre>
+  </div>
+
+  <div slot="examples-table">
+    <table class="data-table">
+      <thead>
+        <tr>
+          <th>Room Size</th>
+          <th>Square Footage</th>
+          <th>Middle Floor</th>
+          <th>Top Floor (Sun)</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr><td>10 ft × 12 ft</td><td>120 sq ft</td><td>1.0 Ton (12,000 BTU)</td><td>1.0 – 1.5 Ton</td></tr>
+        <tr><td>12 ft × 14 ft</td><td>168 sq ft</td><td>1.5 Ton (18,000 BTU)</td><td>1.5 Ton</td></tr>
+        <tr><td>16 ft × 18 ft</td><td>288 sq ft</td><td>1.5 – 2.0 Ton</td><td>2.0 Ton (24,000 BTU)</td></tr>
+        <tr><td>20 ft × 20 ft</td><td>400 sq ft</td><td>2.0 Ton</td><td>2.5 Ton (30,000 BTU)</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div slot="faq">
+    <FaqAccordion items={faqs} />
+  </div>
+
+  <div slot="related-tools">
+    <div class="related-tools-grid">
+      <a href="/pakistan/electricity-bill-calculator" class="card related-tool-card">
+        <h3>Electricity Bill Calculator</h3>
+        <p>Calculate power consumption costs across LESCO, IESCO, and K-Electric.</p>
+      </a>
+      <a href="/construction/square-footage-calculator" class="card related-tool-card">
+        <h3>Square Footage Calculator</h3>
+        <p>Calculate floor and wall surface dimensions for residential spaces.</p>
+      </a>
+    </div>
+  </div>
+</ToolShell>
+
+<JsonLd schema={[webAppSchema, generateFaqJsonLd(faqs), generateBreadcrumbJsonLd([{ name: 'Home', item: '/' }, { name: 'Pakistan', item: '/pakistan' }, { name: 'AC Tonnage Calculator', item: '/pakistan/ac-tonnage-calculator' }])]} />
+
+<style>
+  .form-row-2 {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: var(--space-4);
+  }
+
+  @media (min-width: 640px) {
+    .form-row-2 {
+      grid-template-columns: 1fr 1fr;
+    }
+  }
+
+  .ac-breakdown-table {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-2);
+    padding: var(--space-4) 0;
+    border-top: 1px solid var(--color-border);
+    margin-top: var(--space-4);
+    font-size: var(--text-sm);
+  }
+
+  .breakdown-row {
+    display: flex;
+    justify-content: space-between;
+  }
+</style>
+
+<script>
+  import { calculateAcTonnage } from '@lib/calc/ac-tonnage';
+  import { parseNumberInput } from '@lib/format/number';
+
+  function initAc() {
+    const lenIn = document.getElementById('ac-len') as HTMLInputElement | null;
+    const widIn = document.getElementById('ac-wid') as HTMLInputElement | null;
+    const hgtIn = document.getElementById('ac-height') as HTMLInputElement | null;
+    const occIn = document.getElementById('ac-occupants') as HTMLInputElement | null;
+    const floorIn = document.getElementById('ac-floor-level') as HTMLSelectElement | null;
+    const sunIn = document.getElementById('ac-sunlight') as HTMLSelectElement | null;
+
+    const tonsDisplay = document.getElementById('ac-rec-tons');
+    const unitDisplay = document.getElementById('ac-rec-unit');
+    const areaDisplay = document.getElementById('ac-area-disp');
+    const btuDisplay = document.getElementById('ac-btu-disp');
+
+    function update() {
+      const roomLengthFt = parseNumberInput(lenIn?.value, 14);
+      const roomWidthFt = parseNumberInput(widIn?.value, 12);
+      const ceilingHeightFt = parseNumberInput(hgtIn?.value, 10);
+      const occupants = parseNumberInput(occIn?.value, 2);
+      const isTopFloor = floorIn?.value === 'top';
+      const hasDirectSunlight = sunIn?.value === 'direct';
+
+      const res = calculateAcTonnage({
+        roomLengthFt,
+        roomWidthFt,
+        ceilingHeightFt,
+        occupants,
+        isTopFloor,
+        hasDirectSunlight
+      });
+
+      if (tonsDisplay) tonsDisplay.textContent = `${res.recommendedTons} Ton`;
+      if (unitDisplay) unitDisplay.textContent = res.suggestedUnit;
+      if (areaDisplay) areaDisplay.textContent = `${res.roomAreaSqFt} sq ft`;
+      if (btuDisplay) btuDisplay.textContent = `${res.totalRequiredBtu.toLocaleString()} BTU/hr`;
+    }
+
+    [lenIn, widIn, hgtIn, occIn, floorIn, sunIn].forEach(i => {
+      i?.addEventListener('input', update);
+      i?.addEventListener('change', update);
+    });
+    update();
+  }
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initAc);
+  } else {
+    initAc();
+  }
+</script>

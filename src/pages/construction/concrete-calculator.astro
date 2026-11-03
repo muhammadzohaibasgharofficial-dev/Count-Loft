@@ -1,0 +1,235 @@
+---
+import ToolShell from '@components/tool/ToolShell.astro';
+import FaqAccordion from '@components/tool/FaqAccordion.astro';
+import JsonLd from '@components/seo/JsonLd.astro';
+import { buildBreadcrumbs } from '@lib/format/breadcrumbs';
+import { generateWebApplicationJsonLd, generateFaqJsonLd, generateBreadcrumbJsonLd } from '@lib/seo/jsonld';
+
+const breadcrumbs = buildBreadcrumbs([
+  { label: 'Construction', href: '/construction' },
+  { label: 'Concrete Calculator' }
+]);
+
+const faqs = [
+  {
+    question: 'How do you calculate concrete in cubic yards?',
+    answer: 'Multiply length (feet) by width (feet) by thickness (inches converted to feet by dividing by 12), then divide the total cubic feet by 27. The shortcut formula is: (Length in ft × Width in ft × Thickness in inches) ÷ 324.'
+  },
+  {
+    question: 'How many bags of concrete make a cubic yard?',
+    answer: 'It takes approximately 60 bags of 60-lb pre-mix concrete, or about 45 bags of 80-lb pre-mix concrete to yield 1 cubic yard.'
+  },
+  {
+    question: 'What is the standard thickness for a concrete slab?',
+    answer: 'Standard residential walkways and patios are typically 4 inches thick. Driveways supporting passenger vehicles should be 4 to 5 inches, while heavy truck pads require 6 inches or more.'
+  },
+  {
+    question: 'Should I order extra concrete for a pour?',
+    answer: 'Yes. Most concrete contractors recommend adding 5% to 10% safety margin for ground spillage, excavation irregularities, and slab deflection.'
+  },
+  {
+    question: 'When should I order ready-mix truck delivery vs pre-mix bags?',
+    answer: 'For projects requiring more than 1 to 1.5 cubic yards (around 50 to 70 bags), ordering a ready-mix concrete delivery truck is significantly more economical and saves heavy labor.'
+  }
+];
+
+const webAppSchema = generateWebApplicationJsonLd({
+  name: 'Concrete Calculator — Count Loft',
+  description: 'Calculate cubic yards, cubic meters, and pre-mixed bag quantities needed for slabs, footings, and patios.',
+  url: 'https://count-loft.com/construction/concrete-calculator',
+  category: 'WebApplication'
+});
+---
+
+<ToolShell
+  title="Concrete Calculator"
+  description="Estimate cubic yards, cubic meters, and 60-lb or 80-lb pre-mix bags needed for slabs, driveways, footings, and patios."
+  category="construction"
+  breadcrumbs={breadcrumbs}
+  author="Count Loft Team"
+  lastUpdated="2026-10-31"
+>
+  <div slot="inputs">
+    <form id="concrete-form" novalidate onsubmit="return false;">
+      <div class="form-row-2">
+        <div class="form-group">
+          <label for="conc-length" class="form-label">Slab Length (Feet)</label>
+          <input type="number" id="conc-length" class="form-input" value="10" min="0.5" step="0.5" />
+        </div>
+        <div class="form-group">
+          <label for="conc-width" class="form-label">Slab Width (Feet)</label>
+          <input type="number" id="conc-width" class="form-input" value="10" min="0.5" step="0.5" />
+        </div>
+      </div>
+
+      <div class="form-row-2">
+        <div class="form-group">
+          <label for="conc-thickness" class="form-label">Slab Thickness (Inches)</label>
+          <input type="number" id="conc-thickness" class="form-input" value="4" min="1" max="24" step="0.5" />
+        </div>
+        <div class="form-group">
+          <label for="conc-waste" class="form-label">Waste Margin</label>
+          <select id="conc-waste" class="form-input">
+            <option value="0">0% (Exact Volume)</option>
+            <option value="5">5% (Tightly Formed)</option>
+            <option value="10" selected>10% (Recommended)</option>
+          </select>
+        </div>
+      </div>
+    </form>
+  </div>
+
+  <div slot="results">
+    <div class="result-hero">
+      <span class="result-hero-label">Total Concrete Required</span>
+      <span class="result-hero-value" id="conc-yards-val">1.36 yd³</span>
+      <span class="result-hero-subtext" id="conc-meters-val">1.04 m³</span>
+    </div>
+
+    <div class="conc-breakdown-table">
+      <div class="breakdown-row">
+        <span>60-lb Pre-Mix Bags:</span>
+        <strong id="conc-bags60-val">80 Bags</strong>
+      </div>
+      <div class="breakdown-row">
+        <span>80-lb Pre-Mix Bags:</span>
+        <strong id="conc-bags80-val">62 Bags</strong>
+      </div>
+      <div class="breakdown-row">
+        <span>Exact Cubic Volume:</span>
+        <strong id="conc-exact-val">1.23 yd³ (Before waste)</strong>
+      </div>
+    </div>
+  </div>
+
+  <div slot="how-to">
+    <ol>
+      <li><strong>Measure the slab perimeter:</strong> Enter length and width in feet.</li>
+      <li><strong>Specify slab depth:</strong> Enter thickness in inches (4 inches is standard for patios and sidewalks).</li>
+      <li><strong>Choose pre-mix bags or ready-mix:</strong> For jobs over 1.5 yd³, contact a ready-mix concrete batch plant.</li>
+    </ol>
+  </div>
+
+  <div slot="formula">
+    <pre><code>Cubic Yards  = (Length in ft × Width in ft × Thickness in inches) ÷ 324
+Cubic Meters = Cubic Yards × 0.764555
+60-lb Bags   = Cubic Yards ÷ 0.017
+80-lb Bags   = Cubic Yards ÷ 0.022</code></pre>
+  </div>
+
+  <div slot="examples-table">
+    <table class="data-table">
+      <thead>
+        <tr>
+          <th>Dimensions (4" Depth)</th>
+          <th>Cubic Yards</th>
+          <th>Cubic Meters</th>
+          <th>80-lb Bags</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr><td>4 ft × 8 ft</td><td>0.40 yd³</td><td>0.31 m³</td><td>18 Bags</td></tr>
+        <tr><td>10 ft × 10 ft</td><td>1.23 yd³</td><td>0.94 m³</td><td>56 Bags</td></tr>
+        <tr><td>12 ft × 12 ft</td><td>1.78 yd³</td><td>1.36 m³</td><td>81 Bags</td></tr>
+        <tr><td>20 ft × 20 ft</td><td>4.94 yd³</td><td>3.78 m³</td><td>225 Bags (Truck)</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div slot="faq">
+    <FaqAccordion items={faqs} />
+  </div>
+
+  <div slot="related-tools">
+    <div class="related-tools-grid">
+      <a href="/construction/square-footage-calculator" class="card related-tool-card">
+        <h3>Square Footage Calculator</h3>
+        <p>Calculate surface area in square feet and square meters with cost estimates.</p>
+      </a>
+      <a href="/construction/tile-calculator" class="card related-tool-card">
+        <h3>Tile Calculator</h3>
+        <p>Calculate tile counts and boxes required with pattern cut allowances.</p>
+      </a>
+    </div>
+  </div>
+</ToolShell>
+
+<JsonLd schema={[webAppSchema, generateFaqJsonLd(faqs), generateBreadcrumbJsonLd([{ name: 'Home', item: '/' }, { name: 'Construction', item: '/construction' }, { name: 'Concrete Calculator', item: '/construction/concrete-calculator' }])]} />
+
+<style>
+  .form-row-2 {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: var(--space-4);
+  }
+
+  @media (min-width: 640px) {
+    .form-row-2 {
+      grid-template-columns: 1fr 1fr;
+    }
+  }
+
+  .conc-breakdown-table {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-2);
+    padding: var(--space-4) 0;
+    border-top: 1px solid var(--color-border);
+    margin-top: var(--space-4);
+    font-size: var(--text-sm);
+  }
+
+  .breakdown-row {
+    display: flex;
+    justify-content: space-between;
+  }
+</style>
+
+<script>
+  import { calculateConcrete } from '@lib/calc/construction';
+  import { parseNumberInput } from '@lib/format/number';
+
+  function initConcrete() {
+    const lenIn = document.getElementById('conc-length') as HTMLInputElement | null;
+    const widIn = document.getElementById('conc-width') as HTMLInputElement | null;
+    const thkIn = document.getElementById('conc-thickness') as HTMLInputElement | null;
+    const wasteIn = document.getElementById('conc-waste') as HTMLSelectElement | null;
+
+    const yardsDisplay = document.getElementById('conc-yards-val');
+    const metersDisplay = document.getElementById('conc-meters-val');
+    const bags60Display = document.getElementById('conc-bags60-val');
+    const bags80Display = document.getElementById('conc-bags80-val');
+    const exactDisplay = document.getElementById('conc-exact-val');
+
+    function update() {
+      const length = parseNumberInput(lenIn?.value, 10);
+      const width = parseNumberInput(widIn?.value, 10);
+      const thickness = parseNumberInput(thkIn?.value, 4);
+      const wastePct = parseNumberInput(wasteIn?.value, 10);
+
+      const exact = calculateConcrete(length, width, thickness);
+      const withWasteYards = Math.round(exact.cubicYards * (1 + wastePct / 100) * 100) / 100;
+      const withWasteMeters = Math.round(withWasteYards * 0.764555 * 100) / 100;
+      const b60 = Math.ceil(withWasteYards / 0.017);
+      const b80 = Math.ceil(withWasteYards / 0.022);
+
+      if (yardsDisplay) yardsDisplay.textContent = `${withWasteYards} yd³`;
+      if (metersDisplay) metersDisplay.textContent = `${withWasteMeters} m³`;
+      if (bags60Display) bags60Display.textContent = `${b60} Bags`;
+      if (bags80Display) bags80Display.textContent = `${b80} Bags`;
+      if (exactDisplay) exactDisplay.textContent = `${exact.cubicYards} yd³ (Before waste)`;
+    }
+
+    [lenIn, widIn, thkIn, wasteIn].forEach(i => {
+      i?.addEventListener('input', update);
+      i?.addEventListener('change', update);
+    });
+    update();
+  }
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initConcrete);
+  } else {
+    initConcrete();
+  }
+</script>

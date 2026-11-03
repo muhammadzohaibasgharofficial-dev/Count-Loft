@@ -1,0 +1,261 @@
+---
+/**
+ * Count Loft — Interest Calculator
+ * Direct side-by-side comparison of Simple Interest vs Compound Interest.
+ */
+import ToolShell from '@components/tool/ToolShell.astro';
+import FaqAccordion from '@components/tool/FaqAccordion.astro';
+import JsonLd from '@components/seo/JsonLd.astro';
+import { buildBreadcrumbs } from '@lib/format/breadcrumbs';
+import { generateWebApplicationJsonLd, generateFaqJsonLd, generateBreadcrumbJsonLd } from '@lib/seo/jsonld';
+
+const breadcrumbs = buildBreadcrumbs([
+  { label: 'Finance', href: '/finance' },
+  { label: 'Interest Calculator' }
+]);
+
+const faqs = [
+  {
+    question: 'What is simple interest?',
+    answer: 'Simple interest is calculated solely on the original principal amount deposited or borrowed: Interest = Principal × Rate × Time.'
+  },
+  {
+    question: 'Why does compound interest yield more than simple interest?',
+    answer: 'Compound interest generates interest on interest previously earned, creating accelerating exponential growth rather than linear growth.'
+  },
+  {
+    question: 'What types of accounts use simple interest?',
+    answer: 'Most short-term personal loans, auto loans, and certain treasury bills use simple interest. Savings accounts and certificates of deposit (CDs) almost always compound.'
+  },
+  {
+    question: 'How do you calculate annual percentage yield (APY)?',
+    answer: 'APY accounts for compound frequency: APY = (1 + r/n)ⁿ - 1, representing the true annualized return on investment.'
+  },
+  {
+    question: 'Can simple interest ever exceed compound interest?',
+    answer: 'No. For identical principal, nominal rates, and positive time periods, compound interest will always equal or exceed simple interest.'
+  }
+];
+
+const webAppSchema = generateWebApplicationJsonLd({
+  name: 'Interest Calculator — Count Loft',
+  description: 'Compare simple interest and compound interest returns side-by-side over time.',
+  url: 'https://count-loft.com/finance/interest-calculator',
+  category: 'FinanceApplication'
+});
+---
+
+<ToolShell
+  title="Interest Calculator"
+  description="Compare simple interest and compound interest returns side-by-side with interactive principal and annual rate controls."
+  category="finance"
+  breadcrumbs={breadcrumbs}
+  author="Count Loft Team"
+  lastUpdated="2026-10-31"
+>
+  <div slot="inputs">
+    <form id="interest-form" novalidate onsubmit="return false;">
+      <div class="form-group">
+        <label for="int-principal" class="form-label">Principal Amount ($)</label>
+        <input type="number" id="int-principal" class="form-input" value="10000" step="500" />
+      </div>
+
+      <div class="form-row-2">
+        <div class="form-group">
+          <label for="int-rate" class="form-label">Annual Interest Rate (%)</label>
+          <input type="number" id="int-rate" class="form-input" value="5.0" step="0.1" />
+        </div>
+        <div class="form-group">
+          <label for="int-years" class="form-label">Time Period (Years)</label>
+          <input type="number" id="int-years" class="form-input" value="5" min="1" max="40" />
+        </div>
+      </div>
+    </form>
+  </div>
+
+  <div slot="results">
+    <div class="interest-comparison-grid">
+      <!-- Simple Interest -->
+      <div class="card int-card">
+        <h3>Simple Interest</h3>
+        <div class="int-hero-val" id="simple-total-val">$12,500.00</div>
+        <div class="int-sub">
+          <span>Interest Earned:</span>
+          <strong id="simple-interest-val">$2,500.00</strong>
+        </div>
+      </div>
+
+      <!-- Compound Interest -->
+      <div class="card int-card highlight">
+        <h3>Compound Interest (Annual)</h3>
+        <div class="int-hero-val" id="compound-total-val">$12,762.82</div>
+        <div class="int-sub">
+          <span>Interest Earned:</span>
+          <strong id="compound-interest-val">$2,762.82</strong>
+        </div>
+      </div>
+    </div>
+
+    <div class="compound-bonus-callout">
+      <span>Compounding Advantage:</span>
+      <strong id="advantage-val">+$262.82 extra profit</strong>
+    </div>
+  </div>
+
+  <div slot="how-to">
+    <ol>
+      <li><strong>Input initial balance:</strong> Enter your principal deposit.</li>
+      <li><strong>Set annual interest percentage:</strong> Input the advertised interest rate.</li>
+      <li><strong>Select duration in years:</strong> Observe how compounding pulls ahead as time expands.</li>
+    </ol>
+  </div>
+
+  <div slot="formula">
+    <pre><code>Simple Interest:   Total = P × (1 + r × t)
+Compound Interest: Total = P × (1 + r)ᵗ</code></pre>
+  </div>
+
+  <div slot="examples-table">
+    <table class="data-table">
+      <thead>
+        <tr>
+          <th>Years</th>
+          <th>Simple Total (5%)</th>
+          <th>Compound Total (5%)</th>
+          <th>Difference</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr><td>1 Year</td><td>$10,500.00</td><td>$10,500.00</td><td>$0.00</td></tr>
+        <tr><td>3 Years</td><td>$11,500.00</td><td>$11,576.25</td><td>+$76.25</td></tr>
+        <tr><td>5 Years</td><td>$12,500.00</td><td>$12,762.82</td><td>+$262.82</td></tr>
+        <tr><td>10 Years</td><td>$15,000.00</td><td>$16,288.95</td><td>+$1,288.95</td></tr>
+        <tr><td>20 Years</td><td>$20,000.00</td><td>$26,532.98</td><td>+$6,532.98</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div slot="faq">
+    <FaqAccordion items={faqs} />
+  </div>
+
+  <div slot="related-tools">
+    <div class="related-tools-grid">
+      <a href="/finance/compound-interest-calculator" class="card related-tool-card">
+        <h3>Compound Interest Calculator</h3>
+        <p>Model monthly savings additions and advanced compounding schedules.</p>
+      </a>
+      <a href="/finance/loan-calculator" class="card related-tool-card">
+        <h3>Loan Calculator</h3>
+        <p>Amortize debts with fixed monthly payments.</p>
+      </a>
+    </div>
+  </div>
+</ToolShell>
+
+<JsonLd schema={[webAppSchema, generateFaqJsonLd(faqs), generateBreadcrumbJsonLd([{ name: 'Home', item: '/' }, { name: 'Finance', item: '/finance' }, { name: 'Interest Calculator', item: '/finance/interest-calculator' }])]} />
+
+<style>
+  .form-row-2 {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: var(--space-4);
+  }
+
+  @media (min-width: 640px) {
+    .form-row-2 {
+      grid-template-columns: 1fr 1fr;
+    }
+  }
+
+  .interest-comparison-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: var(--space-3);
+  }
+
+  .int-card {
+    padding: var(--space-4);
+    text-align: center;
+  }
+
+  .int-card.highlight {
+    border-color: var(--color-primary);
+  }
+
+  .int-card h3 {
+    font-size: var(--text-sm);
+    margin: 0 0 var(--space-2) 0;
+    color: var(--color-text-muted);
+  }
+
+  .int-hero-val {
+    font-size: 1.25rem;
+    font-weight: var(--font-weight-bold);
+    color: var(--color-text);
+  }
+
+  .int-sub {
+    font-size: var(--text-xs);
+    margin-top: var(--space-2);
+    display: flex;
+    justify-content: space-between;
+    border-top: 1px solid var(--color-border);
+    padding-top: var(--space-2);
+  }
+
+  .compound-bonus-callout {
+    margin-top: var(--space-4);
+    padding: var(--space-3);
+    background-color: var(--color-surface-muted);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-md);
+    display: flex;
+    justify-content: space-between;
+    font-size: var(--text-sm);
+  }
+
+  .compound-bonus-callout strong {
+    color: var(--color-success);
+  }
+</style>
+
+<script>
+  import { compareInterest } from '@lib/calc/interest';
+  import { formatCurrency, parseNumberInput } from '@lib/format/number';
+
+  function initInterest() {
+    const pIn = document.getElementById('int-principal') as HTMLInputElement | null;
+    const rIn = document.getElementById('int-rate') as HTMLInputElement | null;
+    const yIn = document.getElementById('int-years') as HTMLInputElement | null;
+
+    const sTotal = document.getElementById('simple-total-val');
+    const sInt = document.getElementById('simple-interest-val');
+    const cTotal = document.getElementById('compound-total-val');
+    const cInt = document.getElementById('compound-interest-val');
+    const advantage = document.getElementById('advantage-val');
+
+    function update() {
+      const res = compareInterest({
+        principal: parseNumberInput(pIn?.value, 10000),
+        annualRate: parseNumberInput(rIn?.value, 5.0),
+        timeYears: parseNumberInput(yIn?.value, 5)
+      });
+
+      if (sTotal) sTotal.textContent = formatCurrency(res.simpleTotal);
+      if (sInt) sInt.textContent = formatCurrency(res.simpleInterest);
+      if (cTotal) cTotal.textContent = formatCurrency(res.compoundTotal);
+      if (cInt) cInt.textContent = formatCurrency(res.compoundInterest);
+      if (advantage) advantage.textContent = `+${formatCurrency(res.compoundingAdvantage)} extra profit`;
+    }
+
+    [pIn, rIn, yIn].forEach(i => i?.addEventListener('input', update));
+    update();
+  }
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initInterest);
+  } else {
+    initInterest();
+  }
+</script>

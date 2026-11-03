@@ -1,0 +1,209 @@
+---
+import ToolShell from '@components/tool/ToolShell.astro';
+import FaqAccordion from '@components/tool/FaqAccordion.astro';
+import JsonLd from '@components/seo/JsonLd.astro';
+import { buildBreadcrumbs } from '@lib/format/breadcrumbs';
+import { generateWebApplicationJsonLd, generateFaqJsonLd, generateBreadcrumbJsonLd } from '@lib/seo/jsonld';
+
+const breadcrumbs = buildBreadcrumbs([
+  { label: 'Health', href: '/health' },
+  { label: 'Ovulation Calculator' }
+]);
+
+const faqs = [
+  {
+    question: 'When does ovulation occur in a typical cycle?',
+    answer: 'Ovulation typically occurs roughly 14 days before the start of the next menstrual period. For a regular 28-day cycle, ovulation usually takes place on or around Day 14.'
+  },
+  {
+    question: 'What is the fertile window?',
+    answer: 'The fertile window encompasses the 5 days leading up to ovulation plus the day of ovulation itself (6 days total). Because sperm can survive in cervical fluid for up to 5 days, intercourse during this window can lead to conception.'
+  },
+  {
+    question: 'What physical signs indicate ovulation?',
+    answer: 'Common biological indicators include clear, slippery cervical mucus (resembling raw egg whites), a subtle rise in basal body temperature following ovulation, mild unilateral lower abdominal cramping (mittelschmerz), and heightened luteinizing hormone (LH) detected by urine test strips.'
+  },
+  {
+    question: 'How do cycle length variations change the ovulation date?',
+    answer: 'The luteal phase (time between ovulation and the next period) is relatively constant at 14 days. If your cycle is 32 days, ovulation is typically around Day 18 (32 − 14). If 24 days, around Day 10.'
+  },
+  {
+    question: 'Can this calculator be used as birth control?',
+    answer: 'No. Calendar-based methods have significant failure rates as contraception because ovulation dates naturally fluctuate with stress, illness, travel, and hormonal shifts.'
+  }
+];
+
+const webAppSchema = generateWebApplicationJsonLd({
+  name: 'Ovulation Calculator — Count Loft',
+  description: 'Calculate your most fertile days, estimated ovulation date, and next cycle start date.',
+  url: 'https://count-loft.com/health/ovulation-calculator',
+  category: 'HealthApplication'
+});
+---
+
+<ToolShell
+  title="Ovulation Calculator"
+  description="Estimate your peak ovulation date, 6-day fertile conception window, and next anticipated menstrual period."
+  category="health"
+  breadcrumbs={breadcrumbs}
+  author="Count Loft Team"
+  lastUpdated="2026-10-31"
+>
+  <div slot="inputs">
+    <form id="ovul-form" novalidate onsubmit="return false;">
+      <div class="form-group">
+        <label for="ovul-lmp" class="form-label">First Day of Last Menstrual Period</label>
+        <input type="date" id="ovul-lmp" class="form-input" />
+      </div>
+
+      <div class="form-group">
+        <label for="ovul-cycle" class="form-label">Average Cycle Length (Days)</label>
+        <input type="number" id="ovul-cycle" class="form-input" value="28" min="21" max="45" />
+      </div>
+    </form>
+  </div>
+
+  <div slot="results">
+    <div class="result-hero">
+      <span class="result-hero-label">Estimated Ovulation Date</span>
+      <span class="result-hero-value" id="ovul-date-val">—</span>
+      <span class="result-hero-subtext" id="ovul-window-val">—</span>
+    </div>
+
+    <div class="ovul-breakdown-table">
+      <div class="breakdown-row">
+        <span>Peak Conception Window:</span>
+        <strong id="ovul-fertile-span">—</strong>
+      </div>
+      <div class="breakdown-row">
+        <span>Next Period Begins:</span>
+        <strong id="ovul-next-period">—</strong>
+      </div>
+      <div class="breakdown-row">
+        <span>Cycle Phase Assumption:</span>
+        <strong>14-Day Post-Ovulatory Luteal Phase</strong>
+      </div>
+    </div>
+  </div>
+
+  <div slot="how-to">
+    <ol>
+      <li><strong>Input the start date of your last period:</strong> Select the day your cycle began.</li>
+      <li><strong>Provide your average cycle duration:</strong> Standard cycles span between 24 and 35 days.</li>
+      <li><strong>View your fertile window:</strong> Identify the 6 key days with highest probability of conception.</li>
+    </ol>
+  </div>
+
+  <div slot="formula">
+    <pre><code>Ovulation Date       = LMP Date + (Cycle Length − 14 Days)
+Fertile Window Start = Ovulation Date − 5 Days
+Fertile Window End   = Ovulation Date
+Next Menstrual Cycle = LMP Date + Cycle Length Days</code></pre>
+  </div>
+
+  <div slot="examples-table">
+    <table class="data-table">
+      <thead>
+        <tr>
+          <th>Cycle Duration</th>
+          <th>Estimated Ovulation Day</th>
+          <th>Fertile Conception Window</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr><td>26 Days</td><td>Day 12 of cycle</td><td>Days 7 – 12</td></tr>
+        <tr><td>28 Days</td><td>Day 14 of cycle</td><td>Days 9 – 14</td></tr>
+        <tr><td>30 Days</td><td>Day 16 of cycle</td><td>Days 11 – 16</td></tr>
+        <tr><td>32 Days</td><td>Day 18 of cycle</td><td>Days 13 – 18</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div slot="faq">
+    <FaqAccordion items={faqs} />
+  </div>
+
+  <div slot="related-tools">
+    <div class="related-tools-grid">
+      <a href="/health/pregnancy-due-date-calculator" class="card related-tool-card">
+        <h3>Pregnancy Due Date Calculator</h3>
+        <p>Track gestational age and calculate estimated delivery dates.</p>
+      </a>
+      <a href="/math/age-calculator" class="card related-tool-card">
+        <h3>Age Calculator</h3>
+        <p>Compute precise chronological age across years, months, and days.</p>
+      </a>
+    </div>
+  </div>
+</ToolShell>
+
+<JsonLd schema={[webAppSchema, generateFaqJsonLd(faqs), generateBreadcrumbJsonLd([{ name: 'Home', item: '/' }, { name: 'Health', item: '/health' }, { name: 'Ovulation Calculator', item: '/health/ovulation-calculator' }])]} />
+
+<style>
+  .ovul-breakdown-table {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-2);
+    padding: var(--space-4) 0;
+    border-top: 1px solid var(--color-border);
+    margin-top: var(--space-4);
+    font-size: var(--text-sm);
+  }
+
+  .breakdown-row {
+    display: flex;
+    justify-content: space-between;
+  }
+</style>
+
+<script>
+  import { calculateOvulation } from '@lib/calc/pregnancy';
+  import { parseNumberInput } from '@lib/format/number';
+
+  function initOvulation() {
+    const lmpIn = document.getElementById('ovul-lmp') as HTMLInputElement | null;
+    const cycleIn = document.getElementById('ovul-cycle') as HTMLInputElement | null;
+
+    const dateDisplay = document.getElementById('ovul-date-val');
+    const windowDisplay = document.getElementById('ovul-window-val');
+    const spanDisplay = document.getElementById('ovul-fertile-span');
+    const nextPeriodDisplay = document.getElementById('ovul-next-period');
+
+    // Default to 10 days ago for interactive initial preview
+    if (lmpIn && !lmpIn.value) {
+      const defaultLmp = new Date();
+      defaultLmp.setDate(defaultLmp.getDate() - 10);
+      lmpIn.value = defaultLmp.toISOString().split('T')[0] || '';
+    }
+
+    function formatDate(dateStr: string): string {
+      const d = new Date(dateStr);
+      if (isNaN(d.getTime())) return dateStr;
+      return d.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+    }
+
+    function update() {
+      const lmpStr = lmpIn?.value || '';
+      const cycle = parseNumberInput(cycleIn?.value, 28);
+
+      if (!lmpStr) return;
+
+      const res = calculateOvulation(lmpStr, cycle);
+
+      if (dateDisplay) dateDisplay.textContent = formatDate(res.estimatedOvulationDate);
+      if (windowDisplay) windowDisplay.textContent = `Fertile Window: ${formatDate(res.fertileWindowStart)} – ${formatDate(res.fertileWindowEnd)}`;
+      if (spanDisplay) spanDisplay.textContent = `${formatDate(res.fertileWindowStart)} to ${formatDate(res.fertileWindowEnd)}`;
+      if (nextPeriodDisplay) nextPeriodDisplay.textContent = formatDate(res.nextPeriodDate);
+    }
+
+    lmpIn?.addEventListener('input', update);
+    cycleIn?.addEventListener('input', update);
+    update();
+  }
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initOvulation);
+  } else {
+    initOvulation();
+  }
+</script>

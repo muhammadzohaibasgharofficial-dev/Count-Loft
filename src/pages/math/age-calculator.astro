@@ -1,0 +1,215 @@
+---
+/**
+ * Count Loft — Age Calculator
+ * Computes exact chronological age and milestones between dates.
+ */
+import ToolShell from '@components/tool/ToolShell.astro';
+import FaqAccordion from '@components/tool/FaqAccordion.astro';
+import JsonLd from '@components/seo/JsonLd.astro';
+import { buildBreadcrumbs } from '@lib/format/breadcrumbs';
+import { generateWebApplicationJsonLd, generateFaqJsonLd, generateBreadcrumbJsonLd } from '@lib/seo/jsonld';
+
+const breadcrumbs = buildBreadcrumbs([
+  { label: 'Math', href: '/math' },
+  { label: 'Age Calculator' }
+]);
+
+const faqs = [
+  {
+    question: 'How does the Age Calculator account for leap years?',
+    answer: 'The calculator handles leap years by calculating true calendar elapsed periods, adding February 29th whenever a leap year falls within the calculation timeframe.'
+  },
+  {
+    question: 'Can I calculate my age on a specific future or past date?',
+    answer: 'Yes. You can customize both the Date of Birth and the Target Age Date to determine how old someone was or will be at any milestone.'
+  },
+  {
+    question: 'How are months with varying lengths (28, 30, 31 days) calculated?',
+    answer: 'When remaining days are negative, the calculator borrows the actual number of days from the preceding calendar month rather than using an arbitrary 30-day average.'
+  },
+  {
+    question: 'What is chronological age?',
+    answer: 'Chronological age is the exact amount of time that has elapsed from birth to a given date, measured in calendar years, months, days, and hours.'
+  },
+  {
+    question: 'How many hours old am I?',
+    answer: 'Multiply your total days lived by 24. A 25-year-old has lived roughly 9,131 days, or approximately 219,144 hours.'
+  }
+];
+
+const webAppSchema = generateWebApplicationJsonLd({
+  name: 'Age Calculator — Count Loft',
+  description: 'Calculate your exact age in years, months, days, hours, and see days until your next birthday.',
+  url: 'https://count-loft.com/math/age-calculator',
+  category: 'EducationalApplication'
+});
+---
+
+<ToolShell
+  title="Age Calculator"
+  description="Calculate your exact age in years, months, days, and total hours lived, plus find the countdown to your next birthday."
+  category="math"
+  breadcrumbs={breadcrumbs}
+  author="Count Loft Team"
+  lastUpdated="2026-10-31"
+>
+  <div slot="inputs">
+    <form id="age-form" novalidate onsubmit="return false;">
+      <div class="form-group">
+        <label for="birth-date" class="form-label">Date of Birth</label>
+        <input type="date" id="birth-date" class="form-input" value="2000-01-01" />
+      </div>
+
+      <div class="form-group">
+        <label for="target-date" class="form-label">Age at Date</label>
+        <input type="date" id="target-date" class="form-input" value="2026-10-31" />
+      </div>
+    </form>
+  </div>
+
+  <div slot="results">
+    <div class="result-hero">
+      <span class="result-hero-label">Your Exact Age</span>
+      <span class="result-hero-value" id="age-hero-val">26 Years</span>
+      <span class="result-hero-subtext" id="age-hero-sub">9 months, 30 days</span>
+    </div>
+
+    <div class="age-stats-grid">
+      <div class="stat-card">
+        <span class="stat-label">Total Days:</span>
+        <strong id="stat-days">9,800</strong>
+      </div>
+      <div class="stat-card">
+        <span class="stat-label">Total Weeks:</span>
+        <strong id="stat-weeks">1,400</strong>
+      </div>
+      <div class="stat-card">
+        <span class="stat-label">Total Hours:</span>
+        <strong id="stat-hours">235,200</strong>
+      </div>
+      <div class="stat-card">
+        <span class="stat-label">Next Birthday in:</span>
+        <strong id="stat-next">62 days</strong>
+      </div>
+    </div>
+  </div>
+
+  <div slot="how-to">
+    <ol>
+      <li><strong>Select Date of Birth:</strong> Enter your year, month, and day of birth.</li>
+      <li><strong>Select Target Date:</strong> Defaults to the current date or choose a milestone date.</li>
+      <li><strong>View Detailed Breakdown:</strong> Instantly inspect calendar age, total hours lived, and days remaining until your birthday.</li>
+    </ol>
+  </div>
+
+  <div slot="formula">
+    <pre><code>Years  = TargetYear - BirthYear (adjusted for month/day)
+Months = TargetMonth - BirthMonth (borrowing 12 months if negative)
+Days   = TargetDay - BirthDay (borrowing days from prior month if negative)</code></pre>
+  </div>
+
+  <div slot="examples-table">
+    <table class="data-table">
+      <thead>
+        <tr>
+          <th>Age Milestone</th>
+          <th>Approximate Days</th>
+          <th>Approximate Hours</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr><td>18 Years</td><td>6,574 days</td><td>157,776 hours</td></tr>
+        <tr><td>21 Years</td><td>7,670 days</td><td>184,080 hours</td></tr>
+        <tr><td>30 Years</td><td>10,957 days</td><td>262,968 hours</td></tr>
+        <tr><td>50 Years</td><td>18,262 days</td><td>438,288 hours</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div slot="faq">
+    <FaqAccordion items={faqs} />
+  </div>
+
+  <div slot="related-tools">
+    <div class="related-tools-grid">
+      <a href="/math/date-difference-calculator" class="card related-tool-card">
+        <h3>Date Difference Calculator</h3>
+        <p>Calculate business days and elapsed calendar time between dates.</p>
+      </a>
+      <a href="/math/time-hours-calculator" class="card related-tool-card">
+        <h3>Time / Hours Calculator</h3>
+        <p>Add and subtract hours and minutes for timesheets.</p>
+      </a>
+    </div>
+  </div>
+</ToolShell>
+
+<JsonLd schema={[webAppSchema, generateFaqJsonLd(faqs), generateBreadcrumbJsonLd([{ name: 'Home', item: '/' }, { name: 'Math', item: '/math' }, { name: 'Age Calculator', item: '/math/age-calculator' }])]} />
+
+<style>
+  .age-stats-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: var(--space-3);
+    margin-top: var(--space-4);
+  }
+
+  .stat-card {
+    background-color: var(--color-surface);
+    border: 1px solid var(--color-border);
+    padding: var(--space-3);
+    border-radius: var(--radius-md);
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-1);
+  }
+
+  .stat-label {
+    font-size: var(--text-xs);
+    color: var(--color-text-muted);
+  }
+
+  .stat-card strong {
+    font-size: var(--text-body);
+    color: var(--color-text);
+  }
+</style>
+
+<script>
+  import { calculateAge } from '@lib/calc/age';
+  import { formatNumber } from '@lib/format/number';
+
+  function initAge() {
+    const birthInput = document.getElementById('birth-date') as HTMLInputElement | null;
+    const targetInput = document.getElementById('target-date') as HTMLInputElement | null;
+
+    const heroVal = document.getElementById('age-hero-val');
+    const heroSub = document.getElementById('age-hero-sub');
+    const statDays = document.getElementById('stat-days');
+    const statWeeks = document.getElementById('stat-weeks');
+    const statHours = document.getElementById('stat-hours');
+    const statNext = document.getElementById('stat-next');
+
+    function update() {
+      if (!birthInput?.value) return;
+      const res = calculateAge(birthInput.value, targetInput?.value);
+
+      if (heroVal) heroVal.textContent = `${res.years} Years`;
+      if (heroSub) heroSub.textContent = `${res.months} months, ${res.days} days`;
+      if (statDays) statDays.textContent = formatNumber(res.totalDays, 0);
+      if (statWeeks) statWeeks.textContent = formatNumber(res.totalWeeks, 0);
+      if (statHours) statHours.textContent = formatNumber(res.totalHours, 0);
+      if (statNext) statNext.textContent = `${res.daysUntilNextBirthday} days`;
+    }
+
+    birthInput?.addEventListener('input', update);
+    targetInput?.addEventListener('input', update);
+    update();
+  }
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initAge);
+  } else {
+    initAge();
+  }
+</script>

@@ -1,0 +1,295 @@
+---
+/**
+ * Count Loft — BMI Calculator
+ * Supports Metric (kg/cm) and Imperial (lbs/inches) units with WHO classifications.
+ */
+import ToolShell from '@components/tool/ToolShell.astro';
+import FaqAccordion from '@components/tool/FaqAccordion.astro';
+import JsonLd from '@components/seo/JsonLd.astro';
+import { buildBreadcrumbs } from '@lib/format/breadcrumbs';
+import { generateWebApplicationJsonLd, generateFaqJsonLd, generateBreadcrumbJsonLd } from '@lib/seo/jsonld';
+
+const breadcrumbs = buildBreadcrumbs([
+  { label: 'Health', href: '/health' },
+  { label: 'BMI Calculator' }
+]);
+
+const faqs = [
+  {
+    question: 'What is a normal BMI for adults?',
+    answer: 'According to the World Health Organization (WHO), a normal BMI for adults aged 20 and over is between 18.5 and 24.9.'
+  },
+  {
+    question: 'How accurate is BMI as a health metric?',
+    answer: 'BMI is an effective population screening tool, but it does not differentiate between fat mass and muscle mass. Athletes and bodybuilders may register as overweight due to dense muscle tissue.'
+  },
+  {
+    question: 'What is the formula for calculating BMI?',
+    answer: 'In metric units: BMI = weight (kg) / [height (m)]². In imperial units: BMI = 703 * weight (lbs) / [height (in)]².'
+  },
+  {
+    question: 'Does age or gender affect BMI classification?',
+    answer: 'For adults 20 and older, standard WHO BMI categories are identical for men and women regardless of age. For children and teens, BMI percentiles based on age and sex charts are used instead.'
+  },
+  {
+    question: 'How can I calculate my healthy weight range?',
+    answer: 'Multiply 18.5 and 24.9 by the square of your height in meters. For someone 1.75m tall, the healthy weight range is roughly 56.7 kg to 76.3 kg (125 to 168 lbs).'
+  }
+];
+
+const webAppSchema = generateWebApplicationJsonLd({
+  name: 'BMI Calculator — Count Loft',
+  description: 'Free online BMI calculator. Calculate your Body Mass Index (BMI), category classification, and healthy weight range instantly.',
+  url: 'https://count-loft.com/health/bmi-calculator',
+  category: 'HealthApplication'
+});
+---
+
+<ToolShell
+  title="BMI Calculator"
+  description="Calculate your Body Mass Index (BMI), WHO weight category, and target healthy weight range with metric or imperial units."
+  category="health"
+  breadcrumbs={breadcrumbs}
+  author="Count Loft Team"
+  lastUpdated="2026-10-31"
+>
+  <div slot="inputs">
+    <div class="bmi-form-wrapper">
+      <div class="unit-toggle-row">
+        <button type="button" id="btn-metric" class="btn btn-primary unit-tab active">Metric (kg, cm)</button>
+        <button type="button" id="btn-imperial" class="btn btn-ghost unit-tab">US Units (lbs, ft/in)</button>
+      </div>
+
+      <form id="bmi-form" novalidate onsubmit="return false;">
+        <!-- Metric Fields -->
+        <div id="metric-fields">
+          <div class="form-group">
+            <label for="weight-kg" class="form-label">Weight (kg)</label>
+            <input type="number" id="weight-kg" class="form-input" value="70" min="20" max="300" />
+          </div>
+          <div class="form-group">
+            <label for="height-cm" class="form-label">Height (cm)</label>
+            <input type="number" id="height-cm" class="form-input" value="175" min="50" max="250" />
+          </div>
+        </div>
+
+        <!-- Imperial Fields -->
+        <div id="imperial-fields" hidden>
+          <div class="form-group">
+            <label for="weight-lbs" class="form-label">Weight (lbs)</label>
+            <input type="number" id="weight-lbs" class="form-input" value="154" min="40" max="600" />
+          </div>
+          <div class="form-group">
+            <label for="height-ft" class="form-label">Height (feet & inches)</label>
+            <div class="height-imperial-row">
+              <input type="number" id="height-ft" class="form-input" value="5" min="2" max="8" />
+              <span>ft</span>
+              <input type="number" id="height-in" class="form-input" value="9" min="0" max="11" />
+              <span>in</span>
+            </div>
+          </div>
+        </div>
+
+        <button type="button" id="btn-recalc" class="btn btn-primary" style="margin-top: var(--space-4);">
+          Recalculate
+        </button>
+      </form>
+    </div>
+  </div>
+
+  <div slot="results">
+    <div class="card result-card-bmi">
+      <span class="result-hero-label">Your Body Mass Index</span>
+      <div class="result-hero-value" id="bmi-score">22.9</div>
+      <div class="bmi-category-badge" id="bmi-badge">Normal weight</div>
+
+      <div class="bmi-breakdown-details">
+        <div class="detail-row">
+          <span>Healthy Weight Range:</span>
+          <strong id="healthy-range">56.7 kg – 76.3 kg</strong>
+        </div>
+        <div class="detail-row">
+          <span>BMI Prime:</span>
+          <strong id="bmi-prime">0.91</strong>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div slot="how-to">
+    <ol>
+      <li><strong>Select your unit system:</strong> Toggle between Metric (centimeters/kilograms) or Imperial (feet/inches/pounds).</li>
+      <li><strong>Enter your height and weight:</strong> Provide your accurate current physical measurements.</li>
+      <li><strong>Review your category:</strong> Check your classification on the standard WHO scale.</li>
+    </ol>
+  </div>
+
+  <div slot="formula">
+    <pre><code>Metric Formula:   BMI = weight (kg) ÷ [height (m)]²
+Imperial Formula: BMI = 703 × weight (lbs) ÷ [height (in)]²</code></pre>
+  </div>
+
+  <div slot="examples-table">
+    <table class="data-table">
+      <thead>
+        <tr>
+          <th>BMI Range</th>
+          <th>WHO Category</th>
+          <th>Health Risk Profile</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr><td>&lt; 18.5</td><td>Underweight</td><td>Nutritional deficiency risk</td></tr>
+        <tr><td>18.5 – 24.9</td><td>Normal weight</td><td>Lowest mortality risk</td></tr>
+        <tr><td>25.0 – 29.9</td><td>Overweight</td><td>Moderate risk</td></tr>
+        <tr><td>30.0 – 34.9</td><td>Obesity Class I</td><td>High risk</td></tr>
+        <tr><td>35.0 – 39.9</td><td>Obesity Class II</td><td>Very high risk</td></tr>
+        <tr><td>&ge; 40.0</td><td>Obesity Class III</td><td>Extremely high risk</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div slot="faq">
+    <FaqAccordion items={faqs} />
+  </div>
+
+  <div slot="related-tools">
+    <div class="related-tools-grid">
+      <a href="/health/calorie-calculator" class="card related-tool-card">
+        <h3>Calorie Calculator</h3>
+        <p>Calculate your daily maintenance calories and weight loss targets.</p>
+      </a>
+      <a href="/health/bmr-calculator" class="card related-tool-card">
+        <h3>BMR Calculator</h3>
+        <p>Find your Basal Metabolic Rate using Mifflin-St Jeor.</p>
+      </a>
+    </div>
+  </div>
+</ToolShell>
+
+<JsonLd schema={[webAppSchema, generateFaqJsonLd(faqs), generateBreadcrumbJsonLd([{ name: 'Home', item: '/' }, { name: 'Health', item: '/health' }, { name: 'BMI Calculator', item: '/health/bmi-calculator' }])]} />
+
+<style>
+  .unit-toggle-row {
+    display: flex;
+    gap: var(--space-2);
+    margin-bottom: var(--space-4);
+  }
+
+  .height-imperial-row {
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+  }
+
+  .height-imperial-row input {
+    width: 80px;
+  }
+
+  .result-card-bmi {
+    text-align: center;
+    padding: var(--space-5);
+  }
+
+  .bmi-category-badge {
+    display: inline-block;
+    margin-top: var(--space-2);
+    padding: var(--space-1) var(--space-3);
+    background-color: var(--color-surface-muted);
+    border-radius: var(--radius-full);
+    font-weight: var(--font-weight-semibold);
+    font-size: var(--text-sm);
+  }
+
+  .bmi-breakdown-details {
+    margin-top: var(--space-5);
+    padding-top: var(--space-4);
+    border-top: 1px solid var(--color-border);
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-2);
+    text-align: left;
+    font-size: var(--text-sm);
+  }
+
+  .detail-row {
+    display: flex;
+    justify-content: space-between;
+  }
+</style>
+
+<script>
+  import { calculateBmiMetric, calculateBmiImperial } from '@lib/calc/bmi';
+  import { parseNumberInput } from '@lib/format/number';
+
+  function initBmi() {
+    let mode: 'metric' | 'imperial' = 'metric';
+    const btnMetric = document.getElementById('btn-metric');
+    const btnImperial = document.getElementById('btn-imperial');
+    const metricFields = document.getElementById('metric-fields');
+    const imperialFields = document.getElementById('imperial-fields');
+
+    const weightKg = document.getElementById('weight-kg') as HTMLInputElement | null;
+    const heightCm = document.getElementById('height-cm') as HTMLInputElement | null;
+    const weightLbs = document.getElementById('weight-lbs') as HTMLInputElement | null;
+    const heightFt = document.getElementById('height-ft') as HTMLInputElement | null;
+    const heightIn = document.getElementById('height-in') as HTMLInputElement | null;
+
+    const bmiScore = document.getElementById('bmi-score');
+    const bmiBadge = document.getElementById('bmi-badge');
+    const healthyRange = document.getElementById('healthy-range');
+    const bmiPrime = document.getElementById('bmi-prime');
+
+    function update() {
+      let res;
+      if (mode === 'metric') {
+        res = calculateBmiMetric(parseNumberInput(weightKg?.value, 70), parseNumberInput(heightCm?.value, 175));
+        if (healthyRange) healthyRange.textContent = `${res.healthyWeightMin} kg – ${res.healthyWeightMax} kg`;
+      } else {
+        const totalInches = (parseNumberInput(heightFt?.value, 5) * 12) + parseNumberInput(heightIn?.value, 9);
+        res = calculateBmiImperial(parseNumberInput(weightLbs?.value, 154), totalInches);
+        if (healthyRange) healthyRange.textContent = `${res.healthyWeightMin} lbs – ${res.healthyWeightMax} lbs`;
+      }
+
+      if (bmiScore) bmiScore.textContent = res.bmi.toFixed(1);
+      if (bmiBadge) {
+        bmiBadge.textContent = res.category;
+        bmiBadge.style.color = res.categoryColor;
+      }
+      if (bmiPrime) {
+        bmiPrime.textContent = (res.bmi / 25).toFixed(2);
+      }
+    }
+
+    btnMetric?.addEventListener('click', () => {
+      mode = 'metric';
+      btnMetric.classList.add('btn-primary');
+      btnMetric.classList.remove('btn-ghost');
+      btnImperial?.classList.remove('btn-primary');
+      btnImperial?.classList.add('btn-ghost');
+      metricFields?.removeAttribute('hidden');
+      imperialFields?.setAttribute('hidden', '');
+      update();
+    });
+
+    btnImperial?.addEventListener('click', () => {
+      mode = 'imperial';
+      btnImperial.classList.add('btn-primary');
+      btnImperial.classList.remove('btn-ghost');
+      btnMetric?.classList.remove('btn-primary');
+      btnMetric?.classList.add('btn-ghost');
+      imperialFields?.removeAttribute('hidden');
+      metricFields?.setAttribute('hidden', '');
+      update();
+    });
+
+    [weightKg, heightCm, weightLbs, heightFt, heightIn].forEach(i => i?.addEventListener('input', update));
+    update();
+  }
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initBmi);
+  } else {
+    initBmi();
+  }
+</script>

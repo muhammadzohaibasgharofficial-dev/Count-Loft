@@ -1,0 +1,155 @@
+---
+/**
+ * Count Loft — Site Header Component
+ * Contains brand logo, 7 desktop category routes (>=1024px), theme toggle, and mobile trigger (<1024px).
+ */
+import ThemeToggle from '@components/ui/ThemeToggle.astro';
+
+const categories = [
+  { label: 'Finance', href: '/finance' },
+  { label: 'Health', href: '/health' },
+  { label: 'Math', href: '/math' },
+  { label: 'Construction', href: '/construction' },
+  { label: 'Converters', href: '/converters' },
+  { label: 'Pakistan', href: '/pakistan' },
+  { label: 'Islamic', href: '/islamic' }
+];
+---
+
+<header class="site-header">
+  <div class="container header-container">
+    <div class="brand-wrapper">
+      <a href="/" class="brand-link" aria-label="Count Loft Home">
+        <span class="brand-name">Count Loft</span>
+      </a>
+    </div>
+
+    <!-- Desktop Navigation (>=1024px) -->
+    <nav class="desktop-nav" aria-label="Main Navigation">
+      <ul class="nav-list">
+        {categories.map((cat) => (
+          <li>
+            <a href={cat.href} class="nav-link">{cat.label}</a>
+          </li>
+        ))}
+      </ul>
+    </nav>
+
+    <!-- Header Actions -->
+    <div class="header-actions">
+      <div class="desktop-theme-wrapper">
+        <ThemeToggle />
+      </div>
+
+      <!-- Mobile Menu Trigger (<1024px) -->
+      <button
+        type="button"
+        class="btn btn-ghost hamburger-btn"
+        aria-expanded="false"
+        aria-controls="mobile-nav-dialog"
+        aria-label="Open menu"
+      >
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <line x1="3" y1="12" x2="21" y2="12"></line>
+          <line x1="3" y1="6" x2="21" y2="6"></line>
+          <line x1="3" y1="18" x2="21" y2="18"></line>
+        </svg>
+      </button>
+    </div>
+  </div>
+</header>
+
+<style>
+  .site-header {
+    background-color: var(--color-surface);
+    border-bottom: 1px solid var(--color-border);
+    position: sticky;
+    top: 0;
+    z-index: 100;
+  }
+
+  .header-container {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    height: 4rem;
+  }
+
+  .brand-wrapper {
+    display: flex;
+    align-items: center;
+  }
+
+  .brand-link {
+    text-decoration: none;
+    color: var(--color-text);
+  }
+
+  .brand-name {
+    font-size: 1.25rem;
+    font-weight: var(--font-weight-bold);
+    letter-spacing: -0.02em;
+    color: var(--color-text);
+  }
+
+  /* Desktop Navigation: Hidden below 1024px */
+  .desktop-nav {
+    display: none;
+  }
+
+  .nav-list {
+    display: flex;
+    align-items: center;
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    gap: var(--space-4);
+  }
+
+  .nav-link {
+    font-size: var(--text-label);
+    font-weight: var(--font-weight-medium);
+    color: var(--color-text-muted);
+    text-decoration: none;
+    padding: var(--space-2) var(--space-1);
+    transition: color var(--transition-fast);
+  }
+
+  .nav-link:hover {
+    color: var(--color-link);
+  }
+
+  .header-actions {
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+  }
+
+  .desktop-theme-wrapper {
+    display: none;
+  }
+
+  .hamburger-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: var(--min-touch-target);
+    min-height: var(--min-touch-target);
+    padding: var(--space-2);
+  }
+
+  /* Breakpoint: At 1024px and above, show desktop nav, hide hamburger */
+  @media (min-width: 1024px) {
+    .desktop-nav {
+      display: block;
+    }
+
+    .desktop-theme-wrapper {
+      display: block;
+    }
+
+    .hamburger-btn {
+      display: none;
+    }
+  }
+</style>

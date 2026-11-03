@@ -1,0 +1,273 @@
+---
+/**
+ * Count Loft — Percentage Calculator
+ * Covers X% of Y, X is what % of Y, and % Increase / Decrease.
+ */
+import ToolShell from '@components/tool/ToolShell.astro';
+import FaqAccordion from '@components/tool/FaqAccordion.astro';
+import JsonLd from '@components/seo/JsonLd.astro';
+import { buildBreadcrumbs } from '@lib/format/breadcrumbs';
+import { generateWebApplicationJsonLd, generateFaqJsonLd, generateBreadcrumbJsonLd } from '@lib/seo/jsonld';
+
+const breadcrumbs = buildBreadcrumbs([
+  { label: 'Math', href: '/math' },
+  { label: 'Percentage Calculator' }
+]);
+
+const faqs = [
+  {
+    question: 'How do you calculate a percentage of a number?',
+    answer: 'Convert the percentage into a decimal by dividing by 100, then multiply by the total number. For example, 20% of 150 is 0.20 * 150 = 30.'
+  },
+  {
+    question: 'How do you calculate percentage increase or decrease?',
+    answer: 'Subtract the old value from the new value, divide by the absolute old value, and multiply by 100: ((New - Old) / Old) * 100.'
+  },
+  {
+    question: 'What is the difference between percentage and percentage points?',
+    answer: 'A percentage represents a relative ratio, while percentage points measure the simple arithmetic difference between two percentages (e.g. going from 10% to 15% is a 5 percentage point increase, but a 50% relative increase).'
+  },
+  {
+    question: 'Can a percentage be greater than 100%?',
+    answer: 'Yes. Any quantity that exceeds the base or comparison value results in a percentage over 100%. For instance, 250 is 250% of 100.'
+  },
+  {
+    question: 'How do you find the original price before a percentage discount?',
+    answer: 'Divide the discounted sale price by (1 - discount percentage / 100). If an item costs $80 after a 20% discount, the original was $80 / 0.80 = $100.'
+  }
+];
+
+const webAppSchema = generateWebApplicationJsonLd({
+  name: 'Percentage Calculator — Count Loft',
+  description: 'Free online percentage calculator. Calculate percentage of a number, percentage change, and proportions instantly.',
+  url: 'https://count-loft.com/math/percentage-calculator',
+  category: 'EducationalApplication'
+});
+---
+
+<ToolShell
+  title="Percentage Calculator"
+  description="Calculate percentages of any number, find the percentage between two numbers, and compute percent increase or decrease."
+  category="math"
+  breadcrumbs={breadcrumbs}
+  author="Count Loft Team"
+  lastUpdated="2026-10-31"
+>
+  <div slot="inputs">
+    <div class="percentage-app">
+      <!-- Calculator 1: What is P% of Y? -->
+      <div class="calc-sub-card">
+        <h3>1. What is P% of Y?</h3>
+        <div class="form-inline-row">
+          <label for="p1-percent" class="visually-hidden">Percentage</label>
+          <div class="input-affix-wrapper">
+            <input type="text" id="p1-percent" inputmode="decimal" class="form-input has-suffix" value="20" />
+            <span class="input-suffix">%</span>
+          </div>
+          <span class="inline-text">of</span>
+          <label for="p1-total" class="visually-hidden">Total</label>
+          <input type="text" id="p1-total" inputmode="decimal" class="form-input" value="150" />
+          <span class="inline-text">=</span>
+          <div class="result-badge" id="p1-res">30</div>
+        </div>
+      </div>
+
+      <!-- Calculator 2: X is what % of Y? -->
+      <div class="calc-sub-card">
+        <h3>2. X is what % of Y?</h3>
+        <div class="form-inline-row">
+          <label for="p2-part" class="visually-hidden">Part</label>
+          <input type="text" id="p2-part" inputmode="decimal" class="form-input" value="30" />
+          <span class="inline-text">is what % of</span>
+          <label for="p2-total" class="visually-hidden">Total</label>
+          <input type="text" id="p2-total" inputmode="decimal" class="form-input" value="150" />
+          <span class="inline-text">=</span>
+          <div class="result-badge" id="p2-res">20%</div>
+        </div>
+      </div>
+
+      <!-- Calculator 3: Percentage Change from X to Y -->
+      <div class="calc-sub-card">
+        <h3>3. Percentage Increase / Decrease</h3>
+        <div class="form-inline-row">
+          <span class="inline-text">From</span>
+          <label for="p3-from" class="visually-hidden">From value</label>
+          <input type="text" id="p3-from" inputmode="decimal" class="form-input" value="100" />
+          <span class="inline-text">to</span>
+          <label for="p3-to" class="visually-hidden">To value</label>
+          <input type="text" id="p3-to" inputmode="decimal" class="form-input" value="125" />
+          <span class="inline-text">=</span>
+          <div class="result-badge" id="p3-res">+25%</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div slot="results">
+    <div class="result-summary-box">
+      <span class="result-hero-label">Primary Calculation</span>
+      <div class="result-hero-value" id="summary-value">30</div>
+      <p class="summary-explanation" id="summary-explanation">20% of 150 = 30</p>
+    </div>
+  </div>
+
+  <div slot="how-to">
+    <ol>
+      <li><strong>Select your question:</strong> Choose whether you need to find a fraction of a number, determine a ratio, or compute change.</li>
+      <li><strong>Enter your numbers:</strong> Fill in the values. Results update instantly as you type.</li>
+      <li><strong>Observe the formulas:</strong> View the exact arithmetic operation step-by-step.</li>
+    </ol>
+  </div>
+
+  <div slot="formula">
+    <pre><code>Percentage of Number: Result = (P / 100) × Y
+What Percentage:       Result = (X / Y) × 100
+Percentage Change:     Result = ((New - Old) / |Old|) × 100</code></pre>
+  </div>
+
+  <div slot="examples-table">
+    <table class="data-table">
+      <thead>
+        <tr>
+          <th>Percentage</th>
+          <th>Of $50</th>
+          <th>Of $100</th>
+          <th>Of $250</th>
+          <th>Of $500</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr><td>5%</td><td>$2.50</td><td>$5.00</td><td>$12.50</td><td>$25.00</td></tr>
+        <tr><td>10%</td><td>$5.00</td><td>$10.00</td><td>$25.00</td><td>$50.00</td></tr>
+        <tr><td>15%</td><td>$7.50</td><td>$15.00</td><td>$37.50</td><td>$75.00</td></tr>
+        <tr><td>20%</td><td>$10.00</td><td>$20.00</td><td>$50.00</td><td>$100.00</td></tr>
+        <tr><td>25%</td><td>$12.50</td><td>$25.00</td><td>$62.50</td><td>$125.00</td></tr>
+        <tr><td>50%</td><td>$25.00</td><td>$50.00</td><td>$125.00</td><td>$250.00</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div slot="faq">
+    <FaqAccordion items={faqs} />
+  </div>
+
+  <div slot="related-tools">
+    <div class="related-tools-grid">
+      <a href="/math/percentage-change-calculator" class="card related-tool-card">
+        <h3>Percentage Change Calculator</h3>
+        <p>Calculate absolute and relative growth or decline.</p>
+      </a>
+      <a href="/finance/tip-and-discount-calculator" class="card related-tool-card">
+        <h3>Tip & Discount Calculator</h3>
+        <p>Apply percentage discounts and calculate gratuity.</p>
+      </a>
+    </div>
+  </div>
+</ToolShell>
+
+<JsonLd schema={[webAppSchema, generateFaqJsonLd(faqs), generateBreadcrumbJsonLd([{ name: 'Home', item: '/' }, { name: 'Math', item: '/math' }, { name: 'Percentage Calculator', item: '/math/percentage-calculator' }])]} />
+
+<style>
+  .percentage-app {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-4);
+  }
+
+  .calc-sub-card {
+    background-color: var(--color-surface);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-md);
+    padding: var(--space-4);
+  }
+
+  .calc-sub-card h3 {
+    margin: 0 0 var(--space-3) 0;
+    font-size: var(--text-body);
+  }
+
+  .form-inline-row {
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+    flex-wrap: wrap;
+  }
+
+  .form-inline-row input {
+    width: 100px;
+  }
+
+  .inline-text {
+    font-weight: var(--font-weight-medium);
+    color: var(--color-text-muted);
+  }
+
+  .result-badge {
+    font-size: 1.125rem;
+    font-weight: var(--font-weight-bold);
+    color: var(--color-primary);
+    background-color: var(--color-surface-muted);
+    padding: var(--space-1) var(--space-3);
+    border-radius: var(--radius-md);
+    border: 1px solid var(--color-border);
+  }
+
+  .result-summary-box {
+    padding: var(--space-4);
+    background-color: var(--color-surface);
+    border-radius: var(--radius-md);
+    border: 1px solid var(--color-border);
+    text-align: center;
+  }
+
+  .summary-explanation {
+    color: var(--color-text-muted);
+    font-size: var(--text-sm);
+    margin-top: var(--space-2);
+  }
+</style>
+
+<script>
+  import { calculatePercentageOf, calculateWhatPercentage, calculatePercentageChange } from '@lib/calc/percentage';
+  import { parseNumberInput } from '@lib/format/number';
+
+  function initPercentagePage() {
+    const p1Percent = document.getElementById('p1-percent') as HTMLInputElement | null;
+    const p1Total = document.getElementById('p1-total') as HTMLInputElement | null;
+    const p1Res = document.getElementById('p1-res');
+    const summaryVal = document.getElementById('summary-value');
+    const summaryExp = document.getElementById('summary-explanation');
+
+    const p2Part = document.getElementById('p2-part') as HTMLInputElement | null;
+    const p2Total = document.getElementById('p2-total') as HTMLInputElement | null;
+    const p2Res = document.getElementById('p2-res');
+
+    const p3From = document.getElementById('p3-from') as HTMLInputElement | null;
+    const p3To = document.getElementById('p3-to') as HTMLInputElement | null;
+    const p3Res = document.getElementById('p3-res');
+
+    function update() {
+      // Calc 1
+      const res1 = calculatePercentageOf(parseNumberInput(p1Percent?.value, 20), parseNumberInput(p1Total?.value, 150));
+      if (p1Res) p1Res.textContent = String(res1.result);
+      if (summaryVal) summaryVal.textContent = String(res1.result);
+      if (summaryExp) summaryExp.textContent = res1.formula;
+
+      // Calc 2
+      const res2 = calculateWhatPercentage(parseNumberInput(p2Part?.value, 30), parseNumberInput(p2Total?.value, 150));
+      if (p2Res) p2Res.textContent = `${res2.percentage}%`;
+
+      // Calc 3
+      const res3 = calculatePercentageChange(parseNumberInput(p3From?.value, 100), parseNumberInput(p3To?.value, 125));
+      if (p3Res) p3Res.textContent = `${res3.direction === 'increase' ? '+' : res3.direction === 'decrease' ? '-' : ''}${res3.changePercent}%`;
+    }
+
+    [p1Percent, p1Total, p2Part, p2Total, p3From, p3To].forEach(i => i?.addEventListener('input', update));
+  }
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initPercentagePage);
+  } else {
+    initPercentagePage();
+  }
+</script>

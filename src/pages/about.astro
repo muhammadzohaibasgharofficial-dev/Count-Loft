@@ -1,0 +1,118 @@
+---
+/**
+ * Count Loft — About Page
+ * Transparent mission, team, and privacy-first architectural values.
+ */
+import BaseLayout from '@components/layout/BaseLayout.astro';
+import Breadcrumbs from '@components/seo/Breadcrumbs.astro';
+import { buildBreadcrumbs } from '@lib/format/breadcrumbs';
+
+const breadcrumbs = buildBreadcrumbs([
+  { label: 'About Count Loft' }
+]);
+---
+
+<BaseLayout
+  title="About Count Loft — Fast, Trustworthy Online Calculators"
+  description="Learn about Count Loft, our mission to provide lightning-fast, accessible, client-side calculator tools with zero data tracking."
+>
+  <div class="container article-page-container">
+    <Breadcrumbs items={breadcrumbs} />
+
+    <header class="page-header">
+      <h1>About Count Loft</h1>
+      <p class="lead-text">
+        Count Loft is a free, modern online calculation platform built for speed, privacy, and precision.
+      </p>
+    </header>
+
+    <article class="article-content">
+      <h2>Our Mission</h2>
+      <p>
+        Every day, millions of people make critical personal decisions involving loans, taxes, health, mortgages, and construction. Unfortunately, many online calculators are cluttered with invasive tracking scripts, pop-ups, slow page reloads, and outdated formulas.
+      </p>
+      <p>
+        Count Loft was created to fix that. We provide clean, instant, transparent calculation tools that respect your time, device performance, and privacy.
+      </p>
+
+      <h2>Our Core Principles</h2>
+      <div class="principles-grid">
+        <div class="card principle-card">
+          <h3>1. Privacy by Architecture</h3>
+          <p>
+            <strong>"Your numbers never leave your browser."</strong> Our calculators execute 100% client-side in your device's browser engine. We never store, transmit, or monetize your private financial or health numbers.
+          </p>
+        </div>
+        <div class="card principle-card">
+          <h3>2. Instant Results</h3>
+          <p>
+            No page reloads, no waiting. Inputs compute instantaneously as you type, paired with interactive visual breakdowns and amortization schedules.
+          </p>
+        </div>
+        <div class="card principle-card">
+          <h3>3. Transparent Math</h3>
+          <p>
+            We don't hide formulas behind black boxes. Every tool includes full formula breakdowns, worked real-number examples, and clear explanations of every variable.
+          </p>
+        </div>
+        <div class="card principle-card">
+          <h3>4. Accessibility for All</h3>
+          <p>
+            Built to WCAG 2.2 AA accessibility standards with full keyboard support, high-contrast light and dark themes, screen-reader live regions, and zero layout shift.
+          </p>
+        </div>
+      </div>
+
+      <h2>Who Builds Count Loft?</h2>
+      <p>
+        Count Loft is designed and maintained by the <strong>Count Loft Team</strong> — a dedicated group of software engineers, mathematical enthusiasts, and accessibility specialists focused on crafting top-tier web utilities.
+      </p>
+    </article>
+  </div>
+</BaseLayout>
+
+<style>
+  .article-page-container {
+    padding-top: var(--space-6);
+    padding-bottom: var(--space-8);
+  }
+
+  .page-header {
+    margin-bottom: var(--space-6);
+  }
+
+  .lead-text {
+    font-size: var(--text-h3);
+    color: var(--color-text-muted);
+    margin-top: var(--space-2);
+  }
+
+  .principles-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: var(--space-4);
+    margin: var(--space-5) 0;
+  }
+
+  @media (min-width: 768px) {
+    .principles-grid {
+      grid-template-columns: repeat(2, 1fr);
+    }
+  }
+
+  .principle-card {
+    padding: var(--space-4);
+  }
+
+  .principle-card h3 {
+    margin-top: 0;
+    margin-bottom: var(--space-2);
+    font-size: var(--text-body);
+  }
+
+  .principle-card p {
+    margin: 0;
+    font-size: var(--text-sm);
+    color: var(--color-text-muted);
+  }
+</style>

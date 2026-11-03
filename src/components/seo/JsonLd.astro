@@ -1,0 +1,13 @@
+---
+/**
+ * Count Loft — JSON-LD Script Renderer
+ */
+
+export interface Props {
+  schema: Record<string, unknown> | Array<Record<string, unknown>>;
+}
+
+const { schema } = Astro.props;
+---
+
+<script type="application/ld+json" set:html={JSON.stringify(schema)} />

@@ -1,0 +1,91 @@
+---
+/**
+ * Count Loft — Privacy Policy Page
+ * Clarifies the client-side zero-storage promise and browser-local state handling.
+ */
+import BaseLayout from '@components/layout/BaseLayout.astro';
+import Breadcrumbs from '@components/seo/Breadcrumbs.astro';
+import { buildBreadcrumbs } from '@lib/format/breadcrumbs';
+
+const breadcrumbs = buildBreadcrumbs([
+  { label: 'Privacy Policy' }
+]);
+---
+
+<BaseLayout
+  title="Privacy Policy — Count Loft"
+  description="Read Count Loft's Privacy Policy and client-side privacy architecture. Your numbers never leave your browser."
+>
+  <div class="container article-page-container">
+    <Breadcrumbs items={breadcrumbs} />
+
+    <header class="page-header">
+      <h1>Privacy Policy</h1>
+      <p class="lead-text">
+        Last updated: October 31, 2026
+      </p>
+    </header>
+
+    <article class="article-content">
+      <div class="alert alert-info privacy-highlight">
+        <p><strong>Our Core Promise:</strong> "Your numbers never leave your browser."</p>
+      </div>
+
+      <h2>1. Client-Side Calculation Guarantee</h2>
+      <p>
+        Count Loft is built with a client-first static architecture. All calculators compute their mathematical formulas directly in your device's web browser using client-side JavaScript.
+      </p>
+      <p>
+        When you enter numbers — whether salaries, loan amounts, mortgage balances, medical metrics (BMI/calorie counts), or personal taxes — those figures are processed entirely in your device's memory. <strong>They are never transmitted to our servers or stored in any database.</strong>
+      </p>
+
+      <h2>2. Browser Local Storage</h2>
+      <p>
+        To provide a comfortable user experience, Count Loft uses your browser's <code>localStorage</code> exclusively for:
+      </p>
+      <ul>
+        <li><strong>Theme Preferences:</strong> Remembering whether you prefer light or dark mode.</li>
+        <li><strong>Recent Tools:</strong> Remembering your frequently visited calculators locally on your device.</li>
+      </ul>
+      <p>
+        You can clear this data at any time through your browser's site settings.
+      </p>
+
+      <h2>3. Shareable URLs</h2>
+      <p>
+        When you click the "Share" or "Copy Result" button, calculator parameters may be encoded as query parameters in your browser address bar (e.g. <code>?amount=20000&rate=6</code>). This allows you to bookmark your calculation or send the link to someone else. These query parameters are never logged on our backend.
+      </p>
+
+      <h2>4. Third-Party Analytics and Advertising</h2>
+      <p>
+        Count Loft is a free, ad-supported website. We may display standard non-personalized or contextual advertisements via vetted advertising networks. These networks may use technical cookies to serve ads and prevent fraud.
+      </p>
+
+      <h2>5. Contact Us</h2>
+      <p>
+        If you have any questions regarding this Privacy Policy, you can reach us at <code>contact@count-loft.com</code>.
+      </p>
+    </article>
+  </div>
+</BaseLayout>
+
+<style>
+  .article-page-container {
+    padding-top: var(--space-6);
+    padding-bottom: var(--space-8);
+  }
+
+  .page-header {
+    margin-bottom: var(--space-6);
+  }
+
+  .lead-text {
+    font-size: var(--text-sm);
+    color: var(--color-text-muted);
+    margin-top: var(--space-1);
+  }
+
+  .privacy-highlight {
+    margin-bottom: var(--space-6);
+  }
+</style>

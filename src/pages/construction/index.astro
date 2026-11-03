@@ -1,0 +1,13 @@
+---
+import CategoryHub from '@components/layout/CategoryHub.astro';
+import { CALCULATORS } from '@data/calculators';
+
+const tools = CALCULATORS.filter(c => c.category === 'construction');
+---
+
+<CategoryHub
+  categoryName="Construction"
+  categorySlug="construction"
+  description="Estimate room square footage, compute concrete volume in cubic yards, plan paint cans, and calculate floor tile quantities."
+  tools={tools}
+/>

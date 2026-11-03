@@ -1,0 +1,43 @@
+---
+/**
+ * Count Loft — SEO Metadata Head Component
+ * Manages document title, description, canonical link, OpenGraph, and Twitter cards.
+ */
+
+export interface Props {
+  title: string;
+  description: string;
+  canonicalUrl?: string;
+  robots?: string;
+  ogType?: 'website' | 'article';
+}
+
+const {
+  title,
+  description,
+  canonicalUrl,
+  robots = 'index, follow',
+  ogType = 'website'
+} = Astro.props;
+
+// Determine clean canonical URL without query parameters
+const cleanCanonical = canonicalUrl || new URL(Astro.url.pathname, Astro.site || 'https://count-loft.com').href;
+const siteTitle = 'Count Loft';
+---
+
+<title>{title}</title>
+<meta name="description" content={description} />
+<link rel="canonical" href={cleanCanonical} />
+<meta name="robots" content={robots} />
+
+<!-- OpenGraph Metadata -->
+<meta property="og:site_name" content={siteTitle} />
+<meta property="og:title" content={title} />
+<meta property="og:description" content={description} />
+<meta property="og:url" content={cleanCanonical} />
+<meta property="og:type" content={ogType} />
+
+<!-- Twitter Card Metadata (PRD standard: summary until custom OG assets are defined) -->
+<meta name="twitter:card" content="summary" />
+<meta name="twitter:title" content={title} />
+<meta name="twitter:description" content={description} />

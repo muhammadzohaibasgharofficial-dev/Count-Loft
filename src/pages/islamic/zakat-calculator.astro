@@ -1,0 +1,291 @@
+---
+import ToolShell from '@components/tool/ToolShell.astro';
+import FaqAccordion from '@components/tool/FaqAccordion.astro';
+import JsonLd from '@components/seo/JsonLd.astro';
+import { buildBreadcrumbs } from '@lib/format/breadcrumbs';
+import { generateWebApplicationJsonLd, generateFaqJsonLd, generateBreadcrumbJsonLd } from '@lib/seo/jsonld';
+import zakatData from '@data/zakat-nisab.json';
+
+const breadcrumbs = buildBreadcrumbs([
+  { label: 'Islamic', href: '/islamic' },
+  { label: 'Zakat Calculator' }
+]);
+
+const faqs = [
+  {
+    question: 'What is Zakat and who is obligated to pay it?',
+    answer: 'Zakat is one of the Five Pillars of Islam. It is an obligatory annual religious due of 2.5% payable by every adult, sane Muslim whose net qualifying wealth exceeds the Nisab threshold for a full lunar year (Hawl).'
+  },
+  {
+    question: 'What is Nisab and how is it determined?',
+    answer: 'Nisab is the minimum qualifying threshold of wealth. Classical jurisprudence defines two benchmarks: 87.48 grams (7.5 tolas) of gold, or 612.36 grams (52.5 tolas) of silver. The official notified silver Nisab for Ramadan 2026 is Rs. 503,529.'
+  },
+  {
+    question: 'Should I use the Silver Nisab or Gold Nisab?',
+    answer: 'Most contemporary classical scholars (including Hanafi scholars) recommend using the Silver Nisab because its lower threshold benefits more impoverished recipients and ensures broader charitable fulfillment.'
+  },
+  {
+    question: 'Are personal assets like residential houses and personal vehicles subject to Zakat?',
+    answer: 'No. Primary residences, personal vehicles, everyday furniture, appliances, and essential tools used to earn a livelihood are strictly exempt from Zakat.'
+  },
+  {
+    question: 'Can I deduct debts from my Zakatable wealth?',
+    answer: 'Yes. Immediate debts due for payment (such as short-term liabilities, credit card balances, and due utility bills) can be deducted from gross wealth before calculating Zakat.'
+  }
+];
+
+const webAppSchema = generateWebApplicationJsonLd({
+  name: 'Zakat Calculator — Count Loft',
+  description: 'Calculate your annual Zakat obligation on cash, gold, silver, investments, and business assets according to Islamic jurisprudence.',
+  url: 'https://count-loft.com/islamic/zakat-calculator',
+  category: 'WebApplication'
+});
+---
+
+<ToolShell
+  title="Zakat Calculator"
+  description="Calculate your annual 2.5% Zakat obligation on cash, gold, silver, shares, and merchandise using official notified Nisab thresholds."
+  category="islamic"
+  breadcrumbs={breadcrumbs}
+  author="Count Loft Team"
+  lastUpdated="2026-10-31"
+>
+  <div slot="inputs">
+    <div class="data-badge-notice">
+      Official Benchmark: {zakatData.source} • Verified: {zakatData.lastVerified}
+    </div>
+
+    <form id="zakat-form" novalidate onsubmit="return false;">
+      <div class="form-row-2">
+        <div class="form-group">
+          <label for="zak-cash" class="form-label">Cash in Hand & Bank Accounts</label>
+          <input type="number" id="zak-cash" class="form-input" value="400000" min="0" step="10000" />
+        </div>
+        <div class="form-group">
+          <label for="zak-gold" class="form-label">Gold Value Owned (PKR)</label>
+          <input type="number" id="zak-gold" class="form-input" value="250000" min="0" step="10000" />
+        </div>
+      </div>
+
+      <div class="form-row-2">
+        <div class="form-group">
+          <label for="zak-silver" class="form-label">Silver Value Owned (PKR)</label>
+          <input type="number" id="zak-silver" class="form-input" value="50000" min="0" step="5000" />
+        </div>
+        <div class="form-group">
+          <label for="zak-business" class="form-label">Business Stock / Trade Goods</label>
+          <input type="number" id="zak-business" class="form-input" value="100000" min="0" step="10000" />
+        </div>
+      </div>
+
+      <div class="form-row-2">
+        <div class="form-group">
+          <label for="zak-shares" class="form-label">Shares / Mutual Fund Investments</label>
+          <input type="number" id="zak-shares" class="form-input" value="0" min="0" step="10000" />
+        </div>
+        <div class="form-group">
+          <label for="zak-debts" class="form-label">Immediate Debts & Liabilities to Deduct</label>
+          <input type="number" id="zak-debts" class="form-input" value="50000" min="0" step="5000" />
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label for="zak-nisab-standard" class="form-label">Nisab Benchmark Standard</label>
+        <select id="zak-nisab-standard" class="form-input">
+          <option value="silver" selected>Silver Nisab (Notified: Rs 503,529 • Recommended)</option>
+          <option value="gold">Gold Nisab (~Rs 2,212,544 • 87.48g)</option>
+        </select>
+      </div>
+    </form>
+  </div>
+
+  <div slot="results">
+    <div class="result-hero">
+      <span class="result-hero-label">Total Zakat Due (2.5%)</span>
+      <span class="result-hero-value" id="zak-due-val">Rs 18,750</span>
+      <span class="result-hero-subtext" id="zak-status-val">Net Wealth Exceeds Nisab (Obligatory)</span>
+    </div>
+
+    <div class="zakat-breakdown-table">
+      <div class="breakdown-row">
+        <span>Gross Zakatable Assets:</span>
+        <strong id="zak-gross-val">Rs 800,000</strong>
+      </div>
+      <div class="breakdown-row">
+        <span>Less Immediate Debts:</span>
+        <strong id="zak-debts-val">Rs 50,000</strong>
+      </div>
+      <div class="breakdown-row">
+        <span>Net Zakatable Wealth:</span>
+        <strong id="zak-net-val">Rs 750,000</strong>
+      </div>
+      <div class="breakdown-row">
+        <span>Applicable Nisab Threshold:</span>
+        <strong id="zak-threshold-val">Rs 503,529</strong>
+      </div>
+    </div>
+  </div>
+
+  <div slot="how-to">
+    <ol>
+      <li><strong>Total qualifying assets:</strong> Include cash balances, gold and silver jewelry, business trade inventory, and tradable equities.</li>
+      <li><strong>Subtract due liabilities:</strong> Deduct immediate debt repayments, unpaid rent, and overdue bills.</li>
+      <li><strong>Compare against Nisab:</strong> If net wealth exceeds the threshold for a full lunar year, calculate 2.5% (1/40th) of the total.</li>
+    </ol>
+  </div>
+
+  <div slot="formula">
+    <pre><code>Net Zakatable Wealth = Gross Assets − Immediate Debts
+If Net Wealth ≥ Nisab:
+    Zakat Due = Net Zakatable Wealth × 0.025 (2.5%)
+If Net Wealth < Nisab:
+    Zakat Due = Rs 0 (Exempt)</code></pre>
+  </div>
+
+  <div slot="examples-table">
+    <table class="data-table">
+      <thead>
+        <tr>
+          <th>Net Zakatable Wealth</th>
+          <th>Nisab Status</th>
+          <th>Rate</th>
+          <th>Zakat Payable</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr><td>Rs 400,000</td><td>Below Nisab</td><td>Exempt</td><td>Rs 0</td></tr>
+        <tr><td>Rs 600,000</td><td>Above Nisab</td><td>2.5%</td><td>Rs 15,000</td></tr>
+        <tr><td>Rs 1,000,000</td><td>Above Nisab</td><td>2.5%</td><td>Rs 25,000</td></tr>
+        <tr><td>Rs 2,500,000</td><td>Above Nisab</td><td>2.5%</td><td>Rs 62,500</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div slot="faq">
+    <FaqAccordion items={faqs} />
+  </div>
+
+  <div slot="related-tools">
+    <div class="related-tools-grid">
+      <a href="/islamic/silver-zakat-calculator" class="card related-tool-card">
+        <h3>Silver / Zakat on Gold Calculator</h3>
+        <p>Calculate zakat based strictly on tola and gram weights of precious metals.</p>
+      </a>
+      <a href="/islamic/hijri-gregorian-converter" class="card related-tool-card">
+        <h3>Hijri-Gregorian Date Converter</h3>
+        <p>Determine exact lunar Hawl dates and Islamic calendar equivalents.</p>
+      </a>
+    </div>
+  </div>
+</ToolShell>
+
+<JsonLd schema={[webAppSchema, generateFaqJsonLd(faqs), generateBreadcrumbJsonLd([{ name: 'Home', item: '/' }, { name: 'Islamic', item: '/islamic' }, { name: 'Zakat Calculator', item: '/islamic/zakat-calculator' }])]} />
+
+<style>
+  .data-badge-notice {
+    font-size: var(--text-xs);
+    background-color: var(--color-bg-subtle);
+    padding: var(--space-2) var(--space-3);
+    border-radius: var(--radius-sm);
+    margin-bottom: var(--space-4);
+    border: 1px solid var(--color-border);
+    color: var(--color-text-muted);
+  }
+
+  .form-row-2 {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: var(--space-4);
+  }
+
+  @media (min-width: 640px) {
+    .form-row-2 {
+      grid-template-columns: 1fr 1fr;
+    }
+  }
+
+  .zakat-breakdown-table {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-2);
+    padding: var(--space-4) 0;
+    border-top: 1px solid var(--color-border);
+    margin-top: var(--space-4);
+    font-size: var(--text-sm);
+  }
+
+  .breakdown-row {
+    display: flex;
+    justify-content: space-between;
+  }
+</style>
+
+<script>
+  import { calculateZakat } from '@lib/calc/zakat';
+  import { parseNumberInput } from '@lib/format/number';
+
+  function initZakat() {
+    const cashIn = document.getElementById('zak-cash') as HTMLInputElement | null;
+    const goldIn = document.getElementById('zak-gold') as HTMLInputElement | null;
+    const silverIn = document.getElementById('zak-silver') as HTMLInputElement | null;
+    const busIn = document.getElementById('zak-business') as HTMLInputElement | null;
+    const sharesIn = document.getElementById('zak-shares') as HTMLInputElement | null;
+    const debtsIn = document.getElementById('zak-debts') as HTMLInputElement | null;
+    const nisabIn = document.getElementById('zak-nisab-standard') as HTMLSelectElement | null;
+
+    const dueDisplay = document.getElementById('zak-due-val');
+    const statusDisplay = document.getElementById('zak-status-val');
+    const grossDisplay = document.getElementById('zak-gross-val');
+    const debtsDisplay = document.getElementById('zak-debts-val');
+    const netDisplay = document.getElementById('zak-net-val');
+    const threshDisplay = document.getElementById('zak-threshold-val');
+
+    function formatPkr(val: number): string {
+      return `Rs ${Math.round(val).toLocaleString()}`;
+    }
+
+    function update() {
+      const cash = parseNumberInput(cashIn?.value, 0);
+      const gold = parseNumberInput(goldIn?.value, 0);
+      const silver = parseNumberInput(silverIn?.value, 0);
+      const business = parseNumberInput(busIn?.value, 0);
+      const shares = parseNumberInput(sharesIn?.value, 0);
+      const debts = parseNumberInput(debtsIn?.value, 0);
+      const nisabStandard = (nisabIn?.value as 'silver' | 'gold') || 'silver';
+
+      const res = calculateZakat({
+        cashInHandAndBank: cash,
+        goldValue: gold,
+        silverValue: silver,
+        businessGoodsValue: business,
+        investmentSharesValue: shares,
+        moneyOwedToYou: 0,
+        immediateDebts: debts,
+        nisabStandard
+      });
+
+      if (dueDisplay) dueDisplay.textContent = formatPkr(res.zakatDue);
+      if (statusDisplay) {
+        statusDisplay.textContent = res.isEligibleForZakat
+          ? 'Net Wealth Exceeds Nisab (Obligatory)'
+          : 'Wealth is Below Nisab (Exempt)';
+      }
+      if (grossDisplay) grossDisplay.textContent = formatPkr(res.grossAssets);
+      if (debtsDisplay) debtsDisplay.textContent = formatPkr(debts);
+      if (netDisplay) netDisplay.textContent = formatPkr(res.netZakatableWealth);
+      if (threshDisplay) threshDisplay.textContent = formatPkr(res.nisabThreshold);
+    }
+
+    [cashIn, goldIn, silverIn, busIn, sharesIn, debtsIn, nisabIn].forEach(i => {
+      i?.addEventListener('input', update);
+      i?.addEventListener('change', update);
+    });
+    update();
+  }
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initZakat);
+  } else {
+    initZakat();
+  }
+</script>

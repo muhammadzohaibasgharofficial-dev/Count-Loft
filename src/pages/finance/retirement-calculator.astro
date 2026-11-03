@@ -1,0 +1,240 @@
+---
+import ToolShell from '@components/tool/ToolShell.astro';
+import FaqAccordion from '@components/tool/FaqAccordion.astro';
+import JsonLd from '@components/seo/JsonLd.astro';
+import { buildBreadcrumbs } from '@lib/format/breadcrumbs';
+import { generateWebApplicationJsonLd, generateFaqJsonLd, generateBreadcrumbJsonLd } from '@lib/seo/jsonld';
+
+const breadcrumbs = buildBreadcrumbs([
+  { label: 'Finance', href: '/finance' },
+  { label: 'Retirement Calculator' }
+]);
+
+const faqs = [
+  {
+    question: 'How much money do I need to retire comfortably?',
+    answer: 'A standard financial guideline is the 25x Rule: multiply your expected annual retirement expenses by 25. For example, if you plan to spend $60,000 annually, you need approximately $1.5 million in savings.'
+  },
+  {
+    question: 'What is the 4% safe withdrawal rule?',
+    answer: 'The Trinity Study found that withdrawing 4% of your portfolio in year one of retirement, adjusted annually for inflation, has a 95%+ probability of lasting 30 years.'
+  },
+  {
+    question: 'How does inflation affect retirement planning?',
+    answer: 'Inflation reduces your future purchasing power. Assuming 2.5% to 3% annual inflation means your cost of living will double roughly every 25 years.'
+  },
+  {
+    question: 'Should I include Social Security in my retirement calculations?',
+    answer: 'Yes. Social Security benefits reduce the net amount you need to withdraw from your investment portfolio each year.'
+  },
+  {
+    question: 'What asset allocation is recommended near retirement?',
+    answer: 'Financial planners typically shift portfolios from aggressive equities toward fixed-income bonds and cash equivalents to minimize sequence-of-returns risk.'
+  }
+];
+
+const webAppSchema = generateWebApplicationJsonLd({
+  name: 'Retirement Calculator — Count Loft',
+  description: 'Calculate your required retirement nest egg and project future savings corpus with the 4% rule.',
+  url: 'https://count-loft.com/finance/retirement-calculator',
+  category: 'FinanceApplication'
+});
+---
+
+<ToolShell
+  title="Retirement Calculator"
+  description="Estimate your required retirement savings corpus, project future investment balance, and test withdrawal sustainability."
+  category="finance"
+  breadcrumbs={breadcrumbs}
+  author="Count Loft Team"
+  lastUpdated="2026-10-31"
+>
+  <div slot="inputs">
+    <form id="retire-form" novalidate onsubmit="return false;">
+      <div class="form-row-2">
+        <div class="form-group">
+          <label for="ret-cur-age" class="form-label">Current Age</label>
+          <input type="number" id="ret-cur-age" class="form-input" value="30" min="18" max="80" />
+        </div>
+        <div class="form-group">
+          <label for="ret-ret-age" class="form-label">Retirement Age</label>
+          <input type="number" id="ret-ret-age" class="form-input" value="65" min="40" max="90" />
+        </div>
+      </div>
+
+      <div class="form-row-2">
+        <div class="form-group">
+          <label for="ret-cur-savings" class="form-label">Current Savings ($)</label>
+          <input type="number" id="ret-cur-savings" class="form-input" value="50000" step="5000" />
+        </div>
+        <div class="form-group">
+          <label for="ret-annual-add" class="form-label">Annual Contribution ($)</label>
+          <input type="number" id="ret-annual-add" class="form-input" value="10000" step="1000" />
+        </div>
+      </div>
+
+      <div class="form-row-2">
+        <div class="form-group">
+          <label for="ret-rate" class="form-label">Annual Return Rate (%)</label>
+          <input type="number" id="ret-rate" class="form-input" value="7.0" step="0.1" />
+        </div>
+        <div class="form-group">
+          <label for="ret-spend" class="form-label">Desired Annual Spend in Retirement ($)</label>
+          <input type="number" id="ret-spend" class="form-input" value="60000" step="5000" />
+        </div>
+      </div>
+    </form>
+  </div>
+
+  <div slot="results">
+    <div class="result-hero">
+      <span class="result-hero-label">Projected Corpus at Retirement</span>
+      <span class="result-hero-value" id="ret-corpus-val">$1,927,337</span>
+      <span class="result-hero-subtext" id="ret-status-val">Fully Funded (Surplus of $427,337)</span>
+    </div>
+
+    <div class="mortgage-breakdown-table">
+      <div class="breakdown-row">
+        <span>Target Nest Egg (4% Rule):</span>
+        <strong id="ret-target-val">$1,500,000</strong>
+      </div>
+      <div class="breakdown-row">
+        <span>Years Until Retirement:</span>
+        <strong id="ret-years-val">35 Years</strong>
+      </div>
+      <div class="breakdown-row">
+        <span>Sustainable Withdrawal Rate:</span>
+        <strong id="ret-rate-val">3.1%</strong>
+      </div>
+    </div>
+  </div>
+
+  <div slot="how-to">
+    <ol>
+      <li><strong>Provide current age and target retirement:</strong> The difference represents your compounding window.</li>
+      <li><strong>Input existing savings and yearly contributions:</strong> Model ongoing additions into 401(k) or IRA accounts.</li>
+      <li><strong>Define desired spending:</strong> Estimate annual lifestyle expenses to evaluate portfolio safety.</li>
+    </ol>
+  </div>
+
+  <div slot="formula">
+    <pre><code>Required Nest Egg = Desired Annual Spending × 25
+Projected Corpus  = Σ [Annual Contribution × (1 + r)^(Years)] + Principal × (1 + r)^Years</code></pre>
+  </div>
+
+  <div slot="examples-table">
+    <table class="data-table">
+      <thead>
+        <tr>
+          <th>Annual Spend</th>
+          <th>Target Corpus (4% Rule)</th>
+          <th>At 3.5% Conservative</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr><td>$40,000 / yr</td><td>$1,000,000</td><td>$1,142,857</td></tr>
+        <tr><td>$60,000 / yr</td><td>$1,500,000</td><td>$1,714,286</td></tr>
+        <tr><td>$80,000 / yr</td><td>$2,000,000</td><td>$2,285,714</td></tr>
+        <tr><td>$100,000 / yr</td><td>$2,500,000</td><td>$2,857,143</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div slot="faq">
+    <FaqAccordion items={faqs} />
+  </div>
+
+  <div slot="related-tools">
+    <div class="related-tools-grid">
+      <a href="/finance/compound-interest-calculator" class="card related-tool-card">
+        <h3>Compound Interest Calculator</h3>
+        <p>Project long-term compound growth with regular contributions.</p>
+      </a>
+      <a href="/finance/investment-sip-calculator" class="card related-tool-card">
+        <h3>Investment / SIP Calculator</h3>
+        <p>Calculate mutual fund returns and periodic wealth growth.</p>
+      </a>
+    </div>
+  </div>
+</ToolShell>
+
+<JsonLd schema={[webAppSchema, generateFaqJsonLd(faqs), generateBreadcrumbJsonLd([{ name: 'Home', item: '/' }, { name: 'Finance', item: '/finance' }, { name: 'Retirement Calculator', item: '/finance/retirement-calculator' }])]} />
+
+<style>
+  .form-row-2 {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: var(--space-4);
+  }
+
+  @media (min-width: 640px) {
+    .form-row-2 {
+      grid-template-columns: 1fr 1fr;
+    }
+  }
+
+  .mortgage-breakdown-table {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-2);
+    padding: var(--space-4) 0;
+    border-top: 1px solid var(--color-border);
+    margin-top: var(--space-4);
+    font-size: var(--text-sm);
+  }
+
+  .breakdown-row {
+    display: flex;
+    justify-content: space-between;
+  }
+</style>
+
+<script>
+  import { calculateRetirement } from '@lib/calc/retirement';
+  import { formatCurrency, parseNumberInput } from '@lib/format/number';
+
+  function initRetirement() {
+    const curAgeIn = document.getElementById('ret-cur-age') as HTMLInputElement | null;
+    const retAgeIn = document.getElementById('ret-ret-age') as HTMLInputElement | null;
+    const curSavIn = document.getElementById('ret-cur-savings') as HTMLInputElement | null;
+    const annAddIn = document.getElementById('ret-annual-add') as HTMLInputElement | null;
+    const rateIn = document.getElementById('ret-rate') as HTMLInputElement | null;
+    const spendIn = document.getElementById('ret-spend') as HTMLInputElement | null;
+
+    const corpusDisplay = document.getElementById('ret-corpus-val');
+    const statusDisplay = document.getElementById('ret-status-val');
+    const targetDisplay = document.getElementById('ret-target-val');
+    const yearsDisplay = document.getElementById('ret-years-val');
+    const rateDisplay = document.getElementById('ret-rate-val');
+
+    function update() {
+      const res = calculateRetirement({
+        currentAge: parseNumberInput(curAgeIn?.value, 30),
+        retirementAge: parseNumberInput(retAgeIn?.value, 65),
+        currentSavings: parseNumberInput(curSavIn?.value, 50000),
+        annualContribution: parseNumberInput(annAddIn?.value, 10000),
+        expectedAnnualReturn: parseNumberInput(rateIn?.value, 7.0),
+        annualRetirementSpend: parseNumberInput(spendIn?.value, 60000)
+      });
+
+      if (corpusDisplay) corpusDisplay.textContent = formatCurrency(res.retirementCorpus);
+      if (statusDisplay) {
+        statusDisplay.textContent = res.isFunded
+          ? `Fully Funded (Surplus of ${formatCurrency(res.shortfallOrSurplus)})`
+          : `Funding Shortfall (${formatCurrency(Math.abs(res.shortfallOrSurplus))})`;
+      }
+      if (targetDisplay) targetDisplay.textContent = formatCurrency(res.requiredNestEgg);
+      if (yearsDisplay) yearsDisplay.textContent = `${res.yearsToRetire} Years`;
+      if (rateDisplay) rateDisplay.textContent = `${res.sustainableWithdrawalRate}%`;
+    }
+
+    [curAgeIn, retAgeIn, curSavIn, annAddIn, rateIn, spendIn].forEach(i => i?.addEventListener('input', update));
+    update();
+  }
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initRetirement);
+  } else {
+    initRetirement();
+  }
+</script>

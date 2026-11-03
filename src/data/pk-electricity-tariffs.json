@@ -1,0 +1,37 @@
+{
+  "name": "pk-electricity-tariffs",
+  "source": "National Electric Power Regulatory Authority (NEPRA) Uniform Tariff Schedule",
+  "lastVerified": "2026-10-31",
+  "currency": "PKR",
+  "defaultFpaPerUnit": 3.50,
+  "tvFee": 35,
+  "electricityDutyRate": 0.015,
+  "gstRate": 0.18,
+  "gstUnitThreshold": 200,
+  "discos": [
+    { "id": "lesco", "name": "LESCO (Lahore)" },
+    { "id": "iesco", "name": "IESCO (Islamabad)" },
+    { "id": "fesco", "name": "FESCO (Faisalabad)" },
+    { "id": "gepco", "name": "GEPCO (Gujranwala)" },
+    { "id": "mepco", "name": "MEPCO (Multan)" },
+    { "id": "pesco", "name": "PESCO (Peshawar)" },
+    { "id": "hesco", "name": "HESCO (Hyderabad)" },
+    { "id": "sepco", "name": "SEPCO (Sukkur)" },
+    { "id": "qesco", "name": "QESCO (Quetta)" },
+    { "id": "kelectric", "name": "K-Electric (Karachi)" }
+  ],
+  "unprotectedSlabs": [
+    { "min": 1, "max": 100, "rate": 16.48 },
+    { "min": 101, "max": 200, "rate": 22.95 },
+    { "min": 201, "max": 300, "rate": 27.14 },
+    { "min": 301, "max": 400, "rate": 32.03 },
+    { "min": 401, "max": 500, "rate": 35.24 },
+    { "min": 501, "max": 600, "rate": 36.66 },
+    { "min": 601, "max": 700, "rate": 37.80 },
+    { "min": 701, "max": null, "rate": 42.72 }
+  ],
+  "protectedSlabs": [
+    { "min": 1, "max": 50, "rate": 3.95 },
+    { "min": 51, "max": 100, "rate": 7.74 }
+  ]
+}

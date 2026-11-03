@@ -1,0 +1,271 @@
+/**
+ * Count Loft — Shared Component Styles
+ * Standard classes for buttons, inputs, cards, result displays, and alerts.
+ */
+
+/* ==========================================================================
+   Buttons
+   ========================================================================== */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-2);
+  min-height: var(--min-touch-target);
+  padding: var(--space-2) var(--space-4);
+  font-size: var(--text-body);
+  font-weight: var(--font-weight-medium);
+  border-radius: var(--radius-md);
+  border: 1px solid transparent;
+  cursor: pointer;
+  text-decoration: none;
+  transition: background-color var(--transition-fast), border-color var(--transition-fast), transform 50ms ease;
+  user-select: none;
+  white-space: nowrap;
+}
+
+.btn:active:not(:disabled) {
+  transform: translateY(1px);
+}
+
+.btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+/* Primary Button */
+.btn-primary {
+  background-color: var(--color-primary);
+  color: var(--color-primary-contrast);
+  border-color: var(--color-primary);
+}
+
+.btn-primary:hover:not(:disabled) {
+  background-color: var(--color-primary-hover);
+  border-color: var(--color-primary-hover);
+  color: var(--color-primary-contrast);
+}
+
+/* Secondary Button */
+.btn-secondary {
+  background-color: var(--color-surface);
+  color: var(--color-text);
+  border-color: var(--color-border-input);
+}
+
+.btn-secondary:hover:not(:disabled) {
+  background-color: var(--color-surface-muted);
+}
+
+/* Ghost Button */
+.btn-ghost {
+  background-color: transparent;
+  color: var(--color-text);
+  border-color: transparent;
+}
+
+.btn-ghost:hover:not(:disabled) {
+  background-color: var(--color-surface-muted);
+}
+
+/* ==========================================================================
+   Form Controls
+   ========================================================================== */
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+}
+
+.form-label {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: var(--text-label);
+  font-weight: var(--font-weight-medium);
+  color: var(--color-text);
+}
+
+.form-input,
+.form-select {
+  width: 100%;
+  min-height: var(--min-touch-target);
+  padding: var(--space-2) var(--space-3);
+  font-size: var(--text-body);
+  color: var(--color-text);
+  background-color: var(--color-surface);
+  border: 1px solid var(--color-border-input);
+  border-radius: var(--radius-md);
+  transition: border-color var(--transition-fast), box-shadow var(--transition-fast);
+}
+
+.form-input:focus,
+.form-select:focus {
+  outline: none;
+  border-color: var(--color-primary);
+  box-shadow: 0 0 0 2px var(--color-focus-ring);
+}
+
+.form-input[aria-invalid="true"] {
+  border-color: var(--color-danger);
+}
+
+.form-helper {
+  font-size: var(--text-sm);
+  color: var(--color-text-muted);
+}
+
+.form-error {
+  font-size: var(--text-sm);
+  color: var(--color-danger);
+  display: flex;
+  align-items: center;
+  gap: var(--space-1);
+}
+
+/* Input Affix (Prefix/Suffix) */
+.input-affix-wrapper {
+  display: flex;
+  align-items: center;
+  width: 100%;
+  border: 1px solid var(--color-border-input);
+  border-radius: var(--radius-md);
+  background-color: var(--color-surface);
+  overflow: hidden;
+}
+
+.input-affix-wrapper:focus-within {
+  border-color: var(--color-primary);
+  box-shadow: 0 0 0 2px var(--color-focus-ring);
+}
+
+.input-affix-wrapper .form-input {
+  border: none;
+  border-radius: 0;
+  box-shadow: none;
+}
+
+.input-affix-wrapper .form-input:focus {
+  box-shadow: none;
+}
+
+.input-prefix,
+.input-suffix {
+  display: flex;
+  align-items: center;
+  padding: 0 var(--space-3);
+  min-height: var(--min-touch-target);
+  font-size: var(--text-body);
+  color: var(--color-text-muted);
+  background-color: var(--color-surface-muted);
+  user-select: none;
+}
+
+/* ==========================================================================
+   Cards & Panels
+   ========================================================================== */
+.card {
+  background-color: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  padding: var(--space-5);
+  box-shadow: var(--shadow-sm);
+}
+
+.card-muted {
+  background-color: var(--color-surface-muted);
+}
+
+/* ==========================================================================
+   Result Display Panel
+   ========================================================================== */
+.result-panel {
+  background-color: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  padding: var(--space-5);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+}
+
+.result-hero {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+}
+
+.result-hero-label {
+  font-size: var(--text-sm);
+  font-weight: var(--font-weight-medium);
+  color: var(--color-text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.result-hero-value {
+  font-size: var(--text-result);
+  font-weight: var(--font-weight-bold);
+  line-height: var(--leading-tight);
+  color: var(--color-text);
+  font-variant-numeric: tabular-nums;
+  transition: color var(--transition-fast);
+}
+
+.result-pulse {
+  animation: result-pulse 250ms ease-out;
+}
+
+@keyframes result-pulse {
+  0% { transform: scale(1); }
+  50% { transform: scale(1.02); color: var(--color-primary); }
+  100% { transform: scale(1); }
+}
+
+/* Definition List for secondary results */
+.result-breakdown {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: var(--space-2) var(--space-4);
+  padding-top: var(--space-3);
+  border-top: 1px solid var(--color-border);
+  font-size: var(--text-body);
+}
+
+.result-breakdown dt {
+  color: var(--color-text-muted);
+}
+
+.result-breakdown dd {
+  color: var(--color-text);
+  font-weight: var(--font-weight-semibold);
+  font-variant-numeric: tabular-nums;
+  text-align: right;
+}
+
+/* ==========================================================================
+   Alerts & Disclaimers
+   ========================================================================== */
+.alert {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-3);
+  padding: var(--space-3) var(--space-4);
+  border-radius: var(--radius-md);
+  border: 1px solid var(--color-border);
+  background-color: var(--color-surface-muted);
+  font-size: var(--text-sm);
+  color: var(--color-text);
+}
+
+.alert-warning {
+  border-color: var(--color-warning);
+  background-color: rgb(180 83 9 / 0.08);
+  color: var(--color-text);
+}
+
+.alert-info {
+  border-color: var(--color-primary);
+  background-color: rgb(37 99 235 / 0.08);
+  color: var(--color-text);
+}

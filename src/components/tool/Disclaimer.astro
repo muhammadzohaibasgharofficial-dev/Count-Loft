@@ -1,0 +1,57 @@
+---
+/**
+ * Count Loft — YMYL Compliance Disclaimer Component
+ * Provides standard, non-legal advice notices for Finance and Health calculators.
+ */
+
+export interface Props {
+  category: 'finance' | 'health' | 'general' | 'math' | 'construction' | 'converters' | 'pakistan' | 'islamic';
+  text?: string;
+}
+
+const { category, text } = Astro.props;
+
+let defaultText = 'Estimate only, not advice.';
+if (category === 'finance') {
+  defaultText = 'Estimate only, not advice. Consult a qualified financial advisor for professional guidance.';
+} else if (category === 'health') {
+  defaultText = 'Estimate only, not advice. Consult a healthcare professional before making health or dietary decisions.';
+}
+
+const displayText = text || defaultText;
+---
+
+<aside class="alert alert-warning tool-disclaimer" role="note" aria-label="Disclaimer">
+  <div class="disclaimer-content">
+    <svg class="disclaimer-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+      <circle cx="12" cy="12" r="10"></circle>
+      <line x1="12" y1="8" x2="12" y2="12"></line>
+      <line x1="12" y1="16" x2="12.01" y2="16"></line>
+    </svg>
+    <p class="disclaimer-text">{displayText}</p>
+  </div>
+</aside>
+
+<style>
+  .tool-disclaimer {
+    margin-top: var(--space-6);
+    margin-bottom: var(--space-6);
+  }
+
+  .disclaimer-content {
+    display: flex;
+    align-items: flex-start;
+    gap: var(--space-3);
+  }
+
+  .disclaimer-icon {
+    flex-shrink: 0;
+    margin-top: 2px;
+  }
+
+  .disclaimer-text {
+    margin: 0;
+    font-size: var(--text-sm);
+    line-height: var(--leading-normal);
+  }
+</style>

@@ -1,0 +1,20 @@
+{
+  "name": "benchmark-fx-rates",
+  "baseCurrency": "USD",
+  "source": "Open Exchange Rates & European Central Bank Reference",
+  "lastVerified": "2026-10-31",
+  "rates": {
+    "USD": 1.0,
+    "EUR": 0.9215,
+    "GBP": 0.7712,
+    "CAD": 1.3892,
+    "AUD": 1.5186,
+    "JPY": 152.34,
+    "PKR": 277.85,
+    "INR": 84.08,
+    "AED": 3.6725,
+    "SAR": 3.755,
+    "CHF": 0.8655,
+    "CNY": 7.121
+  }
+}

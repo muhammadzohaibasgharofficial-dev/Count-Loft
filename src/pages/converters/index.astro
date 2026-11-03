@@ -1,0 +1,13 @@
+---
+import CategoryHub from '@components/layout/CategoryHub.astro';
+import { CALCULATORS } from '@data/calculators';
+
+const tools = CALCULATORS.filter(c => c.category === 'converters');
+---
+
+<CategoryHub
+  categoryName="Converters"
+  categorySlug="converters"
+  description="Convert units instantly with zero lag: length, weight, temperature, and foreign currency exchange."
+  tools={tools}
+/>

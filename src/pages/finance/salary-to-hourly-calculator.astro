@@ -1,0 +1,234 @@
+---
+/**
+ * Count Loft — Salary to Hourly Calculator
+ * Converts annual wage to hourly rate, weekly, biweekly, and monthly pay.
+ */
+import ToolShell from '@components/tool/ToolShell.astro';
+import FaqAccordion from '@components/tool/FaqAccordion.astro';
+import JsonLd from '@components/seo/JsonLd.astro';
+import { buildBreadcrumbs } from '@lib/format/breadcrumbs';
+import { generateWebApplicationJsonLd, generateFaqJsonLd, generateBreadcrumbJsonLd } from '@lib/seo/jsonld';
+
+const breadcrumbs = buildBreadcrumbs([
+  { label: 'Finance', href: '/finance' },
+  { label: 'Salary to Hourly Calculator' }
+]);
+
+const faqs = [
+  {
+    question: 'How do you convert annual salary to an hourly wage?',
+    answer: 'Divide the annual salary by total work hours in a year. For a standard 40-hour work week across 52 weeks (2,080 hours), divide salary by 2,080 (e.g. $52,000 / 2,080 = $25/hour).'
+  },
+  {
+    question: 'What is the standard number of work hours in a year?',
+    answer: 'A standard full-time employee working 40 hours per week works 2,080 hours per year (52 weeks × 40 hours).'
+  },
+  {
+    question: 'How is biweekly pay calculated?',
+    answer: 'Biweekly pay occurs every two weeks (26 pay periods per year). Divide annual salary by 26.'
+  },
+  {
+    question: 'How is overtime pay calculated?',
+    answer: 'Federal overtime under the US Fair Labor Standards Act (FLSA) requires 1.5 times the regular hourly rate ("time and a half") for hours worked beyond 40 hours in a single workweek.'
+  },
+  {
+    question: 'What is the difference between gross pay and net pay?',
+    answer: 'Gross pay is total earnings before taxes and benefits deductions. Net pay (take-home pay) is what remains after federal/state income taxes, FICA (Social Security & Medicare), and health insurance premiums are deducted.'
+  }
+];
+
+const webAppSchema = generateWebApplicationJsonLd({
+  name: 'Salary to Hourly Calculator — Count Loft',
+  description: 'Convert annual salary to hourly rate, biweekly pay, monthly earnings, and overtime pay.',
+  url: 'https://count-loft.com/finance/salary-to-hourly-calculator',
+  category: 'FinanceApplication'
+});
+---
+
+<ToolShell
+  title="Salary to Hourly Calculator"
+  description="Convert your annual salary into an hourly wage, daily rate, weekly paycheck, and biweekly take-home equivalent."
+  category="finance"
+  breadcrumbs={breadcrumbs}
+  author="Count Loft Team"
+  lastUpdated="2026-10-31"
+>
+  <div slot="inputs">
+    <form id="salary-form" novalidate onsubmit="return false;">
+      <div class="form-group">
+        <label for="sal-amount" class="form-label">Annual Salary ($)</label>
+        <div class="input-affix-wrapper">
+          <span class="input-prefix">$</span>
+          <input type="number" id="sal-amount" class="form-input has-prefix" value="52000" step="1000" />
+        </div>
+      </div>
+
+      <div class="form-row-2">
+        <div class="form-group">
+          <label for="sal-hours" class="form-label">Hours Per Week</label>
+          <input type="number" id="sal-hours" class="form-input" value="40" min="1" max="80" />
+        </div>
+        <div class="form-group">
+          <label for="sal-weeks" class="form-label">Weeks Per Year</label>
+          <input type="number" id="sal-weeks" class="form-input" value="52" min="1" max="52" />
+        </div>
+      </div>
+    </form>
+  </div>
+
+  <div slot="results">
+    <div class="result-hero">
+      <span class="result-hero-label">Equivalent Hourly Rate</span>
+      <span class="result-hero-value" id="hourly-display">$25.00 / hr</span>
+      <span class="result-hero-subtext">Based on 2,080 working hours/year</span>
+    </div>
+
+    <div class="mortgage-breakdown-table">
+      <div class="breakdown-row">
+        <span>Daily Rate (8 hrs):</span>
+        <strong id="daily-display">$200.00</strong>
+      </div>
+      <div class="breakdown-row">
+        <span>Weekly Pay:</span>
+        <strong id="weekly-display">$1,000.00</strong>
+      </div>
+      <div class="breakdown-row">
+        <span>Biweekly Pay (26 paychecks):</span>
+        <strong id="biweekly-display">$2,000.00</strong>
+      </div>
+      <div class="breakdown-row">
+        <span>Monthly Pay:</span>
+        <strong id="monthly-display">$4,333.33</strong>
+      </div>
+      <div class="breakdown-row">
+        <span>Overtime Rate (1.5x):</span>
+        <strong id="overtime-display">$37.50 / hr</strong>
+      </div>
+    </div>
+  </div>
+
+  <div slot="how-to">
+    <ol>
+      <li><strong>Enter your annual compensation:</strong> Input total yearly base pay.</li>
+      <li><strong>Customize work hours:</strong> Defaults to 40 hours per week and 52 weeks per year.</li>
+      <li><strong>View all wage periods:</strong> Compare hourly, daily, weekly, and monthly rates.</li>
+    </ol>
+  </div>
+
+  <div slot="formula">
+    <pre><code>Hourly Rate   = Annual Salary ÷ (Hours/Week × Weeks/Year)
+Biweekly Pay  = Annual Salary ÷ 26
+Monthly Pay   = Annual Salary ÷ 12
+Overtime Rate = Hourly Rate × 1.5</code></pre>
+  </div>
+
+  <div slot="examples-table">
+    <table class="data-table">
+      <thead>
+        <tr>
+          <th>Annual Salary</th>
+          <th>Hourly Rate (40 hrs/wk)</th>
+          <th>Biweekly Pay</th>
+          <th>Monthly Pay</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr><td>$35,000</td><td>$16.83 / hr</td><td>$1,346.15</td><td>$2,916.67</td></tr>
+        <tr><td>$50,000</td><td>$24.04 / hr</td><td>$1,923.08</td><td>$4,166.67</td></tr>
+        <tr><td>$65,000</td><td>$31.25 / hr</td><td>$2,500.00</td><td>$5,416.67</td></tr>
+        <tr><td>$80,000</td><td>$38.46 / hr</td><td>$3,076.92</td><td>$6,666.67</td></tr>
+        <tr><td>$100,000</td><td>$48.08 / hr</td><td>$3,846.15</td><td>$8,333.33</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div slot="faq">
+    <FaqAccordion items={faqs} />
+  </div>
+
+  <div slot="related-tools">
+    <div class="related-tools-grid">
+      <a href="/finance/income-tax-calculator" class="card related-tool-card">
+        <h3>Income Tax Calculator</h3>
+        <p>Calculate federal tax brackets and net paycheck take-home.</p>
+      </a>
+      <a href="/finance/loan-calculator" class="card related-tool-card">
+        <h3>Loan / EMI Calculator</h3>
+        <p>See how much car or home loan you can afford with your wage.</p>
+      </a>
+    </div>
+  </div>
+</ToolShell>
+
+<JsonLd schema={[webAppSchema, generateFaqJsonLd(faqs), generateBreadcrumbJsonLd([{ name: 'Home', item: '/' }, { name: 'Finance', item: '/finance' }, { name: 'Salary to Hourly Calculator', item: '/finance/salary-to-hourly-calculator' }])]} />
+
+<style>
+  .form-row-2 {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: var(--space-4);
+  }
+
+  @media (min-width: 640px) {
+    .form-row-2 {
+      grid-template-columns: 1fr 1fr;
+    }
+  }
+
+  .mortgage-breakdown-table {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-2);
+    padding: var(--space-4) 0;
+    border-top: 1px solid var(--color-border);
+    margin-top: var(--space-4);
+    font-size: var(--text-sm);
+  }
+
+  .breakdown-row {
+    display: flex;
+    justify-content: space-between;
+  }
+</style>
+
+<script>
+  import { calculateSalaryToHourly } from '@lib/calc/salary';
+  import { formatCurrency, parseNumberInput } from '@lib/format/number';
+
+  function initSalary() {
+    const salIn = document.getElementById('sal-amount') as HTMLInputElement | null;
+    const hrsIn = document.getElementById('sal-hours') as HTMLInputElement | null;
+    const wksIn = document.getElementById('sal-weeks') as HTMLInputElement | null;
+
+    const hourlyDisplay = document.getElementById('hourly-display');
+    const dailyDisplay = document.getElementById('daily-display');
+    const weeklyDisplay = document.getElementById('weekly-display');
+    const biweeklyDisplay = document.getElementById('biweekly-display');
+    const monthlyDisplay = document.getElementById('monthly-display');
+    const overtimeDisplay = document.getElementById('overtime-display');
+
+    function update() {
+      const res = calculateSalaryToHourly({
+        annualSalary: parseNumberInput(salIn?.value, 52000),
+        hoursPerWeek: parseNumberInput(hrsIn?.value, 40),
+        weeksPerYear: parseNumberInput(wksIn?.value, 52)
+      });
+
+      if (hourlyDisplay) hourlyDisplay.textContent = `${formatCurrency(res.hourlyRate)} / hr`;
+      if (dailyDisplay) dailyDisplay.textContent = formatCurrency(res.dailyRate);
+      if (weeklyDisplay) weeklyDisplay.textContent = formatCurrency(res.weeklyRate);
+      if (biweeklyDisplay) biweeklyDisplay.textContent = formatCurrency(res.biweeklyRate);
+      if (monthlyDisplay) monthlyDisplay.textContent = formatCurrency(res.monthlyRate);
+      if (overtimeDisplay) overtimeDisplay.textContent = `${formatCurrency(res.overtimeRate)} / hr`;
+    }
+
+    [salIn, hrsIn, wksIn].forEach(i => i?.addEventListener('input', update));
+    update();
+  }
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initSalary);
+  } else {
+    initSalary();
+  }
+</script>

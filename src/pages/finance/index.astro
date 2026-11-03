@@ -1,0 +1,13 @@
+---
+import CategoryHub from '@components/layout/CategoryHub.astro';
+import { CALCULATORS } from '@data/calculators';
+
+const tools = CALCULATORS.filter(c => c.category === 'finance');
+---
+
+<CategoryHub
+  categoryName="Finance"
+  categorySlug="finance"
+  description="Plan loans, estimate monthly mortgage payments, project compound interest growth, and calculate investment returns."
+  tools={tools}
+/>

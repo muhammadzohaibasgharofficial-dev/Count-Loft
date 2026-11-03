@@ -1,0 +1,13 @@
+---
+import CategoryHub from '@components/layout/CategoryHub.astro';
+import { CALCULATORS } from '@data/calculators';
+
+const tools = CALCULATORS.filter(c => c.category === 'pakistan');
+---
+
+<CategoryHub
+  categoryName="Pakistan"
+  categorySlug="pakistan"
+  description="Compute FBR salaried income tax under current budget slabs, estimate unified DISCO electricity bills, and calculate local gold jewelry prices."
+  tools={tools}
+/>

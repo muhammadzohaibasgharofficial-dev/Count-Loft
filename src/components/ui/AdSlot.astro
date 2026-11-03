@@ -1,0 +1,62 @@
+---
+/**
+ * Count Loft — AdSlot Skeleton Component
+ * Reserved skeleton container to prevent Cumulative Layout Shift (CLS <= 0.1).
+ */
+
+export interface Props {
+  slotId: string;
+  format?: 'leaderboard' | 'rectangle' | 'responsive';
+  minHeight?: string;
+  label?: string;
+}
+
+const {
+  slotId,
+  format = 'responsive',
+  minHeight = format === 'leaderboard' ? '90px' : '250px',
+  label = 'Advertisement'
+} = Astro.props;
+---
+
+<div
+  id={slotId}
+  class={`ad-slot-wrapper ad-format-${format}`}
+  style={`min-height: ${minHeight};`}
+  role="complementary"
+  aria-label={label}
+>
+  <div class="ad-placeholder-skeleton">
+    <span class="ad-label">{label}</span>
+  </div>
+</div>
+
+<style>
+  .ad-slot-wrapper {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+    margin-top: var(--space-6);
+    margin-bottom: var(--space-6);
+    overflow: hidden;
+  }
+
+  .ad-placeholder-skeleton {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    height: 100%;
+    background-color: var(--color-surface-muted);
+    border: 1px dashed var(--color-border-strong);
+    border-radius: var(--radius-md);
+  }
+
+  .ad-label {
+    font-size: var(--text-xs);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: var(--color-text-muted);
+  }
+</style>

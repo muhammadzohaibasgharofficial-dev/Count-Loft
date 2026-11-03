@@ -1,0 +1,205 @@
+---
+import ToolShell from '@components/tool/ToolShell.astro';
+import FaqAccordion from '@components/tool/FaqAccordion.astro';
+import JsonLd from '@components/seo/JsonLd.astro';
+import { buildBreadcrumbs } from '@lib/format/breadcrumbs';
+import { generateWebApplicationJsonLd, generateFaqJsonLd, generateBreadcrumbJsonLd } from '@lib/seo/jsonld';
+
+const breadcrumbs = buildBreadcrumbs([
+  { label: 'Finance', href: '/finance' },
+  { label: 'Investment / SIP Calculator' }
+]);
+
+const faqs = [
+  {
+    question: 'What is a Systematic Investment Plan (SIP)?',
+    answer: 'A SIP is an investment method where an investor deposits a fixed amount of money at regular intervals (typically monthly) into mutual funds or exchange-traded funds (ETFs).'
+  },
+  {
+    question: 'What are the main benefits of SIP investing?',
+    answer: 'SIP enforces disciplined investing, removes the urge to time the stock market, and leverages rupee-cost or dollar-cost averaging to buy more units when market prices dip.'
+  },
+  {
+    question: 'What average rate of return can I expect from equity mutual funds?',
+    answer: 'Historically, diversified index funds have delivered long-term annualized returns between 10% and 14%, though returns are not guaranteed and fluctuate year to year.'
+  },
+  {
+    question: 'Can I increase my monthly SIP amount over time?',
+    answer: 'Yes, known as a "Step-up SIP", increasing your monthly deposit by 5% to 10% each year as your income grows substantially boosts long-term wealth.'
+  },
+  {
+    question: 'Is SIP better than a lump sum investment?',
+    answer: 'SIP carries lower timing risk during market volatility, making it ideal for regular salaried earners investing from monthly cash flow.'
+  }
+];
+
+const webAppSchema = generateWebApplicationJsonLd({
+  name: 'Investment / SIP Calculator — Count Loft',
+  description: 'Calculate mutual fund Systematic Investment Plan (SIP) returns and total wealth creation over time.',
+  url: 'https://count-loft.com/finance/investment-sip-calculator',
+  category: 'FinanceApplication'
+});
+---
+
+<ToolShell
+  title="Investment / SIP Calculator"
+  description="Calculate your mutual fund Systematic Investment Plan (SIP) returns, total invested amount, and projected maturity value."
+  category="finance"
+  breadcrumbs={breadcrumbs}
+  author="Count Loft Team"
+  lastUpdated="2026-10-31"
+>
+  <div slot="inputs">
+    <form id="sip-form" novalidate onsubmit="return false;">
+      <div class="form-group">
+        <label for="sip-monthly" class="form-label">Monthly Investment ($ / Rs)</label>
+        <input type="number" id="sip-monthly" class="form-input" value="500" step="50" />
+      </div>
+
+      <div class="form-row-2">
+        <div class="form-group">
+          <label for="sip-rate" class="form-label">Expected Annual Return (%)</label>
+          <input type="number" id="sip-rate" class="form-input" value="12.0" step="0.5" />
+        </div>
+        <div class="form-group">
+          <label for="sip-years" class="form-label">Time Period (Years)</label>
+          <input type="number" id="sip-years" class="form-input" value="10" min="1" max="40" />
+        </div>
+      </div>
+    </form>
+  </div>
+
+  <div slot="results">
+    <div class="result-hero">
+      <span class="result-hero-label">Total Maturity Value</span>
+      <span class="result-hero-value" id="sip-maturity-val">$116,170</span>
+      <span class="result-hero-subtext">Estimated total portfolio value</span>
+    </div>
+
+    <div class="mortgage-breakdown-table">
+      <div class="breakdown-row">
+        <span>Total Amount Invested:</span>
+        <strong id="sip-invested-val">$60,000</strong>
+      </div>
+      <div class="breakdown-row">
+        <span>Estimated Wealth Gain:</span>
+        <strong id="sip-gain-val">$56,170</strong>
+      </div>
+    </div>
+  </div>
+
+  <div slot="how-to">
+    <ol>
+      <li><strong>Enter monthly SIP installment:</strong> Amount allocated each month.</li>
+      <li><strong>Select expected return:</strong> Historically 10%–14% for diversified equities.</li>
+      <li><strong>Specify horizon:</strong> Longer periods experience exponential compounding acceleration.</li>
+    </ol>
+  </div>
+
+  <div slot="formula">
+    <pre><code>M = P × [((1 + i)ⁿ - 1) / i] × (1 + i)
+Where i = (Rate ÷ 12 ÷ 100), n = Total Months</code></pre>
+  </div>
+
+  <div slot="examples-table">
+    <table class="data-table">
+      <thead>
+        <tr>
+          <th>Monthly SIP</th>
+          <th>5 Years (12%)</th>
+          <th>10 Years (12%)</th>
+          <th>15 Years (12%)</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr><td>$250 / mo</td><td>$20,622</td><td>$58,085</td><td>$126,116</td></tr>
+        <tr><td>$500 / mo</td><td>$41,243</td><td>$116,170</td><td>$252,232</td></tr>
+        <tr><td>$1,000 / mo</td><td>$82,486</td><td>$232,339</td><td>$504,464</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div slot="faq">
+    <FaqAccordion items={faqs} />
+  </div>
+
+  <div slot="related-tools">
+    <div class="related-tools-grid">
+      <a href="/finance/compound-interest-calculator" class="card related-tool-card">
+        <h3>Compound Interest Calculator</h3>
+        <p>Project savings and deposit compound growth.</p>
+      </a>
+      <a href="/finance/retirement-calculator" class="card related-tool-card">
+        <h3>Retirement Calculator</h3>
+        <p>Estimate your required retirement nest egg and safe withdrawals.</p>
+      </a>
+    </div>
+  </div>
+</ToolShell>
+
+<JsonLd schema={[webAppSchema, generateFaqJsonLd(faqs), generateBreadcrumbJsonLd([{ name: 'Home', item: '/' }, { name: 'Finance', item: '/finance' }, { name: 'Investment / SIP Calculator', item: '/finance/investment-sip-calculator' }])]} />
+
+<style>
+  .form-row-2 {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: var(--space-4);
+  }
+
+  @media (min-width: 640px) {
+    .form-row-2 {
+      grid-template-columns: 1fr 1fr;
+    }
+  }
+
+  .mortgage-breakdown-table {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-2);
+    padding: var(--space-4) 0;
+    border-top: 1px solid var(--color-border);
+    margin-top: var(--space-4);
+    font-size: var(--text-sm);
+  }
+
+  .breakdown-row {
+    display: flex;
+    justify-content: space-between;
+  }
+</style>
+
+<script>
+  import { calculateSip } from '@lib/calc/sip';
+  import { formatCurrency, parseNumberInput } from '@lib/format/number';
+
+  function initSip() {
+    const mIn = document.getElementById('sip-monthly') as HTMLInputElement | null;
+    const rIn = document.getElementById('sip-rate') as HTMLInputElement | null;
+    const yIn = document.getElementById('sip-years') as HTMLInputElement | null;
+
+    const maturityDisplay = document.getElementById('sip-maturity-val');
+    const investedDisplay = document.getElementById('sip-invested-val');
+    const gainDisplay = document.getElementById('sip-gain-val');
+
+    function update() {
+      const res = calculateSip({
+        monthlyInvestment: parseNumberInput(mIn?.value, 500),
+        expectedAnnualReturn: parseNumberInput(rIn?.value, 12.0),
+        timePeriodYears: parseNumberInput(yIn?.value, 10)
+      });
+
+      if (maturityDisplay) maturityDisplay.textContent = formatCurrency(res.totalMaturityValue);
+      if (investedDisplay) investedDisplay.textContent = formatCurrency(res.totalInvested);
+      if (gainDisplay) gainDisplay.textContent = formatCurrency(res.estimatedReturns);
+    }
+
+    [mIn, rIn, yIn].forEach(i => i?.addEventListener('input', update));
+    update();
+  }
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initSip);
+  } else {
+    initSip();
+  }
+</script>
