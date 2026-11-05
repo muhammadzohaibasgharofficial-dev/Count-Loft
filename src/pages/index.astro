@@ -1,440 +1,223 @@
 ---
 /**
- * Count Loft — Homepage
- * Searchable directory, category hubs, featured calculators, and zero-data privacy callout.
+ * Count Loft — Platform homepage (Level 0).
+ * Order: proof bar → header → dark hero → Tools (families) → All tools directory → How it works
+ *        → Important pages → FAQ → footer. Everything is computed from src/data/families.ts.
  */
 import BaseLayout from '@components/layout/BaseLayout.astro';
-import { CALCULATORS, CATEGORIES_CONFIG } from '@data/calculators';
+import JsonLd from '@components/seo/JsonLd.astro';
+import Icon from '@components/ui/Icon.astro';
+import Directory from '@components/ui/Directory.astro';
+import FaqAccordion from '@components/tool/FaqAccordion.astro';
+import { generateWebSiteJsonLd, generateOrganizationJsonLd, generateFaqJsonLd } from '@lib/seo/jsonld';
+import { FAMILIES, liveFamilies, familyToolCount, allTools, totalToolCount, liveFamilyCount } from '@data/families';
 
-const featuredTools = CALCULATORS.filter(c =>
-  ['loan-calculator', 'percentage-calculator', 'bmi-calculator', 'mortgage-calculator', 'calorie-calculator', 'compound-interest-calculator'].includes(c.slug)
-);
+const totalTools = totalToolCount();
+const tools = allTools();
+const live = liveFamilies();
+const soonCount = FAMILIES.length - live.length;
+
+const faqs = [
+  { question: 'Is Count Loft really free?', answer: `Yes. All ${totalTools} tools are free to use, with no sign-up, no account and no paywall.` },
+  { question: 'Do my numbers leave my device?', answer: 'No. Every tool runs in your browser, so the values you type are calculated on your own device and are not sent to a server.' },
+  { question: 'Can I trust the results?', answer: 'Each calculator shows its formula and a worked example so you can check the method yourself. Results are estimates for information only, not professional financial, medical or legal advice. If you spot an error, use the Corrections page.' },
+  { question: 'Which tools are available today?', answer: `Today the platform has ${liveFamilyCount()} live tool ${liveFamilyCount() === 1 ? 'family' : 'families'}: Calculators, with ${totalTools} tools across ${live[0]?.categories.length ?? 0} categories. More families are planned and will appear here when they are ready.` },
+  { question: 'Can I put a calculator on my own website?', answer: 'Yes. Every calculator page has an embed option that gives you a small snippet to paste into your site.' },
+];
+
+const pages = [
+  { label: 'About', href: '/about', icon: 'info' },
+  { label: 'How to Use', href: '/calculators/how-to-use', icon: 'book' },
+  { label: 'Privacy Policy', href: '/privacy', icon: 'shield' },
+  { label: 'Terms', href: '/terms', icon: 'doc' },
+  { label: 'Corrections', href: '/corrections', icon: 'flag' },
+];
 ---
 
 <BaseLayout
-  title="Count Loft — 42 Free Online Calculators for Finance, Health & Math"
+  title={`Count Loft — ${totalTools} Free Online Calculators for Finance, Health & Math`}
   description="Fast, accessible, and trustworthy online calculation tools. Instant results, formulas, worked examples, and charts with zero data tracking."
 >
-  <div class="homepage-wrapper">
-    <!-- Hero Banner & Search -->
-    <section class="hero-section">
-      <div class="container hero-container">
-        <h1 class="hero-title">
-          Fast, Free & Trustworthy <br /><span class="hero-highlight">Online Calculators</span>
-        </h1>
-        <p class="hero-subtitle">
-          Instant calculations for loans, mortgages, health, conversions, and math.
-          <strong class="privacy-note">Your numbers never leave your browser.</strong>
-        </p>
+  <link slot="head" rel="preload" href="/fonts/fraunces-latin.woff2" as="font" type="font/woff2" crossorigin />
+  <JsonLd schema={[generateWebSiteJsonLd(), generateOrganizationJsonLd(), generateFaqJsonLd(faqs)]} />
 
-        <!-- Live Instant Filter Search -->
-        <div class="search-box-wrapper">
-          <label for="calculator-search" class="visually-hidden">Search all 42 calculators</label>
-          <div class="search-input-box">
-            <svg class="search-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-              <circle cx="11" cy="11" r="8"></circle>
-              <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
-            </svg>
-            <input
-              type="text"
-              id="calculator-search"
-              class="form-input search-input"
-              placeholder="Search 42 calculators (e.g. loan, bmi, percentage, concrete)..."
-              autocomplete="off"
-            />
-          </div>
-          <div id="search-results-dropdown" class="search-dropdown" hidden>
-            <ul id="search-results-list" class="search-results-list" role="listbox">
-              <!-- Dynamically populated via client-side search -->
-            </ul>
-          </div>
-        </div>
-      </div>
-    </section>
-
-    <!-- Categories Grid -->
-    <section class="categories-section">
-      <div class="container">
-        <div class="section-header">
-          <h2>Browse by Category</h2>
-          <p class="section-lead">Explore our complete catalog organized across 6 primary sectors.</p>
-        </div>
-
-        <div class="category-cards-grid">
-          {CATEGORIES_CONFIG.map((cat) => (
-            <a href={`/${cat.slug}`} class="card category-card">
-              <div class="category-card-top">
-                <span class="category-card-name">{cat.name}</span>
-                <span class="category-card-count">{cat.count} Tools</span>
-              </div>
-              <p class="category-card-desc">{cat.description}</p>
-            </a>
-          ))}
-        </div>
-      </div>
-    </section>
-
-    <!-- Featured Calculators -->
-    <section class="featured-section">
-      <div class="container">
-        <div class="section-header">
-          <h2>Popular Calculators</h2>
-          <p class="section-lead">Most frequently used tools with instant formulas and interactive charts.</p>
-        </div>
-
-        <div class="featured-grid">
-          {featuredTools.map((tool) => (
-            <a href={tool.href} class="card featured-card">
-              <span class="featured-badge">{tool.category.toUpperCase()}</span>
-              <h3>{tool.name}</h3>
-              <p>{tool.description}</p>
-              <span class="featured-cta">Open Calculator &rarr;</span>
-            </a>
-          ))}
-        </div>
-      </div>
-    </section>
-
-    <!-- Trust & Privacy Banner -->
-    <section class="trust-banner-section">
-      <div class="container">
-        <div class="card trust-banner-card">
-          <div class="trust-icon-box">
-            <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-              <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path>
-            </svg>
-          </div>
-          <div class="trust-text-box">
-            <h3>Privacy by Architecture</h3>
-            <p>
-              Unlike traditional calculator websites, Count Loft runs 100% in your browser.
-              No inputs, salaries, or health metrics are sent across the network or stored in databases.
-            </p>
-          </div>
-        </div>
-      </div>
-    </section>
+  <div slot="before-header" class="announce">
+    <p>{totalTools} free tools · No sign-up · Your numbers never leave your browser</p>
   </div>
+
+  <!-- 0.3 HERO (always dark) -->
+  <section class="hero" aria-labelledby="hero-title">
+    <div class="container hero-grid">
+      <div class="hero-copy">
+        <h1 id="hero-title" class="hero-title">A home for free online tools.</h1>
+        <p class="hero-sub">Calculators today, more tool families on the way. Nothing to sign up for, and nothing you type ever leaves your browser.</p>
+        <form class="hero-search" role="search" action="/search" method="get">
+          <label for="hero-q" class="visually-hidden">Search all {totalTools} tools</label>
+          <Icon name="search" size={22} class="hero-search-icon" />
+          <input id="hero-q" name="q" type="search" placeholder={`Search ${totalTools} tools: loan, bmi, zakat, tile…`} autocomplete="off" />
+          <button type="submit" class="cta cta--blue">Search</button>
+        </form>
+      </div>
+      <div class="fan" aria-hidden="true">
+        <div class="fan-card f3"><span class="mark tint-image"><Icon name="image" size={26} /></span><b>Image Tools</b><i>Coming soon</i></div>
+        <div class="fan-card f2"><span class="mark tint-pdf"><Icon name="pdf" size={26} /></span><b>PDF Tools</b><i>Coming soon</i></div>
+        <div class="fan-card f1"><span class="mark tint-calculators"><Icon name="calculator" size={26} /></span><b>Calculators</b><i>{totalTools} free tools</i></div>
+      </div>
+    </div>
+    <div class="container">
+      <dl class="proof">
+        <div><dt>{totalTools}</dt><dd>free tools, ready now</dd></div>
+        <div><dt>{liveFamilyCount()}</dt><dd>{liveFamilyCount() === 1 ? 'family live' : 'families live'}{soonCount > 0 ? ', more coming' : ''}</dd></div>
+        <div><dt>100%</dt><dd>free, no sign-up</dd></div>
+      </dl>
+    </div>
+  </section>
+
+  <!-- 0.4 TOOLS: the biggest section on the site -->
+  <section class="section tools-section" aria-labelledby="tools-title">
+    <div class="container">
+      <div class="section-head">
+        <p class="eyebrow">Tool families</p>
+        <h2 id="tools-title" class="section-title section-title--xl">Pick a family of tools</h2>
+        <p class="section-lead">Each family is a set of free tools built for one kind of job. Start with Calculators; the rest are on the roadmap.</p>
+      </div>
+      <div class="bento">
+        {FAMILIES.map((f) => f.status === 'live' ? (
+          <article class="family live">
+            <span class={`mark mark--lg tint-${f.id}`}><Icon name={f.icon} size={34} /></span>
+            <h3 class="family-title"><a href={f.href} class="stretch">{f.name}</a></h3>
+            <p class="family-count">{familyToolCount(f)} free {f.toolNoun}</p>
+            <p class="family-desc">{f.description} {f.tagline}</p>
+            <ul class="chip-row cat-chips" aria-label={`${f.name} categories`}>
+              {f.categories.map((c) => (<li><a class="chip" href={c.href}>{c.name} <span class="n">{c.count}</span></a></li>))}
+            </ul>
+            <span class="family-go arrow-link">Open {f.name} <Icon name="arrow" size={20} /></span>
+          </article>
+        ) : (
+          <article class="family ghost">
+            <span class={`mark tint-${f.icon}`}><Icon name={f.icon} size={26} /></span>
+            <h3 class="family-title">{f.name}</h3>
+            <p class="family-desc">{f.tagline}</p>
+            <span class="soon">Coming soon</span>
+          </article>
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <!-- 0.5 ALL TOOLS DIRECTORY -->
+  <section class="section directory" id="all-tools" aria-labelledby="dir-title">
+    <div class="container">
+      <div class="section-head">
+        <p class="eyebrow">Directory</p>
+        <h2 id="dir-title" class="section-title">All {totalTools} tools</h2>
+        <p class="section-lead">Every tool on Count Loft in one list. Filter by category, or use search above.</p>
+      </div>
+      <Directory tools={tools} mode="filter" idPrefix="home" />
+    </div>
+  </section>
+
+  <!-- 0.6 HOW IT WORKS -->
+  <section class="section how" aria-labelledby="how-title">
+    <div class="container">
+      <div class="section-head"><h2 id="how-title" class="section-title">How it works</h2></div>
+      <ol class="steps">
+        <li class="card step"><span class="step-n">1</span><h3>Pick a tool</h3><p>Browse a family or search by name.</p></li>
+        <li class="card step"><span class="step-n">2</span><h3>Enter your numbers</h3><p>Results update as you type. No form to submit.</p></li>
+        <li class="card step"><span class="step-n">3</span><h3>Get instant results</h3><p>See the answer, the formula and a worked example.</p></li>
+      </ol>
+      <p class="privacy-line"><Icon name="shield" size={20} /> Your numbers never leave your browser. Calculations run on your device.</p>
+    </div>
+  </section>
+
+  <!-- 0.7 IMPORTANT PAGES (quiet) -->
+  <nav class="pages-band" aria-label="Important pages">
+    <div class="container pages-row">
+      <p class="pages-label">Good to know</p>
+      <ul class="pages-list">
+        {pages.map((p) => (<li><a href={p.href} class="page-link"><Icon name={p.icon} size={18} />{p.label}</a></li>))}
+      </ul>
+    </div>
+  </nav>
+
+  <!-- 0.8 FAQ -->
+  <section class="section faq" aria-labelledby="faq-title">
+    <div class="container faq-wrap">
+      <h2 id="faq-title" class="section-title">Questions, answered</h2>
+      <FaqAccordion items={faqs} />
+    </div>
+  </section>
 </BaseLayout>
 
 <style>
-  .hero-section {
-    padding: var(--space-7) 0 var(--space-6) 0;
-    text-align: center;
-    background-color: var(--color-surface);
-    border-bottom: 1px solid var(--color-border);
-  }
+  .announce { background: var(--ink-deep); color: var(--cream); text-align: center; padding: 0.55rem 1rem; font-size: 0.8125rem; border-bottom: 1px solid #262a33; }
+  .announce p { color: inherit; margin: 0; line-height: 1.4; }
 
-  .hero-container {
-    max-width: var(--container-narrow);
-    margin: 0 auto;
-  }
+  .hero { background: var(--ink-deep); color: var(--cream); padding: clamp(3rem, 7vw, 5.5rem) 0 0; overflow: hidden; }
+  .hero-grid { display: grid; gap: 3rem; align-items: center; }
+  @media (min-width: 960px) { .hero-grid { grid-template-columns: 1.15fr 0.85fr; } }
+  .hero-title { font-size: clamp(2.8rem, 6vw, 4.8rem); line-height: 1.02; letter-spacing: -0.03em; color: var(--cream); max-width: 12ch; }
+  .hero-sub { margin-top: 1.25rem; max-width: 34rem; font-size: 1.125rem; color: #C9C5BA; }
+  .hero-search { margin-top: 2rem; display: flex; align-items: center; gap: 0.5rem; max-width: 36rem; padding: 0.5rem 0.5rem 0.5rem 1.1rem; border-radius: 999px; background: #1B1F27; border: 1px solid #3A404C; }
+  .hero-search:focus-within { border-color: #7AA2FF; }
+  .hero-search :global(.hero-search-icon) { color: #A8A89F; flex: none; }
+  .hero-search input { flex: 1; min-width: 0; background: transparent; border: 0; color: var(--cream); font: inherit; font-size: 1.0625rem; padding: 0.6rem 0; outline: none; }
+  .hero-search input::placeholder { color: #A8A89F; }
+  .hero-search .cta { min-height: 2.75rem; }
 
-  .hero-title {
-    font-size: clamp(2rem, 5vw, 3.25rem);
-    letter-spacing: -0.03em;
-    line-height: var(--leading-tight);
-    margin: 0 0 var(--space-3) 0;
-  }
+  .fan { position: relative; height: 22rem; max-width: 24rem; width: 100%; margin-inline: auto; perspective: 1200px; }
+  .fan-card { position: absolute; left: 50%; top: 50%; width: 13.5rem; height: 17rem; margin: -8.5rem 0 0 -6.75rem; padding: 1.25rem; display: flex; flex-direction: column; justify-content: space-between; border-radius: 28px; background: #F4EFE3; color: var(--ink); box-shadow: 0 30px 60px -20px rgb(0 0 0 / 0.6); transition: transform 400ms cubic-bezier(.2,.7,.2,1); will-change: transform; }
+  .fan-card b { font-family: var(--font-display); font-size: 1.5rem; font-weight: 500; }
+  .fan-card i { font-style: normal; font-size: 0.8125rem; color: #5B574E; }
+  .f1 { background: #DCE8FF; transform: translateX(-3.2rem) rotate(-9deg) rotateY(8deg); z-index: 3; }
+  .f2 { background: #FFE3DC; transform: translateX(2.2rem) rotate(4deg) rotateY(-6deg); z-index: 2; }
+  .f3 { background: #DDF2E6; transform: translateX(7.4rem) rotate(15deg) rotateY(-10deg); z-index: 1; }
+  .hero-grid:hover .f1 { transform: translateX(-4.6rem) rotate(-4deg); }
+  .hero-grid:hover .f2 { transform: translateX(0.6rem) rotate(1deg); }
+  .hero-grid:hover .f3 { transform: translateX(5.8rem) rotate(7deg); }
 
-  .hero-highlight {
-    color: var(--color-primary);
-  }
+  .proof { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1rem; margin: clamp(2.5rem, 6vw, 4rem) 0 0; padding: 1.75rem 0 2.25rem; border-top: 1px solid #2B303A; }
+  .proof dt { font-family: var(--font-display); font-size: clamp(1.75rem, 4vw, 2.75rem); line-height: 1; color: var(--cream); }
+  .proof dd { margin: 0.4rem 0 0; font-size: 0.875rem; color: #B5B1A6; }
 
-  .hero-subtitle {
-    font-size: var(--text-body);
-    color: var(--color-text-muted);
-    max-width: 58ch;
-    margin: 0 auto var(--space-5) auto;
-    line-height: var(--leading-normal);
-  }
+  .section-title--xl { font-size: clamp(2.4rem, 5vw, 3.75rem); }
+  .tools-section { padding-block: clamp(4.5rem, 10vw, 8rem); }
+  .bento { display: grid; gap: 1.25rem; grid-template-columns: 1fr; }
+  @media (min-width: 900px) { .bento { grid-template-columns: 2fr 1fr; grid-template-rows: 1fr 1fr; } .family.live { grid-row: span 2; } }
+  .family { position: relative; display: flex; flex-direction: column; gap: 0.75rem; padding: clamp(1.5rem, 3vw, 2.5rem); border-radius: 32px; border: 1px solid var(--color-border); background: var(--color-surface); }
+  .family.live { transition: transform 200ms ease, box-shadow 200ms ease; }
+  .family.live:hover { transform: translateY(-4px); box-shadow: var(--shadow-lg); }
+  .family-title { font-family: var(--font-display); font-size: clamp(2rem, 4vw, 3rem); font-weight: 500; letter-spacing: -0.02em; margin-top: 0.75rem; }
+  .family.ghost .family-title { font-size: 1.5rem; margin-top: 0.25rem; }
+  .stretch { color: inherit; text-decoration: none; }
+  .stretch::after { content: ""; position: absolute; inset: 0; border-radius: inherit; }
+  .family-count { color: #1D4ED8; font-weight: 600; font-size: 1.125rem; }
+  :root[data-theme="dark"] .family-count { color: #8DB4FF; }
+  .family-desc { color: var(--color-text-muted); max-width: 48ch; }
+  .cat-chips { list-style: none; margin: 0.5rem 0 0; padding: 0; position: relative; z-index: 1; }
+  .family-go { margin-top: auto; padding-top: 1rem; color: var(--color-text); }
+  .family.live:hover .family-go { text-decoration: underline; }
+  .family.ghost { border-style: dashed; background: transparent; justify-content: flex-start; opacity: 0.85; }
+  .family.ghost .mark { filter: grayscale(0.6); }
+  .soon { align-self: flex-start; margin-top: auto; padding: 0.25rem 0.8rem; border-radius: 999px; border: 1px solid var(--color-border-strong); font-size: 0.8125rem; font-weight: 500; color: var(--color-text-muted); }
 
-  .privacy-note {
-    display: block;
-    color: var(--color-text);
-    margin-top: var(--space-1);
-  }
+  .directory { background: var(--color-surface-muted); }
+  .steps { list-style: none; margin: 0; padding: 0; display: grid; gap: 1.25rem; grid-template-columns: 1fr; }
+  @media (min-width: 800px) { .steps { grid-template-columns: repeat(3, 1fr); } }
+  .step { padding: 1.75rem; }
+  .step h3 { margin: 1rem 0 0.4rem; font-size: 1.25rem; }
+  .step p { color: var(--color-text-muted); }
+  .step-n { display: grid; place-items: center; width: 2.5rem; height: 2.5rem; border-radius: 32%; background: #2563EB; color: #fff; font-weight: 700; }
+  .privacy-line { display: flex; align-items: center; gap: 0.6rem; margin-top: 2rem; font-weight: 500; }
+  .privacy-line :global(svg) { color: #15803D; flex: none; }
 
-  .search-box-wrapper {
-    position: relative;
-    max-width: 540px;
-    margin: 0 auto;
-    text-align: left;
-  }
+  .pages-band { border-block: 1px solid var(--color-border); }
+  .pages-row { display: flex; flex-wrap: wrap; align-items: center; gap: 0.75rem 2rem; padding-block: 1.25rem; }
+  .pages-label { font-size: 0.875rem; color: var(--color-text-muted); margin: 0; }
+  .pages-list { list-style: none; display: flex; flex-wrap: wrap; gap: 0.25rem 1.25rem; margin: 0; padding: 0; }
+  .page-link { display: inline-flex; align-items: center; gap: 0.4rem; font-size: 0.9375rem; color: var(--color-text-muted); text-decoration: none; padding-block: 0.4rem; }
+  .page-link:hover { color: var(--color-link); text-decoration: underline; }
 
-  .search-input-box {
-    position: relative;
-    display: flex;
-    align-items: center;
-  }
-
-  .search-icon {
-    position: absolute;
-    left: var(--space-4);
-    color: var(--color-text-muted);
-    pointer-events: none;
-  }
-
-  .search-input {
-    padding-left: 2.75rem;
-    height: 3rem;
-    border-radius: var(--radius-full);
-    font-size: var(--text-body);
-    box-shadow: var(--shadow-sm);
-  }
-
-  .search-dropdown {
-    position: absolute;
-    top: 100%;
-    left: 0;
-    right: 0;
-    margin-top: var(--space-2);
-    background-color: var(--color-surface);
-    border: 1px solid var(--color-border);
-    border-radius: var(--radius-md);
-    box-shadow: var(--shadow-md);
-    max-height: 320px;
-    overflow-y: auto;
-    z-index: 50;
-  }
-
-  .search-results-list {
-    list-style: none;
-    margin: 0;
-    padding: var(--space-2) 0;
-  }
-
-  .search-results-list :global(li a) {
-    display: block;
-    padding: var(--space-3) var(--space-4);
-    text-decoration: none;
-    color: var(--color-text);
-  }
-
-  .search-results-list :global(li a:hover) {
-    background-color: var(--color-surface-muted);
-    color: var(--color-link);
-  }
-
-  .categories-section,
-  .featured-section {
-    padding: var(--space-7) 0;
-  }
-
-  .section-header {
-    margin-bottom: var(--space-5);
-  }
-
-  .section-header h2 {
-    margin: 0;
-    font-size: var(--text-h2);
-  }
-
-  .section-lead {
-    color: var(--color-text-muted);
-    font-size: var(--text-body);
-    margin-top: var(--space-1);
-  }
-
-  .category-cards-grid {
-    display: grid;
-    grid-template-columns: 1fr;
-    gap: var(--space-4);
-  }
-
-  @media (min-width: 640px) {
-    .category-cards-grid {
-      grid-template-columns: repeat(2, 1fr);
-    }
-  }
-
-  @media (min-width: 1024px) {
-    .category-cards-grid {
-      grid-template-columns: repeat(3, 1fr);
-    }
-  }
-
-  .category-card {
-    padding: var(--space-5);
-    text-decoration: none;
-    color: var(--color-text);
-    transition: transform var(--transition-fast), border-color var(--transition-fast);
-  }
-
-  .category-card:hover {
-    border-color: var(--color-primary);
-    transform: translateY(-2px);
-  }
-
-  .category-card-top {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: var(--space-2);
-  }
-
-  .category-card-name {
-    font-size: 1.125rem;
-    font-weight: var(--font-weight-semibold);
-    color: var(--color-link);
-  }
-
-  .category-card-count {
-    font-size: var(--text-xs);
-    background-color: var(--color-surface-muted);
-    padding: var(--space-1) var(--space-2);
-    border-radius: var(--radius-full);
-    color: var(--color-text-muted);
-  }
-
-  .category-card-desc {
-    font-size: var(--text-sm);
-    color: var(--color-text-muted);
-    margin: 0;
-    line-height: var(--leading-normal);
-  }
-
-  .featured-grid {
-    display: grid;
-    grid-template-columns: 1fr;
-    gap: var(--space-5);
-  }
-
-  @media (min-width: 768px) {
-    .featured-grid {
-      grid-template-columns: repeat(2, 1fr);
-    }
-  }
-
-  @media (min-width: 1024px) {
-    .featured-grid {
-      grid-template-columns: repeat(3, 1fr);
-    }
-  }
-
-  .featured-card {
-    padding: var(--space-5);
-    text-decoration: none;
-    color: var(--color-text);
-    display: flex;
-    flex-direction: column;
-    justify-content: space-between;
-    transition: transform var(--transition-fast), border-color var(--transition-fast);
-  }
-
-  .featured-card:hover {
-    border-color: var(--color-primary);
-    transform: translateY(-2px);
-  }
-
-  .featured-badge {
-    font-size: var(--text-xs);
-    font-weight: var(--font-weight-bold);
-    letter-spacing: 0.05em;
-    color: var(--color-primary);
-    margin-bottom: var(--space-2);
-  }
-
-  .featured-card h3 {
-    margin: 0 0 var(--space-2) 0;
-    font-size: 1.125rem;
-  }
-
-  .featured-card p {
-    font-size: var(--text-sm);
-    color: var(--color-text-muted);
-    margin: 0 0 var(--space-4) 0;
-    flex-grow: 1;
-  }
-
-  .featured-cta {
-    font-size: var(--text-xs);
-    font-weight: var(--font-weight-semibold);
-    color: var(--color-link);
-  }
-
-  .trust-banner-section {
-    padding: var(--space-4) 0 var(--space-8) 0;
-  }
-
-  .trust-banner-card {
-    display: flex;
-    align-items: center;
-    gap: var(--space-5);
-    padding: var(--space-6);
-    background-color: var(--color-surface);
-  }
-
-  .trust-icon-box {
-    color: var(--color-secondary);
-    flex-shrink: 0;
-  }
-
-  .trust-text-box h3 {
-    margin: 0 0 var(--space-1) 0;
-    font-size: 1.125rem;
-  }
-
-  .trust-text-box p {
-    margin: 0;
-    font-size: var(--text-sm);
-    color: var(--color-text-muted);
-    line-height: var(--leading-normal);
-  }
+  .faq-wrap { max-width: 52rem; }
+  .faq-wrap .section-title { margin-bottom: 2rem; }
 </style>
-
-<script>
-  import { CALCULATORS } from '@data/calculators';
-
-  function initLiveSearch() {
-    const input = document.getElementById('calculator-search') as HTMLInputElement | null;
-    const dropdown = document.getElementById('search-results-dropdown');
-    const list = document.getElementById('search-results-list');
-
-    if (!input || !dropdown || !list) return;
-
-    input.addEventListener('input', () => {
-      const query = input.value.trim().toLowerCase();
-
-      if (!query) {
-        dropdown.setAttribute('hidden', '');
-        list.innerHTML = '';
-        return;
-      }
-
-      const matches = CALCULATORS.filter(c =>
-        c.name.toLowerCase().includes(query) ||
-        c.description.toLowerCase().includes(query) ||
-        c.category.toLowerCase().includes(query)
-      ).slice(0, 8);
-
-      if (matches.length === 0) {
-        list.innerHTML = `<li style="padding: 12px 16px; color: var(--color-text-muted); font-size: 14px;">No calculators found for "${query}"</li>`;
-      } else {
-        list.innerHTML = matches.map(m => `
-          <li>
-            <a href="${m.href}">
-              <div style="font-weight: 600; font-size: 14px;">${m.name}</div>
-              <div style="font-size: 12px; color: var(--color-text-muted);">${m.description}</div>
-            </a>
-          </li>
-        `).join('');
-      }
-
-      dropdown.removeAttribute('hidden');
-    });
-
-    // Close dropdown on click outside
-    document.addEventListener('click', (e) => {
-      if (!input.contains(e.target as Node) && !dropdown.contains(e.target as Node)) {
-        dropdown.setAttribute('hidden', '');
-      }
-    });
-  }
-
-  if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', initLiveSearch);
-  } else {
-    initLiveSearch();
-  }
-</script>

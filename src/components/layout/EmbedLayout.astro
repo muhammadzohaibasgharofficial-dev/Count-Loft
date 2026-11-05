@@ -1,0 +1,50 @@
+---
+/**
+ * Count Loft — Embed Layout
+ * Minimal shell for iframe embeds: the tool only (no header, footer or ads),
+ * a small "Powered by Count Loft" link back to the tool's main page, and noindex.
+ */
+import '../../styles/global.css';
+
+export interface Props {
+  title: string;
+  toolUrl: string;
+}
+
+const { title, toolUrl } = Astro.props;
+---
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{title} — Count Loft (embed)</title>
+    <meta name="robots" content="noindex, follow" />
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+    <script is:inline>
+      (function () {
+        var t = 'light';
+        try { if (window.matchMedia('(prefers-color-scheme: dark)').matches) t = 'dark'; } catch (e) {}
+        document.documentElement.setAttribute('data-theme', t);
+        document.documentElement.style.colorScheme = t;
+      })();
+    </script>
+  </head>
+  <body class="embed-body">
+    <main class="embed-main">
+      <slot />
+    </main>
+    <footer class="embed-footer">
+      Powered by <a href={toolUrl} target="_blank" rel="noopener">Count Loft</a>
+    </footer>
+  </body>
+</html>
+
+<style is:global>
+  .embed-body { margin: 0; padding: var(--space-3); background: var(--color-bg); }
+  .embed-main { max-width: 960px; margin: 0 auto; }
+  .embed-title { font-size: var(--text-h3); margin: 0 0 var(--space-3) 0; }
+  .embed-footer { max-width: 960px; margin: var(--space-3) auto 0; text-align: right; font-size: var(--text-xs); color: var(--color-text-muted); }
+  .embed-footer a { color: var(--color-link); }
+</style>

@@ -64,6 +64,6 @@ test.describe('Count Loft — Core Site Smoke Tests', () => {
   test('Trust page — Corrections policy is accessible and transparent', async ({ page }) => {
     await page.goto('/corrections');
     await expect(page.locator('h1')).toContainText('Corrections Policy');
-    await expect(page.locator('main')).toContainText('corrections@count-loft.com');
+    await expect(page.locator('main')).toContainText('contact@countloft.site');
   });
 });

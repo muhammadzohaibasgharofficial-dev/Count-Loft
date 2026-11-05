@@ -45,7 +45,7 @@ const faqs = [
 const webAppSchema = generateWebApplicationJsonLd({
   name: 'Loan / EMI Calculator — Count Loft',
   description: 'Calculate monthly loan payments (EMI), total interest charges, and view full amortization schedule.',
-  url: 'https://count-loft.com/finance/loan-calculator',
+  url: '/finance/loan-calculator',
   category: 'FinanceApplication'
 });
 
@@ -93,7 +93,7 @@ const breadcrumbSchema = generateBreadcrumbJsonLd([
         <li><code>r</code> = Monthly interest rate (Annual rate ÷ 12 ÷ 100)</li>
         <li><code>n</code> = Total number of monthly payments</li>
       </ul>
-      <h4>Worked Example:</h4>
+      <h3>Worked Example:</h3>
       <p>For a loan of <strong>$20,000</strong> at <strong>6.0% annual interest</strong> over <strong>48 months</strong>:</p>
       <ul>
         <li>Monthly rate: <code>r = 6 / 12 / 100 = 0.005</code></li>

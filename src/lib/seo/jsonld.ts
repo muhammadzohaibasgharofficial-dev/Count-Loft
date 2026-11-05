@@ -3,12 +3,15 @@
  * Generates schema.org compliant metadata for WebApplication, FAQPage, and BreadcrumbList.
  */
 
+import { SITE_URL, SITE_NAME, absoluteUrl } from './site';
+import { getDates, normalizePath } from '../../data/content-dates.mjs';
+
 export interface BreadcrumbJsonLdItem {
   name: string;
   item?: string;
 }
 
-export function generateBreadcrumbJsonLd(items: BreadcrumbJsonLdItem[], siteUrl: string = 'https://count-loft.com') {
+export function generateBreadcrumbJsonLd(items: BreadcrumbJsonLdItem[], siteUrl: string = SITE_URL) {
   return {
     '@context': 'https://schema.org',
     '@type': 'BreadcrumbList',
@@ -52,6 +55,8 @@ export interface WebApplicationJsonLdOptions {
 }
 
 export function generateWebApplicationJsonLd(options: WebApplicationJsonLdOptions) {
+  // Dates come from src/data/content-dates.mjs and match the visible "Published" / "Last updated" lines
+  const dates = getDates(normalizePath(options.url));
   return {
     '@context': 'https://schema.org',
     '@type': 'WebApplication',
@@ -60,11 +65,41 @@ export function generateWebApplicationJsonLd(options: WebApplicationJsonLdOption
     operatingSystem: 'All',
     browserRequirements: 'Requires JavaScript',
     description: options.description,
-    url: options.url,
+    url: absoluteUrl(options.url),
+    datePublished: dates.published,
+    dateModified: dates.modified,
     offers: {
       '@type': 'Offer',
       price: '0',
       priceCurrency: 'USD'
     }
+  };
+}
+
+export function generateWebSiteJsonLd() {
+  return {
+    '@context': 'https://schema.org',
+    '@type': 'WebSite',
+    name: SITE_NAME,
+    url: SITE_URL,
+    inLanguage: 'en',
+    potentialAction: {
+      '@type': 'SearchAction',
+      target: {
+        '@type': 'EntryPoint',
+        urlTemplate: `${SITE_URL}/search?q={search_term_string}`
+      },
+      'query-input': 'required name=search_term_string'
+    }
+  };
+}
+
+export function generateOrganizationJsonLd() {
+  return {
+    '@context': 'https://schema.org',
+    '@type': 'Organization',
+    name: SITE_NAME,
+    url: SITE_URL,
+    logo: absoluteUrl('/favicon.svg')
   };
 }

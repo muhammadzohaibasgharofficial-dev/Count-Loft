@@ -1,0 +1,41 @@
+---
+/** Editorial article shell for family-level pages (About / How to use). */
+import BaseLayout from '@components/layout/BaseLayout.astro';
+import Breadcrumbs from '@components/seo/Breadcrumbs.astro';
+import JsonLd from '@components/seo/JsonLd.astro';
+import { buildBreadcrumbs } from '@lib/format/breadcrumbs';
+import { generateBreadcrumbJsonLd } from '@lib/seo/jsonld';
+
+export interface Props { title: string; description: string; h1: string; lead: string; path: string; crumb: string; }
+const { title, description, h1, lead, path, crumb } = Astro.props;
+const trail = [{ label: 'Calculators', href: '/calculators' }, { label: crumb }];
+const breadcrumbs = buildBreadcrumbs(trail);
+---
+<BaseLayout title={title} description={description}>
+  <JsonLd schema={[generateBreadcrumbJsonLd([{ name: 'Home', item: '/' }, { name: 'Calculators', item: '/calculators' }, { name: crumb, item: path }])]} />
+  <div class="container fa">
+    <Breadcrumbs items={breadcrumbs} />
+    <header class="fa-head">
+      <h1>{h1}</h1>
+      <p class="fa-lead">{lead}</p>
+    </header>
+    <article class="article-content fa-body"><slot /></article>
+    <nav class="fa-next" aria-label="More about calculators">
+      <a class="chip" href="/calculators">All calculators</a>
+      <a class="chip" href="/calculators/about">About the calculators</a>
+      <a class="chip" href="/calculators/how-to-use">How to use</a>
+      <a class="chip" href="/corrections">Corrections</a>
+    </nav>
+  </div>
+</BaseLayout>
+<style>
+  .fa { padding-top: var(--space-5); padding-bottom: clamp(3rem, 8vw, 6rem); }
+  .fa-head { padding-block: clamp(1.5rem, 4vw, 3rem); max-width: 48rem; }
+  .fa-head h1 { font-size: clamp(2.4rem, 5vw, 3.75rem); line-height: 1.05; }
+  .fa-lead { margin-top: 1rem; font-size: 1.1875rem; color: var(--color-text-muted); }
+  .fa-body { font-size: 1.0625rem; max-width: 44rem; }
+  .fa-body :global(h2) { margin-top: 2.75rem; }
+  .fa-body :global(ul), .fa-body :global(ol) { padding-left: 1.4rem; margin-top: 0.75rem; line-height: 1.7; }
+  .fa-body :global(li + li) { margin-top: 0.4rem; }
+  .fa-next { display: flex; flex-wrap: wrap; gap: 0.5rem; margin-top: 3.5rem; padding-top: 1.5rem; border-top: 1px solid var(--color-border); }
+</style>

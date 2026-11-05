@@ -1,0 +1,91 @@
+---
+/**
+ * Count Loft — Search page (static, client-side filter).
+ * URL pattern: /search?q=<term>   (used by the WebSite SearchAction JSON-LD)
+ * All tools are rendered in the HTML so the page works without JavaScript;
+ * the script only hides non-matching entries. noindex: result pages are not for Google's index.
+ */
+import BaseLayout from '@components/layout/BaseLayout.astro';
+import Breadcrumbs from '@components/seo/Breadcrumbs.astro';
+import { buildBreadcrumbs } from '@lib/format/breadcrumbs';
+import { CALCULATORS, CATEGORIES_CONFIG } from '@data/calculators';
+
+const breadcrumbs = buildBreadcrumbs([{ label: 'Search' }]);
+const categoryName = (slug: string) => CATEGORIES_CONFIG.find(c => c.slug === slug)?.name ?? slug;
+---
+
+<BaseLayout
+  title="Search Calculators — Count Loft"
+  description="Search all Count Loft free online calculators and converters by name or topic."
+  robots="noindex, follow"
+>
+  <div class="container search-page">
+    <Breadcrumbs items={breadcrumbs} />
+    <h1>Search Calculators</h1>
+
+    <form class="search-form" role="search" action="/search" method="get">
+      <label for="search-q" class="visually-hidden">Search calculators</label>
+      <input id="search-q" name="q" type="search" class="form-input" placeholder="e.g. loan, bmi, zakat, tile" autocomplete="off" />
+      <button type="submit" class="btn btn-primary">Search</button>
+    </form>
+
+    <p id="search-status" class="search-status" aria-live="polite">Showing all {CALCULATORS.length} calculators.</p>
+
+    <ul class="search-list" id="search-list">
+      {CALCULATORS.map((c) => (
+        <li data-search={`${c.name} ${c.description} ${c.category} ${categoryName(c.category)}`.toLowerCase()}>
+          <a href={c.href} class="card search-item">
+            <span class="search-item-cat">{categoryName(c.category)}</span>
+            <span class="search-item-name">{c.name}</span>
+            <span class="search-item-desc">{c.description}</span>
+          </a>
+        </li>
+      ))}
+    </ul>
+  </div>
+</BaseLayout>
+
+<style>
+  .search-page { padding-top: var(--space-6); padding-bottom: var(--space-8); }
+  .search-form { display: flex; gap: var(--space-2); margin: var(--space-4) 0; max-width: 560px; }
+  .search-form .form-input { flex: 1; }
+  .search-status { color: var(--color-text-muted); font-size: var(--text-sm); }
+  .search-list { list-style: none; margin: var(--space-4) 0 0; padding: 0; display: grid; gap: var(--space-3); grid-template-columns: 1fr; }
+  @media (min-width: 768px) { .search-list { grid-template-columns: repeat(2, 1fr); } }
+  .search-item { display: flex; flex-direction: column; gap: var(--space-1); padding: var(--space-4); text-decoration: none; color: var(--color-text); }
+  .search-item:hover { border-color: var(--color-primary); }
+  .search-item-cat { font-size: var(--text-xs); font-weight: var(--font-weight-bold); color: var(--color-primary); text-transform: uppercase; letter-spacing: 0.05em; }
+  .search-item-name { font-weight: var(--font-weight-semibold); color: var(--color-link); }
+  .search-item-desc { font-size: var(--text-sm); color: var(--color-text-muted); }
+</style>
+
+<script>
+  const input = document.getElementById('search-q') as HTMLInputElement | null;
+  const status = document.getElementById('search-status');
+  const items = Array.from(document.querySelectorAll<HTMLLIElement>('#search-list > li'));
+
+  function apply(raw: string) {
+    const terms = raw.toLowerCase().split(/\s+/).filter(Boolean);
+    let shown = 0;
+    for (const li of items) {
+      const hay = li.dataset.search || '';
+      const match = terms.every((t) => hay.includes(t));
+      li.hidden = !match;
+      if (match) shown++;
+    }
+    if (status) {
+      status.textContent = terms.length === 0
+        ? `Showing all ${items.length} calculators.`
+        : shown === 0
+          ? 'No calculators match your search.'
+          : `${shown} calculator${shown === 1 ? '' : 's'} found.`;
+    }
+  }
+
+  const initial = new URLSearchParams(window.location.search).get('q') || '';
+  if (input) {
+    input.value = initial;
+    input.addEventListener('input', () => apply(input.value));
+  }
+  apply(initial);
+</script>

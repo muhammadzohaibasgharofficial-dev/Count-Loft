@@ -7,6 +7,7 @@
 @import './reset.css';
 @import './components.css';
 @import './utilities.css';
+@import './design.css';
 
 body {
   font-family: var(--font-sans);

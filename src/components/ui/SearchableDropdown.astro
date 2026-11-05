@@ -1,3 +1,4 @@
+
 ---
 interface Props {
   name: string;
@@ -6,73 +7,267 @@ interface Props {
   selected?: string;
   id?: string;
 }
-  name: string;
-  options: { label: string; value: string }[];
-  placeholder?: string;
-  selected?: string;
-}
-const { name, options, placeholder = 'Search or select...', selected } = Astro.props;
+
+const {
+  name,
+  options,
+  placeholder = 'Search or select...',
+  selected = '',
+  id
+} = Astro.props;
 ---
-<div class="searchable-dropdown" data-name={name}>
-  <input type="hidden" name={name} class="dropdown-value" value={selected ?? ''} />
-  <div class="dropdown-toggle" tabindex="0">
-    <input type="text" class="dropdown-input" placeholder={placeholder} autocomplete="off" value="" />
+
+<div
+  class="searchable-dropdown"
+  data-name={name}
+  id={id}
+>
+  <input
+    type="hidden"
+    name={name}
+    class="dropdown-value"
+    value={selected}
+  />
+
+  <div class="dropdown-toggle">
+    <input
+      type="text"
+      class="dropdown-input"
+      placeholder={placeholder}
+      autocomplete="off"
+      value={options.find((opt) => opt.value === selected)?.label ?? ''}
+    />
     <span class="dropdown-arrow">▼</span>
   </div>
+
   <ul class="dropdown-list hidden">
-    {options.map(opt => (
-      <li class="dropdown-item" data-value={opt.value} data-label={opt.label}>{opt.label}</li>
+    {options.map((opt) => (
+      <li
+        class="dropdown-item"
+        data-value={opt.value}
+        data-label={opt.label}
+      >
+        {opt.label}
+      </li>
     ))}
-    <li class="dropdown-no-results hidden">No results found</li>
+
+    <li class="dropdown-no-results hidden">
+      No results found
+    </li>
   </ul>
 </div>
 
 <style>
-  .searchable-dropdown { position: relative; max-width: 100%; }
-  .dropdown-toggle { display: flex; align-items: center; border: 1px solid var(--color-border); border-radius: var(--radius-md); padding: var(--space-2); background: var(--color-surface); cursor: pointer; }
-  .dropdown-input { border: none; outline: none; flex: 1; font: inherit; background: transparent; }
-  .dropdown-arrow { margin-left: var(--space-2); }
-  .dropdown-list { position: absolute; top: 100%; left: 0; right: 0; margin-top: 4px; padding: 0; list-style: none; background: var(--color-surface); border: 1px solid var(--color-border); border-radius: var(--radius-md); max-height: 200px; overflow-y: auto; z-index: 10; box-shadow: 0 2px 8px rgba(0,0,0,0.1); }
-  .dropdown-item, .dropdown-no-results { padding: var(--space-2) var(--space-3); cursor: pointer; }
-  .dropdown-item:hover { background: var(--color-primary-100); }
-  .hidden { display: none; }
+  .searchable-dropdown {
+    position: relative;
+    width: 100%;
+    max-width: 100%;
+  }
+
+  .dropdown-toggle {
+    display: flex;
+    align-items: center;
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-md);
+    padding: var(--space-2);
+    background: var(--color-surface);
+    cursor: pointer;
+  }
+
+  .dropdown-input {
+    width: 100%;
+    min-width: 0;
+    border: none;
+    outline: none;
+    flex: 1;
+    font: inherit;
+    background: transparent;
+    color: inherit;
+  }
+
+  .dropdown-arrow {
+    margin-left: var(--space-2);
+    flex-shrink: 0;
+    font-size: 12px;
+  }
+
+  .dropdown-list {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
+    margin-top: 4px;
+    padding: 0;
+    list-style: none;
+    background: var(--color-surface);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-md);
+    max-height: 220px;
+    overflow-y: auto;
+    z-index: 100;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  }
+
+  .dropdown-item,
+  .dropdown-no-results {
+    padding: var(--space-2) var(--space-3);
+  }
+
+  .dropdown-item {
+    cursor: pointer;
+  }
+
+  .dropdown-item:hover {
+    background: var(--color-primary-100);
+  }
+
+  .dropdown-no-results {
+    cursor: default;
+    opacity: 0.7;
+  }
+
+  .hidden {
+    display: none !important;
+  }
 </style>
 
-<script client:load>
-  const container = document.currentScript.parentElement!;
-  const input = container.querySelector('.dropdown-input') as HTMLInputElement;
-  const hidden = container.querySelector('.dropdown-value') as HTMLInputElement;
-  const list = container.querySelector('.dropdown-list') as HTMLUListElement;
-  const items = Array.from(container.querySelectorAll('.dropdown-item')) as HTMLLIElement[];
-  const noResults = container.querySelector('.dropdown-no-results') as HTMLLIElement;
+<script>
+  function initializeSearchableDropdowns() {
+    const containers = document.querySelectorAll<HTMLElement>(
+      '.searchable-dropdown'
+    );
 
-  function open() { list.classList.remove('hidden'); }
-  function close() { list.classList.add('hidden'); }
-  function setValue(value: string, label: string) { hidden.value = value; input.value = label; close(); }
+    containers.forEach((container) => {
+      if (container.dataset.initialized === 'true') return;
 
-  input.addEventListener('focus', open);
-  input.addEventListener('input', () => {
-    const q = input.value.toLowerCase();
-    let hits = 0;
-    items.forEach(item => {
-      const txt = item.dataset.label!.toLowerCase();
-      if (txt.includes(q)) { item.classList.remove('hidden'); hits++; } else { item.classList.add('hidden'); }
+      container.dataset.initialized = 'true';
+
+      const input = container.querySelector<HTMLInputElement>(
+        '.dropdown-input'
+      );
+
+      const hidden = container.querySelector<HTMLInputElement>(
+        '.dropdown-value'
+      );
+
+      const list = container.querySelector<HTMLUListElement>(
+        '.dropdown-list'
+      );
+
+      const items = Array.from(
+        container.querySelectorAll<HTMLLIElement>('.dropdown-item')
+      );
+
+      const noResults = container.querySelector<HTMLLIElement>(
+        '.dropdown-no-results'
+      );
+
+      if (!input || !hidden || !list || !noResults) return;
+
+      function open() {
+        list.classList.remove('hidden');
+      }
+
+      function close() {
+        list.classList.add('hidden');
+      }
+
+      function setValue(value: string, label: string) {
+        hidden.value = value;
+        input.value = label;
+
+        hidden.dispatchEvent(
+          new Event('change', { bubbles: true })
+        );
+
+        close();
+      }
+
+      function filterOptions() {
+        const query = input.value.trim().toLowerCase();
+        let matches = 0;
+
+        items.forEach((item) => {
+          const label = (
+            item.dataset.label ?? ''
+          ).toLowerCase();
+
+          const isMatch = label.includes(query);
+
+          item.classList.toggle('hidden', !isMatch);
+
+          if (isMatch) matches++;
+        });
+
+        noResults.classList.toggle(
+          'hidden',
+          matches > 0
+        );
+      }
+
+      input.addEventListener('focus', () => {
+        filterOptions();
+        open();
+      });
+
+      input.addEventListener('input', () => {
+        filterOptions();
+        open();
+      });
+
+      input.addEventListener('keydown', (event) => {
+        if (event.key === 'Escape') {
+          close();
+          input.blur();
+        }
+
+        if (event.key === 'ArrowDown') {
+          event.preventDefault();
+
+          const firstVisible = items.find(
+            (item) => !item.classList.contains('hidden')
+          );
+
+          firstVisible?.focus();
+        }
+      });
+
+      items.forEach((item) => {
+        item.addEventListener('click', () => {
+          setValue(
+            item.dataset.value ?? '',
+            item.dataset.label ?? ''
+          );
+        });
+
+        item.setAttribute('tabindex', '0');
+
+        item.addEventListener('keydown', (event) => {
+          if (event.key === 'Enter' || event.key === ' ') {
+            event.preventDefault();
+
+            setValue(
+              item.dataset.value ?? '',
+              item.dataset.label ?? ''
+            );
+
+            input.focus();
+          }
+        });
+      });
+
+      document.addEventListener('click', (event) => {
+        if (!container.contains(event.target as Node)) {
+          close();
+        }
+      });
     });
-    noResults.classList.toggle('hidden', hits > 0);
-    open();
-  });
-  items.forEach(item => {
-    item.addEventListener('click', () => {
-      setValue(item.dataset.value!, item.dataset.label!);
-    });
-  });
-  document.addEventListener('click', (e) => {
-    if (!container.contains(e.target as Node)) close();
-  });
-
-  // Initialize with preselected value if present
-  if (hidden.value) {
-    const sel = items.find(i => i.dataset.value === hidden.value);
-    if (sel) input.value = sel.dataset.label!;
   }
+
+  initializeSearchableDropdowns();
+
+  document.addEventListener(
+    'astro:page-load',
+    initializeSearchableDropdowns
+  );
 </script>

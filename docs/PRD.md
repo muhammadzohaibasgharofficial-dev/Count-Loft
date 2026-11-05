@@ -2,7 +2,7 @@
 
 > **Audience:** Google Antigravity (AI coding agent) and the human owner reviewing its work.
 > **Status:** Ready to build. Research snapshot dated 31 Oct 2026.
-> **Project name:** **Count Loft**. **Domain:** to be confirmed by the owner (prefer `count-loft.com`; if unavailable, check alternatives before registering). Use "Count Loft" for the site name, logo text, page titles, schema `name`/`publisher` and copy.
+> **Project name:** **Count Loft**. **Domain:** to be confirmed by the owner (confirmed: `countloft.site`). Use "Count Loft" for the site name, logo text, page titles, schema `name`/`publisher` and copy.
 > **Owner language note:** The owner writes in Roman Urdu. All site copy, code and docs are in **English**. Urdu is Phase 2 (regional tools only).
 
 ---

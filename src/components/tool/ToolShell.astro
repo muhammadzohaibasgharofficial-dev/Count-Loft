@@ -7,6 +7,13 @@ import BaseLayout from '@components/layout/BaseLayout.astro';
 import Breadcrumbs from '@components/seo/Breadcrumbs.astro';
 import Disclaimer from '@components/tool/Disclaimer.astro';
 import AdSlot from '@components/ui/AdSlot.astro';
+import EmbedLayout from '@components/layout/EmbedLayout.astro';
+import EmbedPanel from '@components/tool/EmbedPanel.astro';
+import RelatedTools from '@components/tool/RelatedTools.astro';
+import { CALCULATORS } from '@data/calculators';
+import { getToolContent } from '@data/tool-content';
+import { getDates, normalizePath } from '@data/content-dates.mjs';
+import { absoluteUrl } from '@lib/seo/site';
 import type { BreadcrumbItem } from '@lib/format/breadcrumbs';
 
 export interface SourceItem {
@@ -37,24 +44,54 @@ const {
 } = Astro.props;
 
 const isYMYL = category === 'finance' || category === 'health';
+
+// Pakistan pages include tax and tariff figures, so they get the same E-E-A-T treatment as YMYL pages
+const showReviewLine = category === 'finance' || category === 'health' || category === 'pakistan';
+
+// Embed views live at /embed/<tool-path>; the same page component renders both
+const currentPath = normalizePath(Astro.url.pathname);
+const isEmbed = currentPath.startsWith('/embed/');
+const toolPath = isEmbed ? currentPath.replace(/^\/embed/, '') : currentPath;
+const tool = CALCULATORS.find((c) => c.href === toolPath);
+const content = tool ? getToolContent(tool.slug) : undefined;
+
+// Dates come from src/data/content-dates.mjs (single editable place)
+const dates = getDates(toolPath);
 ---
 
+{isEmbed ? (
+  <EmbedLayout title={title} toolUrl={absoluteUrl(toolPath)}>
+    <h1 class="embed-title">{title}</h1>
+    <h2 class="visually-hidden">{title} Calculator Interface</h2>
+    <div class="tool-grid">
+      <div class="calculator-inputs-column">
+        <slot name="inputs" />
+      </div>
+      <div class="calculator-results-column">
+        <slot name="results" />
+        <slot name="chart" />
+      </div>
+    </div>
+  </EmbedLayout>
+) : (
 <BaseLayout title={`${title} — Count Loft`} description={description}>
   <div class="container tool-shell-container">
     <!-- Breadcrumbs -->
     <Breadcrumbs items={breadcrumbs} />
 
-    <!-- Section 1: H1 + Metadata (author, reviewer, sources, last-updated) -->
+    <!-- H1 + Metadata (author, dates, review, sources) -->
     <header class="tool-header">
       <h1 class="tool-title">{title}</h1>
       <p class="tool-lead">{description}</p>
       <div class="tool-meta-bar">
         <span class="tool-meta-item">Author: <strong>{author}</strong></span>
-        {reviewerName && (
-          <span class="tool-meta-item">Reviewed by: <strong>{reviewerName}</strong></span>
-        )}
-        {lastUpdated && (
-          <span class="tool-meta-item">Last updated: <time datetime={lastUpdated}>{lastUpdated}</time></span>
+        <span class="tool-meta-item">Published: <time datetime={dates.published}>{dates.published}</time></span>
+        <span class="tool-meta-item">Last updated: <time datetime={dates.modified}>{dates.modified}</time></span>
+        {showReviewLine && (
+          <span class="tool-meta-item">
+            Fact-checked: {reviewerName ? <strong>{reviewerName}</strong> : <strong>Count Loft Team</strong>} reviewed the method and formulas on <time datetime={dates.reviewed}>{dates.reviewed}</time>
+            (<a href="/corrections">report an error</a>)
+          </span>
         )}
       </div>
       {sources.length > 0 && (
@@ -75,7 +112,7 @@ const isYMYL = category === 'finance' || category === 'health';
       )}
     </header>
 
-    <!-- Sections 2 & 3: Calculator Card (Inputs, Results, Chart) -->
+    <!-- (a) The tool itself, above the fold -->
     <section class="card calculator-card" aria-labelledby="calculator-heading">
       <h2 id="calculator-heading" class="visually-hidden">{title} Calculator Interface</h2>
       <div class="tool-grid">
@@ -87,35 +124,53 @@ const isYMYL = category === 'finance' || category === 'health';
           <slot name="chart" />
         </div>
       </div>
+      <EmbedPanel title={title} embedUrl={absoluteUrl(`/embed${toolPath}`)} />
     </section>
 
-    <!-- Section 3 Disclaimer: Required for Finance and Health -->
+    <!-- Disclaimer: required for Finance and Health -->
     {isYMYL && <Disclaimer category={category} />}
 
-    <!-- Reserved Ad Slot: Strictly Below Tool (PRD §5.3 & §7.1) -->
+    <!-- Reserved Ad Slot: strictly below the tool (PRD §5.3 & §7.1) -->
     <AdSlot slotId="tool-post-calculator" format="leaderboard" minHeight="90px" />
 
-    <!-- Educational & Content Sections -->
+    <!-- Educational & content sections, in this order: intro → formula → examples → how-to → use cases → FAQ -->
     <article class="article-content tool-educational-content">
-      <!-- Section 4: How-to steps -->
-      <section class="tool-section" aria-labelledby="section-how-to">
-        <h2 id="section-how-to">How to Use This Calculator</h2>
-        <slot name="how-to" />
-      </section>
+      <!-- (b) What this calculator does -->
+      {content && (
+        <section class="tool-section" aria-labelledby="section-intro">
+          <h2 id="section-intro">What This Calculator Does</h2>
+          <p>{content.intro}</p>
+        </section>
+      )}
 
-      <!-- Section 5: Formula & worked steps -->
+      <!-- (c) Formula with a worked example -->
       <section class="tool-section" aria-labelledby="section-formula">
         <h2 id="section-formula">Formula and Calculation Steps</h2>
         <slot name="formula" />
       </section>
 
-      <!-- Section 6: Worked examples / lookup table -->
       <section class="tool-section" aria-labelledby="section-examples-table">
         <h2 id="section-examples-table">Worked Examples and Reference Table</h2>
         <slot name="examples-table" />
       </section>
 
-      <!-- Section 7: FAQ (Accordion) -->
+      <!-- (d) Visible numbered how-to steps -->
+      <section class="tool-section" aria-labelledby="section-how-to">
+        <h2 id="section-how-to">How to Use This Calculator</h2>
+        <slot name="how-to" />
+      </section>
+
+      <!-- (e) Common use cases -->
+      {content && content.useCases.length > 0 && (
+        <section class="tool-section" aria-labelledby="section-use-cases">
+          <h2 id="section-use-cases">Common Uses</h2>
+          <ul>
+            {content.useCases.map((u) => <li>{u}</li>)}
+          </ul>
+        </section>
+      )}
+
+      <!-- (f) FAQ -->
       <section class="tool-section" aria-labelledby="section-faq">
         <h2 id="section-faq">Frequently Asked Questions</h2>
         <slot name="faq" />
@@ -125,85 +180,28 @@ const isYMYL = category === 'finance' || category === 'health';
     <!-- Bottom Reserved Ad Slot -->
     <AdSlot slotId="tool-bottom" format="rectangle" minHeight="250px" />
 
-    <!-- Section 8: Related Tools (4-8 tool-level links) -->
+    <!-- Related tools: curated links from the page + automatic category siblings + popular calculators -->
     <aside class="related-tools-container" aria-labelledby="section-related-tools">
       <h2 id="section-related-tools">Related Calculators</h2>
       <slot name="related-tools" />
+      {tool && <RelatedTools current={tool} />}
     </aside>
   </div>
 </BaseLayout>
+)}
 
 <style>
-  .tool-shell-container {
-    padding-top: var(--space-6);
-    padding-bottom: var(--space-8);
-  }
-
-  .tool-header {
-    margin-bottom: var(--space-6);
-  }
-
-  .tool-title {
-    margin: 0;
-  }
-
-  .tool-lead {
-    font-size: var(--text-body);
-    color: var(--color-text-muted);
-    margin-top: var(--space-2);
-    margin-bottom: var(--space-3);
-    max-width: var(--article-max-width);
-  }
-
-  .tool-meta-bar {
-    display: flex;
-    flex-wrap: wrap;
-    align-items: center;
-    gap: var(--space-4);
-    font-size: var(--text-sm);
-    color: var(--color-text-muted);
-  }
-
-  .tool-sources-bar {
-    display: flex;
-    align-items: center;
-    gap: var(--space-2);
-    margin-top: var(--space-2);
-    font-size: var(--text-xs);
-    color: var(--color-text-muted);
-  }
-
-  .sources-list {
-    display: inline-flex;
-    list-style: none;
-    margin: 0;
-    padding: 0;
-    gap: var(--space-3);
-  }
-
-  .calculator-card {
-    margin-bottom: var(--space-6);
-  }
-
-  .tool-educational-content {
-    margin-top: var(--space-6);
-  }
-
-  .tool-section {
-    margin-bottom: var(--space-6);
-  }
-
-  .tool-section h2 {
-    margin-bottom: var(--space-3);
-  }
-
-  .related-tools-container {
-    margin-top: var(--space-7);
-    padding-top: var(--space-6);
-    border-top: 1px solid var(--color-border);
-  }
-
-  .related-tools-container h2 {
-    margin-bottom: var(--space-4);
-  }
+  .tool-shell-container { padding-top: var(--space-5); padding-bottom: clamp(3rem, 8vw, 6rem); }
+  .tool-header { margin-bottom: var(--space-6); padding-top: var(--space-4); }
+  .tool-title { margin: 0; font-size: clamp(2.2rem, 5vw, 3.5rem); line-height: 1.05; letter-spacing: -0.03em; }
+  .tool-lead { font-size: 1.125rem; color: var(--color-text-muted); margin-top: var(--space-3); margin-bottom: var(--space-4); max-width: 46rem; }
+  .tool-meta-bar { display: flex; flex-wrap: wrap; align-items: center; gap: var(--space-2) var(--space-4); font-size: var(--text-sm); color: var(--color-text-muted); }
+  .tool-sources-bar { display: flex; align-items: center; gap: var(--space-2); margin-top: var(--space-2); font-size: var(--text-xs); color: var(--color-text-muted); }
+  .sources-list { display: inline-flex; list-style: none; margin: 0; padding: 0; gap: var(--space-3); }
+  .calculator-card { margin-bottom: var(--space-6); border-radius: var(--radius-2xl); box-shadow: var(--shadow-lg); }
+  .tool-educational-content { margin-top: var(--space-7); font-size: 1.0625rem; }
+  .tool-section { margin-bottom: var(--space-7); }
+  .tool-section h2 { margin-bottom: var(--space-3); }
+  .related-tools-container { margin-top: var(--space-8); padding-top: var(--space-7); border-top: 1px solid var(--color-border); }
+  .related-tools-container h2 { margin-bottom: var(--space-4); }
 </style>

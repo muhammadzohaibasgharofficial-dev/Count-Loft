@@ -1,0 +1,104 @@
+---
+/**
+ * Count Loft — Tool directory (data-driven).
+ * mode "filter": chips (All + categories) hide/show cards client-side. Without JS every card stays visible.
+ * mode "grouped": tools grouped under anchored category sub-headings (h3).
+ */
+import Icon from '@components/ui/Icon.astro';
+import type { DirectoryTool } from '@data/families';
+
+export interface Props {
+  tools: DirectoryTool[];
+  mode?: 'filter' | 'grouped';
+  idPrefix?: string;
+}
+const { tools, mode = 'filter', idPrefix = 'dir' } = Astro.props;
+
+const cats: { slug: string; name: string; tools: DirectoryTool[] }[] = [];
+for (const t of tools) {
+  let c = cats.find((x) => x.slug === t.category);
+  if (!c) { c = { slug: t.category, name: t.categoryName, tools: [] }; cats.push(c); }
+  c.tools.push(t);
+}
+---
+
+{mode === 'filter' ? (
+  <div class="dir" data-dir={idPrefix}>
+    <div class="chip-row" role="group" aria-label="Filter tools by category">
+      <button type="button" class="chip" data-cat="all" aria-pressed="true">All <span class="n">{tools.length}</span></button>
+      {cats.map((c) => (
+        <button type="button" class="chip" data-cat={c.slug} aria-pressed="false">{c.name} <span class="n">{c.tools.length}</span></button>
+      ))}
+    </div>
+    <p class="dir-status" aria-live="polite" data-status>Showing all {tools.length} tools.</p>
+    <ul class="dir-grid">
+      {tools.map((t) => (
+        <li data-category={t.category}>
+          <a href={t.href} class="dir-card lift">
+            <span class={`mark mark--sm tint-${t.category}`}><Icon name={t.category} size={18} /></span>
+            <span class="dir-body">
+              <span class="dir-name">{t.name}</span>
+              <span class="dir-desc">{t.description}</span>
+              <span class="dir-tag">{t.categoryName}</span>
+            </span>
+          </a>
+        </li>
+      ))}
+    </ul>
+  </div>
+) : (
+  <div class="dir-grouped">
+    {cats.map((c) => (
+      <section aria-labelledby={`${idPrefix}-${c.slug}`} class="dir-group">
+        <h3 id={`${idPrefix}-${c.slug}`} class="dir-group-title">
+          <span class={`mark mark--sm tint-${c.slug}`}><Icon name={c.slug} size={18} /></span>
+          {c.name} <span class="dir-group-n">{c.tools.length}</span>
+        </h3>
+        <ul class="dir-grid">
+          {c.tools.map((t) => (
+            <li>
+              <a href={t.href} class="dir-card lift">
+                <span class="dir-body">
+                  <span class="dir-name">{t.name}</span>
+                  <span class="dir-desc">{t.description}</span>
+                </span>
+              </a>
+            </li>
+          ))}
+        </ul>
+      </section>
+    ))}
+  </div>
+)}
+
+<script>
+  document.querySelectorAll<HTMLElement>('[data-dir]').forEach((root) => {
+    const chips = root.querySelectorAll<HTMLButtonElement>('.chip');
+    const items = root.querySelectorAll<HTMLElement>('li[data-category]');
+    const status = root.querySelector<HTMLElement>('[data-status]');
+    chips.forEach((chip) => chip.addEventListener('click', () => {
+      const cat = chip.dataset.cat;
+      let shown = 0;
+      chips.forEach((c) => c.setAttribute('aria-pressed', String(c === chip)));
+      items.forEach((li) => { const ok = cat === 'all' || li.dataset.category === cat; li.hidden = !ok; if (ok) shown++; });
+      if (status) status.textContent = cat === 'all' ? `Showing all ${shown} tools.` : `Showing ${shown} ${chip.textContent?.replace(/\s*\d+$/, '').trim()} tools.`;
+    }));
+  });
+</script>
+
+<style>
+  .dir-status { margin: var(--space-4) 0 var(--space-5); font-size: 0.875rem; color: var(--color-text-muted); }
+  .dir-grid { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: 1fr; gap: var(--space-3); }
+  .dir-grid > li[hidden] { display: none; }
+  @media (min-width: 700px) { .dir-grid { grid-template-columns: repeat(2, 1fr); } }
+  @media (min-width: 1024px) { .dir-grid { grid-template-columns: repeat(3, 1fr); } }
+  .dir-card { display: flex; gap: 0.85rem; align-items: flex-start; height: 100%; padding: 1.1rem 1.2rem; background: var(--color-surface); border: 1px solid var(--color-border); border-radius: var(--radius-xl); text-decoration: none; color: var(--color-text); }
+  .dir-card:hover { color: var(--color-text); border-color: var(--color-border-strong); }
+  .dir-body { display: flex; flex-direction: column; gap: 0.3rem; }
+  .dir-name { font-weight: 600; font-size: 1.0625rem; }
+  .dir-desc { font-size: 0.9rem; color: var(--color-text-muted); line-height: 1.5; }
+  .dir-tag { align-self: flex-start; margin-top: 0.15rem; padding: 0.1rem 0.6rem; border-radius: 999px; background: var(--color-surface-muted); font-size: 0.75rem; font-weight: 500; color: var(--color-text-muted); }
+  .dir-group + .dir-group { margin-top: var(--space-7); }
+  .dir-group-title { display: flex; align-items: center; gap: 0.75rem; margin-bottom: var(--space-4); font-family: var(--font-display); font-size: 1.5rem; font-weight: 500; scroll-margin-top: 6rem; }
+  .dir-group-n { font-family: var(--font-sans); font-size: 0.875rem; color: var(--color-text-muted); font-weight: 400; }
+</style>

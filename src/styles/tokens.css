@@ -7,16 +7,16 @@
   /* ==========================================================================
      Color Tokens — Light Theme (Default)
      ========================================================================== */
-  --color-bg: #F8FAFC;              /* Slate 50  — Page background */
+  --color-bg: #FAF7F1;              /* Slate 50  — Page background */
   --color-surface: #FFFFFF;         /* Pure white — Cards, form inputs */
-  --color-surface-muted: #F1F5F9;   /* Slate 100 — Muted wells, table stripes */
+  --color-surface-muted: #F3EEE3;   /* Slate 100 — Muted wells, table stripes */
   
-  --color-border: #E2E8F0;          /* Slate 200 — Subtle borders, dividers */
-  --color-border-strong: #CBD5E1;   /* Slate 300 — Secondary borders */
-  --color-border-input: #64748B;    /* Slate 500 — Form controls (4.76:1 on white, passes >= 3:1) */
+  --color-border: #E7E0D2;          /* Slate 200 — Subtle borders, dividers */
+  --color-border-strong: #D5CCB9;   /* Slate 300 — Secondary borders */
+  --color-border-input: #6F6A5D;    /* Warm grey — Form controls (5.2:1 on white, passes >= 3:1) */
 
-  --color-text: #0F172A;            /* Slate 900 — 17.85:1 on white (passes AAA) */
-  --color-text-muted: #475569;      /* Slate 600 — 7.58:1 on white (passes AAA) */
+  --color-text: #131417;            /* Slate 900 — 17.85:1 on white (passes AAA) */
+  --color-text-muted: #55524A;      /* Slate 600 — 7.58:1 on white (passes AAA) */
 
   --color-primary: #2563EB;         /* Blue 600 — Primary action */
   --color-primary-hover: #1D4ED8;   /* Blue 700 — Primary hover */
@@ -37,6 +37,10 @@
   /* ==========================================================================
      Typography Tokens (Fluid scale using system font stack)
      ========================================================================== */
+  --font-display: "Fraunces", "Iowan Old Style", "Palatino Linotype", Georgia, serif;
+  --ink: #131417;
+  --ink-deep: #101216;
+  --cream: #FAF7F1;
   --font-sans: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
   --font-mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
 
@@ -76,6 +80,8 @@
   --radius-sm: 6px;
   --radius-md: 10px;
   --radius-lg: 14px;
+  --radius-xl: 22px;
+  --radius-2xl: 28px;
   --radius-full: 9999px;
 
   /* ==========================================================================
@@ -83,6 +89,7 @@
      ========================================================================== */
   --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
   --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.08), 0 2px 4px -2px rgb(0 0 0 / 0.04);
+  --shadow-lg: 0 24px 60px -24px rgb(19 20 23 / 0.28);
 
   /* ==========================================================================
      Transitions (Subtle & fast, <= 200ms)
@@ -93,7 +100,7 @@
   /* ==========================================================================
      Container & Layout Widths
      ========================================================================== */
-  --container-max: 72rem;           /* 1152px */
+  --container-max: 75rem;           /* 1200px */
   --container-narrow: 64rem;        /* 1024px */
   --article-max-width: 70ch;
   --min-touch-target: 44px;
@@ -107,26 +114,26 @@
    Activated by :root[data-theme="dark"]
    ========================================================================== */
 :root[data-theme="dark"] {
-  --color-bg: #0B1220;              /* Deep Navy — Page background */
-  --color-surface: #111827;         /* Gray 900 — Cards, form inputs */
-  --color-surface-muted: #1A2333;   /* Slate 850 — Muted wells, table stripes */
+  --color-bg: #101216;              /* Deep Navy — Page background */
+  --color-surface: #181B21;         /* Gray 900 — Cards, form inputs */
+  --color-surface-muted: #1F232B;   /* Slate 850 — Muted wells, table stripes */
 
-  --color-border: #263247;          /* Slate 750 — Subtle borders, dividers */
-  --color-border-strong: #3B4A63;   /* Slate 650 — Secondary borders */
+  --color-border: #2B303A;          /* Slate 750 — Subtle borders, dividers */
+  --color-border-strong: #3C4350;   /* Slate 650 — Secondary borders */
   --color-border-input: #64748B;    /* Slate 500 — Form controls (3.73:1 on #111827, passes >= 3:1) */
 
-  --color-text: #F1F5F9;            /* Slate 100 — 16.19:1 on surface (passes AAA) */
-  --color-text-muted: #94A3B8;      /* Slate 400 — 6.92:1 on surface (passes AAA) */
+  --color-text: #F3EFE6;            /* Slate 100 — 16.19:1 on surface (passes AAA) */
+  --color-text-muted: #A8A89F;      /* Slate 400 — 6.92:1 on surface (passes AAA) */
 
   --color-primary: #60A5FA;         /* Blue 400 — Primary action */
   --color-primary-hover: #93C5FD;   /* Blue 300 — Primary hover */
-  --color-primary-contrast: #0B1220;/* Deep navy on #60A5FA: 7.36:1 (passes AAA) */
+  --color-primary-contrast: #101216;/* Deep navy on #60A5FA: 7.36:1 (passes AAA) */
 
   --color-link: #60A5FA;            /* Blue 400 — 6.98:1 on surface (passes AAA) */
   --color-link-hover: #93C5FD;      /* Blue 300 */
 
   --color-secondary: #2DD4BF;       /* Teal 400 — Secondary / chart accent */
-  --color-secondary-contrast: #0B1220;
+  --color-secondary-contrast: #101216;
 
   --color-success: #4ADE80;         /* Green 400 */
   --color-warning: #FBBF24;         /* Amber 400 */
@@ -136,6 +143,7 @@
 
   --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.4);
   --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.5), 0 2px 4px -2px rgb(0 0 0 / 0.3);
+  --shadow-lg: 0 24px 60px -24px rgb(0 0 0 / 0.7);
 
   /* Native color scheme */
   color-scheme: dark;

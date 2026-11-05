@@ -1,0 +1,36 @@
+---
+/** Count Loft — How to use the calculators (family-level page, Level 1). */
+import FamilyArticle from '@components/layout/FamilyArticle.astro';
+import { liveFamilies, familyToolCount } from '@data/families';
+const fam = liveFamilies().find((f) => f.id === 'calculators')!;
+const n = familyToolCount(fam);
+---
+<FamilyArticle
+  title="How to Use Count Loft Calculators — A Short Guide"
+  description={`A short guide to the ${n} free Count Loft calculators: picking a tool, entering values, reading results and formulas, embedding and reporting errors.`}
+  h1="How to use Count Loft calculators"
+  lead="Every calculator works the same way, so once you have used one you know them all."
+  path="/calculators/how-to-use"
+  crumb="How to use"
+>
+  <h2>1. Pick a calculator</h2>
+  <p>Open the <a href="/calculators">calculators hub</a> and choose a category, or use <a href="/search">search</a> and type what you need, for example "loan", "bmi" or "tile". The list of all {n} calculators is also on the <a href="/#all-tools">home page</a>.</p>
+
+  <h2>2. Enter your values</h2>
+  <p>Fill in the fields on the left or at the top of the tool. Results update as you type, so there is no submit button. Check the unit next to each field (for example percent, years or square feet) before you read the answer. If a field looks wrong, the calculator shows a message beside it.</p>
+
+  <h2>3. Read the results</h2>
+  <p>The main answer is shown first, with supporting figures and, for some tools, a chart or schedule. Treat results as estimates: rounding, local rules and your own circumstances can change real-world outcomes.</p>
+
+  <h2>4. Check the formula and worked example</h2>
+  <p>Below each calculator you will find what it does, the formula, and a worked example with real numbers. Repeat the example with your own numbers if you want to confirm the result by hand.</p>
+
+  <h2>5. Embed a calculator on your site</h2>
+  <p>Each calculator page has an embed button that shows a small snippet you can paste into your own page. The embedded view shows only the tool, with a "Powered by Count Loft" link.</p>
+
+  <h2>6. Your privacy</h2>
+  <p>Calculations run in your browser. The numbers you type are not sent anywhere. Read the <a href="/privacy">Privacy Policy</a> for details.</p>
+
+  <h2>7. Report an error</h2>
+  <p>If a result, formula or figure looks wrong, send it through the <a href="/corrections">Corrections page</a>. Please include the calculator name and the values you used.</p>
+</FamilyArticle>

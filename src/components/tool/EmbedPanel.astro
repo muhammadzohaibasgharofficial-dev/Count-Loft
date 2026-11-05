@@ -1,0 +1,60 @@
+---
+/**
+ * Count Loft — "Embed this calculator" panel.
+ * Button reveals a copyable <iframe> snippet pointing at /embed/<tool-path>.
+ */
+export interface Props {
+  title: string;
+  embedUrl: string;
+}
+
+const { title, embedUrl } = Astro.props;
+const snippet = `<iframe src="${embedUrl}" title="${title.replace(/"/g, '&quot;')} — Count Loft" width="100%" height="720" style="border:0;max-width:100%" loading="lazy"></iframe>`;
+---
+
+<div class="embed-panel" data-embed-panel>
+  <button type="button" class="btn btn-ghost embed-toggle" aria-expanded="false" aria-controls="embed-code-box" data-embed-toggle>
+    Embed this calculator
+  </button>
+  <div id="embed-code-box" class="embed-code-box" hidden data-embed-box>
+    <label for="embed-code-text" class="embed-label">Copy this code and paste it into your page:</label>
+    <textarea id="embed-code-text" class="form-input embed-code-text" readonly rows="3" data-embed-text>{snippet}</textarea>
+    <button type="button" class="btn btn-primary embed-copy" data-embed-copy>Copy code</button>
+    <span class="embed-status" role="status" aria-live="polite" data-embed-status></span>
+  </div>
+</div>
+
+<style>
+  .embed-panel { margin-top: var(--space-4); padding-top: var(--space-3); border-top: 1px solid var(--color-border); }
+  .embed-code-box { margin-top: var(--space-3); display: flex; flex-direction: column; gap: var(--space-2); align-items: flex-start; }
+  .embed-label { font-size: var(--text-sm); color: var(--color-text-muted); }
+  .embed-code-text { width: 100%; font-family: var(--font-mono, monospace); font-size: var(--text-xs); }
+  .embed-status { font-size: var(--text-sm); color: var(--color-text-muted); }
+</style>
+
+<script>
+  document.querySelectorAll<HTMLElement>('[data-embed-panel]').forEach((panel) => {
+    const toggle = panel.querySelector<HTMLButtonElement>('[data-embed-toggle]');
+    const box = panel.querySelector<HTMLElement>('[data-embed-box]');
+    const text = panel.querySelector<HTMLTextAreaElement>('[data-embed-text]');
+    const copy = panel.querySelector<HTMLButtonElement>('[data-embed-copy]');
+    const status = panel.querySelector<HTMLElement>('[data-embed-status]');
+    if (!toggle || !box || !text || !copy) return;
+
+    toggle.addEventListener('click', () => {
+      const open = toggle.getAttribute('aria-expanded') === 'true';
+      toggle.setAttribute('aria-expanded', String(!open));
+      box.hidden = open;
+    });
+
+    copy.addEventListener('click', async () => {
+      try {
+        await navigator.clipboard.writeText(text.value);
+        if (status) status.textContent = 'Copied!';
+      } catch {
+        text.select();
+        if (status) status.textContent = 'Press Ctrl/Cmd+C to copy.';
+      }
+    });
+  });
+</script>

@@ -1,0 +1,4 @@
+/embed/*
+  X-Robots-Tag: noindex, follow
+/search
+  X-Robots-Tag: noindex, follow

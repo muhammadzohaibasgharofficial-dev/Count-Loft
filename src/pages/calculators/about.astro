@@ -1,0 +1,38 @@
+---
+/** Count Loft — About the Calculators (family-level page, Level 1). */
+import FamilyArticle from '@components/layout/FamilyArticle.astro';
+import { liveFamilies, familyToolCount } from '@data/families';
+const fam = liveFamilies().find((f) => f.id === 'calculators')!;
+const n = familyToolCount(fam);
+const c = fam.categories.length;
+---
+<FamilyArticle
+  title="About Count Loft Calculators — What They Cover and How They Are Checked"
+  description={`What the ${n} free Count Loft calculators cover, how they are built and checked, and who maintains them.`}
+  h1="About the calculators"
+  lead={`Count Loft Calculators is the first family of tools on the platform: ${n} free calculators and converters in ${c} categories.`}
+  path="/calculators/about"
+  crumb="About"
+>
+  <h2>What they cover</h2>
+  <p>The family is grouped into {c} categories, each with its own page:</p>
+  <ul>
+    {fam.categories.map((cat) => (<li><a href={cat.href}><strong>{cat.name}</strong></a> ({cat.count}): {cat.description}</li>))}
+  </ul>
+  <p>They are made for anyone who wants a quick, checkable answer: a student working out a grade, a household comparing loan offers, a builder estimating paint or tiles. Start from the <a href="/calculators">calculators hub</a> or <a href="/search">search</a> for a specific tool.</p>
+
+  <h2>How each calculator is built</h2>
+  <ul>
+    <li><strong>It runs in your browser.</strong> The numbers you enter are calculated on your own device. They are not sent to a server and not stored by Count Loft.</li>
+    <li><strong>The formula is on the page.</strong> Every calculator explains its formula and walks through a worked example with real numbers, so you can repeat the calculation by hand.</li>
+    <li><strong>Reference figures live in data files.</strong> Tax slabs, tariffs, exchange rates and similar values are kept in dedicated files, which makes them easier to review and update than numbers buried in code.</li>
+    <li><strong>The code is tested.</strong> The calculation code has automated tests that compare results with known reference values.</li>
+  </ul>
+
+  <h2>How they are checked</h2>
+  <p>Finance, health and Pakistan pages show a published date, a last-updated date and the date the method was last reviewed. Results are estimates for general information. They do not replace advice from a qualified financial, tax, medical or religious professional.</p>
+  <p>If something looks wrong, tell us on the <a href="/corrections">Corrections page</a>. We review reports, fix the affected calculator and update its date.</p>
+
+  <h2>Who maintains them</h2>
+  <p>The calculators are published and maintained by the Count Loft Team, an independent site. You can reach the team through the <a href="/contact">contact page</a>. Privacy and terms apply to the whole platform: see the <a href="/privacy">Privacy Policy</a> and <a href="/terms">Terms of Service</a>.</p>
+</FamilyArticle>

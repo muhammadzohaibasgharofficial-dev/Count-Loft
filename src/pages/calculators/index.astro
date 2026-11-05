@@ -1,0 +1,112 @@
+---
+/**
+ * Count Loft — Calculators family hub (Level 1).
+ * Category bento (the big section) → all calculators grouped by category → family info band.
+ */
+import BaseLayout from '@components/layout/BaseLayout.astro';
+import Breadcrumbs from '@components/seo/Breadcrumbs.astro';
+import JsonLd from '@components/seo/JsonLd.astro';
+import Icon from '@components/ui/Icon.astro';
+import Directory from '@components/ui/Directory.astro';
+import { buildBreadcrumbs } from '@lib/format/breadcrumbs';
+import { generateBreadcrumbJsonLd } from '@lib/seo/jsonld';
+import { liveFamilies, familyToolCount, allTools } from '@data/families';
+
+const fam = liveFamilies().find((f) => f.id === 'calculators')!;
+const n = familyToolCount(fam);
+const cats = fam.categories;
+const tools = allTools().filter((t) => t.familyId === fam.id);
+const breadcrumbs = buildBreadcrumbs([{ label: 'Calculators' }]);
+---
+<BaseLayout
+  title={`Free Online Calculators — ${n} Calculators in ${cats.length} Categories | Count Loft`}
+  description={`Browse ${n} free online calculators and converters across ${cats.length} categories: ${cats.map((c) => c.name.toLowerCase()).join(', ')}. No sign-up, and your numbers stay in your browser.`}
+>
+  <JsonLd schema={[generateBreadcrumbJsonLd([{ name: 'Home', item: '/' }, { name: 'Calculators', item: '/calculators' }])]} />
+
+  <section class="fh container" aria-labelledby="fh-title">
+    <Breadcrumbs items={breadcrumbs} />
+    <div class="fh-grid">
+      <div>
+        <h1 id="fh-title" class="fh-title">Calculators</h1>
+        <p class="fh-lead">{n} free calculators and converters in {cats.length} categories. Each one shows its formula and a worked example, runs in your browser and needs no sign-up. Made for students, households, builders and anyone who wants a quick answer they can check.</p>
+        <div class="fh-actions">
+          <a class="cta cta--blue" href="/search"><Icon name="search" size={20} /> Search all tools</a>
+          <a class="cta cta--line" href="#categories">Jump to categories</a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section cats" id="categories" aria-labelledby="cats-title">
+    <div class="container">
+      <div class="section-head">
+        <p class="eyebrow">Categories</p>
+        <h2 id="cats-title" class="section-title">Choose a category</h2>
+      </div>
+      <ul class="cat-bento">
+        {cats.map((c, i) => (
+          <li class={`cat-card lift tint-${c.slug} ${i === 0 ? 'wide' : ''}`}>
+            <span class="mark mark--lg" style="--tint: rgb(255 255 255 / 0.65)"><Icon name={c.icon} size={30} /></span>
+            <h3 class="cat-name"><a href={c.href} class="stretch">{c.name}</a></h3>
+            <p class="cat-count">{c.count} calculators</p>
+            <p class="cat-eg">{c.tools.slice(0, 3).map((t) => t.name).join(' · ')}</p>
+          </li>
+        ))}
+      </ul>
+    </div>
+  </section>
+
+  <section class="section all" aria-labelledby="all-title">
+    <div class="container">
+      <div class="section-head">
+        <h2 id="all-title" class="section-title">All {n} calculators</h2>
+        <p class="section-lead">Grouped by category. Jump to one:</p>
+        <ul class="chip-row jump" aria-label="Jump to category">
+          {cats.map((c) => (<li><a class="chip" href={`#fam-${c.slug}`}>{c.name} <span class="n">{c.count}</span></a></li>))}
+        </ul>
+      </div>
+      <Directory tools={tools} mode="grouped" idPrefix="fam" />
+    </div>
+  </section>
+
+  <section class="info" aria-labelledby="info-title">
+    <div class="container info-row">
+      <div>
+        <h2 id="info-title" class="info-title">About these calculators</h2>
+        <p>Every calculator runs on your device, shows its formula and gives estimates for general information. Learn how they are built and checked, or read a short guide to using them.</p>
+      </div>
+      <ul class="info-links">
+        <li><a class="chip" href="/calculators/about">About the calculators</a></li>
+        <li><a class="chip" href="/calculators/how-to-use">How to use</a></li>
+        <li><a class="chip" href="/corrections">Corrections</a></li>
+      </ul>
+    </div>
+  </section>
+</BaseLayout>
+
+<style>
+  .fh { padding-top: var(--space-5); padding-bottom: clamp(2rem, 5vw, 4rem); }
+  .fh-grid { padding-top: clamp(1.5rem, 4vw, 3rem); }
+  .fh-title { font-size: clamp(3rem, 7vw, 5.5rem); line-height: 1; letter-spacing: -0.03em; }
+  .fh-lead { margin-top: 1.25rem; max-width: 40rem; font-size: 1.1875rem; color: var(--color-text-muted); }
+  .fh-actions { display: flex; flex-wrap: wrap; gap: 0.75rem; margin-top: 2rem; }
+  .cat-bento { list-style: none; margin: 0; padding: 0; display: grid; gap: 1.1rem; grid-template-columns: 1fr; }
+  @media (min-width: 640px) { .cat-bento { grid-template-columns: repeat(2, 1fr); } }
+  @media (min-width: 1000px) { .cat-bento { grid-template-columns: repeat(3, 1fr); } .cat-card.wide { grid-column: span 2; } }
+  .cat-card { position: relative; display: flex; flex-direction: column; gap: 0.4rem; padding: 1.6rem; border-radius: 28px; background: var(--tint); color: var(--ink); min-height: 14rem; transition: transform 200ms ease, box-shadow 200ms ease; }
+  .cat-card:hover { transform: translateY(-4px); box-shadow: var(--shadow-lg); }
+  .cat-card :global(.mark) { background: rgb(255 255 255 / 0.65); }
+  .cat-name { font-family: var(--font-display); font-size: 1.75rem; font-weight: 500; margin-top: 0.75rem; color: var(--ink); }
+  .stretch { color: inherit; text-decoration: none; }
+  .stretch::after { content: ""; position: absolute; inset: 0; border-radius: inherit; }
+  .cat-count { font-weight: 600; color: var(--ink); }
+  .cat-eg { margin-top: auto; font-size: 0.875rem; color: #3B3A36; }
+  .all { background: var(--color-surface-muted); }
+  .jump { list-style: none; padding: 0; margin: 1.25rem 0 0; }
+  .info { border-top: 1px solid var(--color-border); padding-block: 2.5rem; }
+  .info-row { display: flex; flex-wrap: wrap; gap: 1.5rem 3rem; align-items: center; justify-content: space-between; }
+  .info-row p { color: var(--color-text-muted); max-width: 40rem; margin-top: 0.4rem; }
+  .info-title { font-size: 1.375rem; }
+  .info-links { list-style: none; display: flex; flex-wrap: wrap; gap: 0.5rem; margin: 0; padding: 0; }
+</style>

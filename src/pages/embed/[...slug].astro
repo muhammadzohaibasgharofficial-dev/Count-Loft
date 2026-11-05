@@ -1,0 +1,37 @@
+---
+/**
+ * Count Loft — Embed routes: /embed/<category>/<tool>
+ * Renders the SAME calculator page component; ToolShell detects the /embed/ path
+ * and outputs the minimal tool-only layout (noindex, no header/footer/ads).
+ * Excluded from the sitemap in astro.config.mjs.
+ */
+import { CALCULATORS } from '@data/calculators';
+
+export function getStaticPaths() {
+  return CALCULATORS.map((c) => ({
+    params: { slug: c.href.replace(/^\//, '') },
+    props: { href: c.href }
+  }));
+}
+
+const { href } = Astro.props;
+
+// Explicit folders only (never the embed folder itself, to avoid a circular import)
+const pages = import.meta.glob([
+  '../finance/*.astro',
+  '../health/*.astro',
+  '../math/*.astro',
+  '../construction/*.astro',
+  '../converters/*.astro',
+  '../pakistan/*.astro',
+  '../islamic/*.astro'
+]);
+
+const load = pages[`..${href}.astro`];
+if (!load) {
+  throw new Error(`Embed route: no page component found for ${href}`);
+}
+const Page = ((await load()) as { default: any }).default;
+---
+
+<Page />

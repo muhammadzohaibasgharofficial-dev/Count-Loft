@@ -1,0 +1,88 @@
+---
+/**
+ * Count Loft — Related tools block.
+ * Links to: category siblings (padded to at least 10 tools using neighbouring categories)
+ * and a "Popular calculators" list. All URLs come from the calculator registry,
+ * so every link is a real internal page.
+ */
+import { CALCULATORS, CATEGORIES_CONFIG } from '@data/calculators';
+import type { CalculatorMeta } from '@data/calculators';
+
+export interface Props {
+  current: CalculatorMeta;
+}
+
+const { current } = Astro.props;
+
+const NEIGHBOURS: Record<string, string[]> = {
+  finance: ['math', 'pakistan', 'converters'],
+  health: ['math', 'converters'],
+  math: ['finance', 'health', 'construction'],
+  construction: ['math', 'converters', 'pakistan'],
+  converters: ['math', 'construction', 'finance'],
+  pakistan: ['finance', 'islamic', 'construction'],
+  islamic: ['pakistan', 'finance', 'math']
+};
+const MIN_LINKS = 10;
+
+const siblings = CALCULATORS.filter((c) => c.category === current.category && c.href !== current.href);
+const more: CalculatorMeta[] = [];
+for (const cat of NEIGHBOURS[current.category] ?? []) {
+  for (const c of CALCULATORS.filter((x) => x.category === cat)) {
+    if (siblings.length + more.length >= MIN_LINKS) break;
+    more.push(c);
+  }
+}
+
+const categoryName = CATEGORIES_CONFIG.find((c) => c.slug === current.category)?.name ?? current.category;
+
+const POPULAR_SLUGS = [
+  'loan-calculator', 'percentage-calculator', 'bmi-calculator', 'mortgage-calculator',
+  'calorie-calculator', 'compound-interest-calculator', 'age-calculator', 'currency-converter'
+];
+const popular = POPULAR_SLUGS
+  .map((slug) => CALCULATORS.find((c) => c.slug === slug))
+  .filter((c): c is CalculatorMeta => !!c && c.href !== current.href);
+---
+
+<section class="related-block" aria-labelledby="more-in-category">
+  <h3 id="more-in-category">More {categoryName} calculators</h3>
+  <ul class="related-links">
+    {siblings.map((c) => <li><a href={c.href}>{c.name}</a></li>)}
+  </ul>
+  <a class="related-hub-link" href={`/${current.category}`}>All {categoryName} calculators &rarr;</a>
+</section>
+
+{more.length > 0 && (
+  <section class="related-block" aria-labelledby="you-may-also-need">
+    <h3 id="you-may-also-need">You may also need</h3>
+    <ul class="related-links">
+      {more.map((c) => <li><a href={c.href}>{c.name}</a></li>)}
+    </ul>
+  </section>
+)}
+
+<section class="related-block" aria-labelledby="popular-calculators">
+  <h3 id="popular-calculators">Popular calculators</h3>
+  <ul class="related-links">
+    {popular.map((c) => <li><a href={c.href}>{c.name}</a></li>)}
+  </ul>
+</section>
+
+<style>
+  .related-block { margin-top: var(--space-5); }
+  .related-block h3 { font-size: 1.0625rem; margin: 0 0 var(--space-2) 0; }
+  .related-links {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: var(--space-2) var(--space-4);
+  }
+  @media (min-width: 640px) { .related-links { grid-template-columns: repeat(2, 1fr); } }
+  @media (min-width: 1024px) { .related-links { grid-template-columns: repeat(3, 1fr); } }
+  .related-links a { color: var(--color-link); text-decoration: none; font-size: var(--text-sm); }
+  .related-links a:hover { text-decoration: underline; }
+  .related-hub-link { display: inline-block; margin-top: var(--space-2); font-size: var(--text-sm); font-weight: var(--font-weight-semibold); }
+</style>

@@ -1,0 +1,50 @@
+---
+/**
+ * Count Loft — 404 Page
+ * A real 404 stops static hosts from serving the homepage for unknown URLs
+ * (soft-404s), which hurts SEO.
+ */
+import BaseLayout from '@components/layout/BaseLayout.astro';
+import { CALCULATORS } from '@data/calculators';
+
+const popular = CALCULATORS.filter(c =>
+  ['loan-calculator', 'percentage-calculator', 'bmi-calculator', 'mortgage-calculator'].includes(c.slug)
+);
+---
+
+<BaseLayout
+  title="Page Not Found — Count Loft"
+  description="The page you are looking for does not exist. Browse Count Loft's free online calculators."
+  robots="noindex, follow"
+>
+  <div class="container not-found">
+    <h1>Page not found</h1>
+    <p>Sorry, we couldn't find that page. Try one of these popular calculators or go back to the homepage.</p>
+    <ul class="not-found-list">
+      {popular.map((c) => (
+        <li><a href={c.href}>{c.name}</a></li>
+      ))}
+    </ul>
+    <p><a href="/" class="not-found-home">&larr; Back to homepage</a></p>
+  </div>
+</BaseLayout>
+
+<style>
+  .not-found {
+    padding-top: var(--space-7);
+    padding-bottom: var(--space-8);
+    text-align: center;
+  }
+  .not-found-list {
+    list-style: none;
+    padding: 0;
+    margin: var(--space-4) 0;
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-3);
+    justify-content: center;
+  }
+  .not-found-home {
+    font-weight: var(--font-weight-semibold);
+  }
+</style>
