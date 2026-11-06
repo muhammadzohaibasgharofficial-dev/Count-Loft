@@ -1,112 +1,101 @@
 ---
 /**
- * Count Loft — Site Header (sticky).
- * Logo · Tools mega-menu (rendered from src/data/families.ts) · About · How to Use · Search · All Tools.
+ * Count Loft — Site Header (SELENE chrome).
+ * Same markup and Tailwind classes as SELENE's Chrome.tsx Header (src/selene is the design source),
+ * with Count Loft links. Transparent over the hero on the homepage, solid glass on every other page.
+ * Mobile menu is the SELENE full-screen overlay. This file is scanned by Tailwind (see src/selene/selene.css).
  */
-import ThemeToggle from '@components/ui/ThemeToggle.astro';
-import Icon from '@components/ui/Icon.astro';
-import { liveFamilies, comingSoonFamilies, familyToolCount } from '@data/families';
+const path = Astro.url.pathname;
+const isHome = path === '/';
 
-const live = liveFamilies();
-const soon = comingSoonFamilies();
+const nav = [
+  { label: 'Finance', href: '/finance' },
+  { label: 'Health', href: '/health' },
+  { label: 'Math', href: '/math' },
+  { label: 'Pakistan', href: '/pakistan' },
+  { label: 'Islamic', href: '/islamic' },
+  { label: 'About', href: '/about' },
+];
+
+// Full list for the mobile overlay (same links the old mobile drawer had).
+const menu = [
+  { label: 'All Tools', href: '/#all-tools' },
+  { label: 'Calculators', href: '/calculators' },
+  { label: 'Finance', href: '/finance' },
+  { label: 'Health', href: '/health' },
+  { label: 'Math', href: '/math' },
+  { label: 'Construction', href: '/construction' },
+  { label: 'Converters', href: '/converters' },
+  { label: 'Pakistan', href: '/pakistan' },
+  { label: 'Islamic', href: '/islamic' },
+  { label: 'About', href: '/about' },
+  { label: 'How to Use', href: '/calculators/how-to-use' },
+  { label: 'Search', href: '/search' },
+];
+
+const isCurrent = (href: string) => href !== '/' && !href.includes('#') && (path === href || path.startsWith(href + '/'));
+const bar = isHome ? '' : 'border-b border-regolith/15 bg-void/80 pb-3 backdrop-blur-xl';
 ---
 
-<header class="site-header">
-  <div class="container header-container">
-    <a href="/" class="brand-link" aria-label="Count Loft Home">
-      <span class="brand-mark" aria-hidden="true"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M6 12h12M12 6v12"></path></svg></span>
-      <span class="brand-name">Count Loft</span>
+<header class="site-header fixed inset-x-0 top-0 z-50 text-regolith" data-menu-root>
+  <div class={`flex items-center justify-between px-4 pt-4 sm:px-6 sm:pt-5 md:px-[3vw] ${bar}`}>
+    <a href="/" class="flex items-center gap-2.5 text-regolith no-underline" aria-label="Count Loft — home">
+      <svg viewBox="0 0 24 24" aria-hidden="true" class="size-5">
+        <path d="M15.5 3.2A9 9 0 1 0 20.8 16 7.2 7.2 0 0 1 15.5 3.2Z" fill="currentColor"></path>
+      </svg>
+      <span class="font-display text-[0.9375rem] tracking-[0.36em]">COUNT LOFT</span>
     </a>
 
-    <nav class="desktop-nav" aria-label="Main Navigation">
-      <ul class="nav-list">
-        <li class="has-menu">
-          <button type="button" class="nav-link nav-trigger" aria-expanded="false" aria-controls="tools-menu" id="tools-trigger">
-            Tools <Icon name="chevron" size={16} />
-          </button>
-          <div class="mega" id="tools-menu" role="region" aria-label="Tools menu">
-            {live.map((f) => (
-              <div class="mega-family">
-                <a href={f.href} class="mega-family-head">
-                  <span class={`mark mark--sm tint-${f.id}`}><Icon name={f.icon} size={20} /></span>
-                  <span><strong>{f.name}</strong><span class="mega-sub">{familyToolCount(f)} free {f.toolNoun}. {f.tagline}</span></span>
-                </a>
-                <ul class="mega-cats">
-                  {f.categories.map((c) => (
-                    <li>
-                      <a href={c.href} class="mega-cat">
-                        <span class={`mark mark--sm tint-${c.slug}`}><Icon name={c.icon} size={18} /></span>
-                        <span><strong>{c.name}</strong><span class="mega-sub">{c.count} tools</span></span>
-                      </a>
-                    </li>
-                  ))}
-                </ul>
-              </div>
-            ))}
-            {soon.length > 0 && (
-              <p class="mega-soon">Coming soon: {soon.map((f) => f.name).join(', ')}</p>
-            )}
-          </div>
-        </li>
-        <li><a href="/about" class="nav-link">About</a></li>
-        <li><a href="/calculators/how-to-use" class="nav-link">How to Use</a></li>
-      </ul>
+    <nav aria-label="Main Navigation" class="hidden items-center gap-8 lg:flex">
+      {nav.map((item) => (
+        <a
+          href={item.href}
+          aria-current={isCurrent(item.href) ? 'page' : undefined}
+          class="font-mono text-label text-regolith/70 uppercase no-underline transition-colors hover:text-regolith aria-[current=page]:text-regolith"
+        >
+          {item.label}
+        </a>
+      ))}
+      <a href="/search" aria-label="Search all tools" class="font-mono text-label text-regolith/70 uppercase no-underline transition-colors hover:text-regolith">Search</a>
+      <a href="/#all-tools" class="rounded-[4px] bg-regolith px-4 py-2.5 font-mono text-label text-void uppercase no-underline transition-colors hover:bg-earth hover:text-void">
+        All tools
+      </a>
     </nav>
 
-    <div class="header-actions">
-      <a href="/search" class="btn btn-ghost search-link" aria-label="Search all tools">
-        <Icon name="search" size={20} />
+    <button type="button" data-menu-button aria-expanded="false" aria-controls="menu" class="font-mono text-label uppercase lg:hidden">
+      Menu
+    </button>
+  </div>
+
+  <div
+    id="menu"
+    inert
+    data-menu-panel
+    class="pointer-events-none fixed inset-0 -z-10 flex flex-col justify-center gap-4 overflow-y-auto bg-void/95 px-6 py-24 opacity-0 backdrop-blur-xl transition-opacity data-[open=true]:pointer-events-auto data-[open=true]:opacity-100 lg:hidden"
+  >
+    {menu.map((item, i) => (
+      <a href={item.href} class="flex items-baseline gap-4 font-display text-[1.25rem] tracking-[0.14em] text-regolith uppercase no-underline sm:text-[1.5rem]">
+        <span class="font-mono text-label text-earth">{String(i + 1).padStart(2, '0')}</span>
+        {item.label}
       </a>
-      <div class="desktop-theme-wrapper"><ThemeToggle /></div>
-      <a href="/#all-tools" class="cta cta--blue all-tools-btn">All Tools</a>
-      <button type="button" class="btn btn-ghost hamburger-btn" aria-expanded="false" aria-controls="mobile-nav-dialog" aria-label="Open menu">
-        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg>
-      </button>
-    </div>
+    ))}
   </div>
 </header>
 
 <script>
-  const trigger = document.getElementById('tools-trigger');
-  const li = trigger?.closest('.has-menu');
-  const setOpen = (open: boolean) => {
-    li?.classList.toggle('open', open);
-    trigger?.setAttribute('aria-expanded', String(open));
-  };
-  trigger?.addEventListener('click', () => setOpen(!li?.classList.contains('open')));
-  document.addEventListener('keydown', (e) => { if (e.key === 'Escape') { setOpen(false); } });
-  document.addEventListener('click', (e) => { if (li && !li.contains(e.target as Node)) setOpen(false); });
-</script>
+  const root = document.querySelector<HTMLElement>('[data-menu-root]');
+  const button = root?.querySelector<HTMLButtonElement>('[data-menu-button]');
+  const panel = root?.querySelector<HTMLElement>('[data-menu-panel]');
 
-<style>
-  .site-header { background: color-mix(in srgb, var(--color-bg) 92%, transparent); backdrop-filter: blur(10px); border-bottom: 1px solid var(--color-border); position: sticky; top: 0; z-index: 100; }
-  .header-container { display: flex; align-items: center; justify-content: space-between; height: 4.25rem; gap: var(--space-4); }
-  .brand-link { display: inline-flex; align-items: center; gap: 0.6rem; text-decoration: none; color: var(--color-text); }
-  .brand-mark { display: grid; place-items: center; width: 2rem; height: 2rem; border-radius: 32%; background: #2563EB; color: #fff; }
-  .brand-name { font-family: var(--font-display); font-size: 1.35rem; font-weight: 600; letter-spacing: -0.02em; }
-  .desktop-nav { display: none; }
-  .nav-list { display: flex; align-items: center; list-style: none; margin: 0; padding: 0; gap: var(--space-2); }
-  .nav-link { display: inline-flex; align-items: center; gap: 0.25rem; font: inherit; font-size: var(--text-label); font-weight: 500; color: var(--color-text); text-decoration: none; padding: 0.5rem 0.9rem; border-radius: 999px; background: none; border: 0; cursor: pointer; }
-  .nav-link:hover { background: var(--color-surface-muted); color: var(--color-text); }
-  .has-menu { position: relative; }
-  .mega { position: absolute; left: 50%; top: calc(100% + 0.5rem); width: min(44rem, 90vw); padding: var(--space-5); background: var(--color-surface); border: 1px solid var(--color-border); border-radius: var(--radius-2xl); box-shadow: var(--shadow-lg); opacity: 0; visibility: hidden; transform: translate(-50%, 6px); transition: opacity 160ms ease, transform 160ms ease, visibility 160ms; }
-  .has-menu.open .mega, .has-menu:hover .mega, .has-menu:focus-within .mega { opacity: 1; visibility: visible; transform: translate(-50%, 0); }
-  .has-menu.open .nav-trigger :global(svg), .has-menu:hover .nav-trigger :global(svg) { transform: rotate(180deg); }
-  .mega-family-head, .mega-cat { display: flex; gap: 0.75rem; align-items: center; text-decoration: none; color: var(--color-text); padding: 0.55rem; border-radius: var(--radius-lg); }
-  .mega-family-head { margin-bottom: var(--space-2); }
-  .mega-family-head:hover, .mega-cat:hover { background: var(--color-surface-muted); color: var(--color-text); }
-  .mega-sub { display: block; font-size: 0.8125rem; color: var(--color-text-muted); font-weight: 400; }
-  .mega-cats { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(2, 1fr); gap: 0.15rem 0.75rem; }
-  .mega-soon { margin: var(--space-4) 0 0; padding-top: var(--space-3); border-top: 1px solid var(--color-border); font-size: 0.8125rem; color: var(--color-text-muted); }
-  .header-actions { display: flex; align-items: center; gap: var(--space-2); }
-  .search-link { display: inline-flex; align-items: center; justify-content: center; border-radius: 999px; }
-  .desktop-theme-wrapper, .all-tools-btn { display: none; }
-  .all-tools-btn { min-height: 2.5rem; padding: 0.4rem 1.1rem; font-size: 0.9375rem; }
-  .hamburger-btn { display: inline-flex; align-items: center; justify-content: center; min-width: var(--min-touch-target); min-height: var(--min-touch-target); padding: var(--space-2); }
-  @media (min-width: 1024px) {
-    .desktop-nav { display: block; }
-    .desktop-theme-wrapper { display: block; }
-    .all-tools-btn { display: inline-flex; }
-    .hamburger-btn { display: none; }
-  }
-</style>
+  const setOpen = (open: boolean) => {
+    if (!button || !panel) return;
+    panel.dataset.open = String(open);
+    panel.toggleAttribute('inert', !open);
+    button.setAttribute('aria-expanded', String(open));
+    button.textContent = open ? 'Close' : 'Menu';
+  };
+
+  button?.addEventListener('click', () => setOpen(button.getAttribute('aria-expanded') !== 'true'));
+  panel?.querySelectorAll('a').forEach((a) => a.addEventListener('click', () => setOpen(false)));
+  document.addEventListener('keydown', (e) => { if (e.key === 'Escape') setOpen(false); });
+</script>

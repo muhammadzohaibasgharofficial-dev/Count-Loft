@@ -4,11 +4,11 @@
  * Root HTML shell managing metadata, theme initialization, navigation landmarks, and global styling.
  */
 import '../../styles/global.css';
+import '../../selene/selene.css';
 import '../../styles/print.css';
 
 import SEOHead from '@components/seo/SEOHead.astro';
 import Header from '@components/layout/Header.astro';
-import MobileNav from '@components/layout/MobileNav.astro';
 import Footer from '@components/layout/Footer.astro';
 import Toast from '@components/ui/Toast.astro';
 import { CLOUDFLARE_WA_TOKEN, analyticsEnabled } from '@lib/seo/analytics';
@@ -20,6 +20,8 @@ export interface Props {
   robots?: string;
   ogType?: 'website' | 'article';
 }
+
+const isHome = Astro.url.pathname === '/';
 
 const {
   title,
@@ -36,6 +38,18 @@ const {
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
 
+    <!-- Monetag ad tag (zone 306282) — site-wide; embed pages use EmbedLayout and stay ad-free -->
+    <script src="https://quge5.com/88/tag.min.js" data-zone="306282" async data-cfasync="false"></script>
+
+    <meta name="theme-color" content="#FAF7F1" />
+    <!-- SELENE type system: Michroma (display), Manrope (text), IBM Plex Mono (telemetry). -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Michroma&family=Manrope:wght@300..700&family=IBM+Plex+Mono:wght@400;500&display=swap"
+      rel="stylesheet"
+    />
+
     <slot name="head" />
     <SEOHead
       title={title}
@@ -45,51 +59,17 @@ const {
       ogType={ogType}
     />
 
-    <!-- Synchronous inline script to prevent Flash of Unstyled Content (FOUC).
-         Follows identical canonical hierarchy to src/lib/storage/theme.ts:
-           1. Explicit user selection (localStorage 'theme' if 'light' | 'dark')
-           2. OS preference (window.matchMedia prefers-color-scheme: dark)
-           3. Safe fallback ('light') -->
+    <!-- The site has one theme (cream). Set it before first paint so there is no flash. -->
     <script is:inline>
-      (function () {
-        try {
-          var saved = null;
-          try {
-            if (typeof localStorage !== 'undefined') {
-              var val = localStorage.getItem('theme');
-              if (val === 'light' || val === 'dark') {
-                saved = val;
-              }
-            }
-          } catch (storageErr) {}
-
-          var theme = saved;
-          if (!theme) {
-            try {
-              if (typeof window !== 'undefined' && typeof window.matchMedia === 'function') {
-                theme = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
-              }
-            } catch (mediaErr) {}
-          }
-          if (!theme) {
-            theme = 'light';
-          }
-
-          document.documentElement.setAttribute('data-theme', theme);
-          document.documentElement.style.colorScheme = theme;
-        } catch (e) {
-          document.documentElement.setAttribute('data-theme', 'light');
-          document.documentElement.style.colorScheme = 'light';
-        }
-      })();
+      document.documentElement.setAttribute('data-theme', 'light');
+      document.documentElement.style.colorScheme = 'light';
     </script>
   </head>
   <body>
     <a href="#main" class="skip-link">Skip to main content</a>
     <slot name="before-header" />
     <Header />
-    <MobileNav />
-    <main id="main">
+    <main id="main" style={isHome ? undefined : 'padding-top: 4.75rem'}>
       <slot />
     </main>
     <Footer />

@@ -1,5 +1,7 @@
 import { defineConfig } from 'astro/config';
 import sitemap from '@astrojs/sitemap';
+import react from '@astrojs/react';
+import tailwindcss from '@tailwindcss/vite';
 import { copyFile } from 'node:fs/promises';
 import { fileURLToPath } from 'node:url';
 import { join } from 'node:path';
@@ -37,6 +39,8 @@ export default defineConfig({
   trailingSlash: 'never',
 
   integrations: [
+    // React is used only for the SELENE Earthrise hero island (src/selene)
+    react(),
     // 404 page is noindex, so keep it out of the sitemap
     sitemap({
       // Keep noindex pages (404, search results, embed views) out of the sitemap
@@ -56,6 +60,11 @@ export default defineConfig({
     // must come AFTER sitemap() so sitemap-index.xml already exists
     sitemapXmlAlias(),
   ],
+
+  vite: {
+    // Tailwind v4 (utilities only, scoped to src/selene + Header/Footer; see src/selene/selene.css)
+    plugins: [tailwindcss()],
+  },
 
   build: {
     // Inline small stylesheets for faster first paint

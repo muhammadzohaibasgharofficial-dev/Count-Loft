@@ -11,9 +11,11 @@
   font-display: swap;
 }
 
-h1, h2 { font-family: var(--font-display); font-weight: 500; letter-spacing: -0.02em; }
-h1 { font-size: clamp(2rem, 4.4vw, 3rem); }
-h2 { font-size: clamp(1.5rem, 3vw, 2rem); }
+/* Michroma is wide and has one weight: smaller sizes, light tracking. */
+h1, h2, h3 { font-family: var(--font-display); font-weight: 400; letter-spacing: 0.02em; }
+h1 { font-size: clamp(1.5rem, 3.4vw, 2.25rem); }
+h2 { font-size: clamp(1.25rem, 2.4vw, 1.625rem); }
+h3 { font-size: clamp(1rem, 1.6vw, 1.125rem); }
 
 .container { max-width: var(--container-max); }
 .card { border-radius: var(--radius-xl); background: var(--color-surface); border: 1px solid var(--color-border); }
@@ -22,12 +24,12 @@ h2 { font-size: clamp(1.5rem, 3vw, 2rem); }
 .section { padding-block: clamp(3.5rem, 8vw, 6rem); }
 .section--tight { padding-block: clamp(2rem, 4vw, 3rem); }
 .section-head { max-width: 46rem; margin-bottom: clamp(1.75rem, 4vw, 3rem); }
-.section-title { font-size: clamp(2rem, 4vw, 3rem); line-height: 1.08; }
+.section-title { font-size: clamp(1.5rem, 3.2vw, 2.25rem); line-height: 1.15; }
 .section-lead { margin-top: var(--space-3); font-size: 1.0625rem; color: var(--color-text-muted); max-width: 60ch; }
-.eyebrow { display: inline-block; margin-bottom: var(--space-3); font-family: var(--font-mono); font-size: 0.75rem; letter-spacing: 0.08em; text-transform: uppercase; color: var(--color-text-muted); }
+.eyebrow { display: inline-block; margin-bottom: var(--space-3); font-family: var(--font-mono); font-size: 0.6875rem; letter-spacing: 0.16em; text-transform: uppercase; color: var(--color-primary); }
 
 /* Squircle mark: the logo-mark shape reused as icon frame */
-.mark { --size: 3rem; width: var(--size); height: var(--size); flex: none; display: grid; place-items: center; border-radius: 32%; background: var(--tint, #D9E6FF); color: var(--ink); }
+.mark { --size: 3rem; width: var(--size); height: var(--size); flex: none; display: grid; place-items: center; border-radius: 6px; background: color-mix(in srgb, var(--color-primary) 12%, transparent); border: 1px solid var(--color-border-strong); color: var(--color-primary); }
 .mark--lg { --size: 4.25rem; }
 .mark--sm { --size: 2.25rem; }
 .tint-calculators, .tint-finance { --tint: #D9E6FF; }
@@ -39,19 +41,18 @@ h2 { font-size: clamp(1.5rem, 3vw, 2rem); }
 .tint-islamic { --tint: #E3DCF5; }
 
 /* Pills / chips */
-.chip { display: inline-flex; align-items: center; gap: 0.4rem; min-height: 2.25rem; padding: 0.35rem 0.9rem; border-radius: 999px; border: 1px solid var(--color-border-strong); background: var(--color-surface); color: var(--color-text); font-size: 0.875rem; font-weight: 500; text-decoration: none; cursor: pointer; transition: background-color 150ms ease, border-color 150ms ease; }
+.chip { display: inline-flex; align-items: center; gap: 0.4rem; min-height: 2.25rem; padding: 0.35rem 0.9rem; border-radius: 4px; font-family: var(--font-mono); text-transform: uppercase; letter-spacing: 0.1em; border: 1px solid var(--color-border-strong); background: var(--color-surface); color: var(--color-text); font-size: 0.6875rem; font-weight: 500; text-decoration: none; cursor: pointer; transition: background-color 150ms ease, border-color 150ms ease; }
 a.chip:hover, button.chip:hover { background: var(--color-surface-muted); color: var(--color-text); }
 .chip[aria-pressed="true"], .chip[aria-current="page"] { background: var(--ink); border-color: var(--ink); color: var(--cream); }
-:root[data-theme="dark"] .chip[aria-pressed="true"], :root[data-theme="dark"] .chip[aria-current="page"] { background: var(--cream); border-color: var(--cream); color: var(--ink); }
 .chip-row { display: flex; flex-wrap: wrap; gap: 0.5rem; }
 .chip .n { color: var(--color-text-muted); font-variant-numeric: tabular-nums; }
 .chip[aria-pressed="true"] .n, .chip[aria-current="page"] .n { color: inherit; opacity: 0.75; }
 
 /* Pill buttons (marketing surfaces only; calculator .btn is untouched) */
-.cta { display: inline-flex; align-items: center; justify-content: center; gap: 0.5rem; min-height: 3rem; padding: 0.6rem 1.4rem; border-radius: 999px; font-weight: 600; font-size: 1rem; text-decoration: none; border: 1px solid transparent; transition: transform 150ms ease, background-color 150ms ease; }
+.cta { display: inline-flex; align-items: center; justify-content: center; gap: 0.5rem; min-height: 3rem; padding: 0.6rem 1.4rem; border-radius: 4px; font-family: var(--font-mono); text-transform: uppercase; letter-spacing: 0.16em; font-weight: 500; font-size: 0.6875rem; text-decoration: none; border: 1px solid transparent; transition: transform 150ms ease, background-color 150ms ease; }
 .cta:hover { transform: translateY(-1px); }
-.cta--blue { background: #2563EB; color: #fff; }
-.cta--blue:hover { background: #1D4ED8; color: #fff; }
+.cta--blue { background: #fff; color: var(--color-bg); }
+.cta--blue:hover { background: var(--color-primary); color: var(--color-bg); }
 .cta--line { background: transparent; border-color: var(--color-border-strong); color: var(--color-text); }
 .cta--line:hover { background: var(--color-surface-muted); color: var(--color-text); }
 

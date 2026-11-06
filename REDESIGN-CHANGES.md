@@ -68,3 +68,29 @@ Add one entry to `FAMILIES` in `src/data/families.ts` (status `live`, categories
 
 ## Assistant verification pass (2026-11-05, after delivery)
 Independently re-run on the receiving side: `npm install` + `npm run build` → **102 pages, zero errors**; `npm run verify` → **All checks passed ✓** (58 sitemap URLs, all with `<lastmod>`, old-domain occurrences 0). Sitemap URL diff vs the verified v2 build: **exactly the 3 allowed additions** (/calculators, /calculators/about, /calculators/how-to-use), zero removed or changed. Spot checks passed: hero search form posts to /search?q=; family card links to /calculators; coming-soon ghost cards present without links; homepage + hub directories list all tools (36 URLs match the `*calculator` pattern + 6 converter/generator-named tools = 42); tool-page canonical and JSON-LD types identical to v2; embed pages still noindex with the Powered-by link; llms.txt carries the new families section. The new homepage FAQ (5 questions) was read — all honest, no invented statistics. **Still unverified anywhere: Lighthouse scores and the visual/responsive look** (no Chrome available in either sandbox) — to be checked on the live site via PageSpeed Insights immediately after deploy.
+
+
+## SELENE redesign (section 7 of animation.txt)
+
+- Whole site moved to the SELENE look: void/regolith/earth palette, Michroma + Manrope + IBM Plex Mono, square 4px controls, mono uppercase labels. The site is dark-only now (theme toggle removed from the header; `data-theme` is forced to `dark` in `BaseLayout.astro`).
+- Homepage hero is SELENE's Earthrise (React island): `src/selene/` holds the original files (`components/Earthrise.tsx`, `hooks/`, `lib/`, `content.ts`, `selene.css`). Only `hero` text in `content.ts` was changed to Count Loft copy.
+- `Header.astro` and the bottom bar of `Footer.astro` use SELENE's Chrome markup. The old mobile drawer (`MobileNav.astro`) is no longer rendered; the SELENE full-screen menu lives in `Header.astro`.
+- CSS: all site CSS is in cascade layer `site`; Tailwind v4 (theme + utilities only, no preflight) is scoped to `src/selene`, `Header.astro` and `Footer.astro`. Tokens `--text-label` and `--text-body` were renamed to `--ui-text-label` and `--ui-text-body` to avoid clashing with SELENE's type scale.
+- Needs the 12 hero images in `public/layers/d/` and `public/layers/m/` (sky, earth, moonscape, frame, astronaut, ground as .webp).
+
+## Assistant verification pass — SELENE build (2026-11-06)
+- As delivered, the ZIP **could not build anywhere**: `astro.config.mjs` uses `@astrojs/react` + `@tailwindcss/vite`, and `src/selene` imports `lenis`, but `package.json`/`package-lock.json` declared NONE of: react, react-dom, @astrojs/react, @tailwindcss/vite, tailwindcss, lenis. Assistant added exactly those 6 packages (deps only, no source changes) → build then passes: **102 pages, zero errors**.
+- **Hero images MISSING from the delivery:** `src/selene/components/Earthrise.tsx` references `/layers/d/{sky,earth,moonscape,frame,astronaut,ground}.webp`, but no `public/layers/` folder exists in the ZIP and no .webp files were delivered at all. Deployed as-is, the Earthrise hero renders blank. Builder must supply the 6 layer files.
+- SEO freeze intact: sitemap = the same 58 countloft.site URLs as the live build (diff empty); canonicals correct; Monetag tag (zone 306282) present on normal pages, absent from embeds; `public/sw.js` byte-identical to Monetag's original.
+- `npm run verify`: only 6 flags, all `/: <img> without meaningful alt` — these are the hero's decorative layers with `alt=""` + `aria-hidden="true"`, which is the correct accessibility pattern; the verify rule does not exempt aria-hidden images. Not a real defect.
+- Costs to know: JS total 74 KB → 320 KB (React island + lenis); fonts moved from self-hosted to Google Fonts (Michroma/Manrope/IBM Plex Mono); site is dark-only (theme toggle removed, `data-theme` forced dark).
+
+## Cream conversion (assistant, 2026-11-06 — owner's order: "dark khtm kr do, cream he rehni chyee")
+- SELENE layout/structure kept; the dark theme was removed and the cream/ink palette of the previous live design restored. Token NAMES unchanged everywhere — only values changed:
+  - `src/styles/tokens.css`: `:root` palette = cream set (#FAF7F1 bg, #FFFFFF surface, #131417 ink text, #2563EB primary, teal secondary, AA state colors); `--cream`/`--ink` aliases restored to their original meanings; `color-scheme: light` for both data-theme values.
+  - `src/selene/selene.css` @theme: void → #faf7f1, void-2 → #ffffff, regolith → #131417, dust → #55524a, earth → #2563eb (sunlit tint kept).
+  - `BaseLayout.astro`: theme init forces `light`; theme-color meta → #FAF7F1.
+  - `Header.astro` / `Footer.astro`: white-text classes remapped to regolith (ink); the header CTA is now ink with cream text, hover earth-blue.
+  - `Earthrise.tsx`: headline/subline ink instead of white, dark text-shadow removed, canvas dust tinted warm grey (#b9ae97) so the drift stays visible on cream.
+  - `design.css`: pressed/active chip = ink background with cream text (clearly visible on cream).
+- Re-verified after conversion: build 102 pages ✓; sitemap identical 58 URLs ✓; Monetag tag intact ✓; verify flags = the same 6 decorative-alt notes as before. Still outstanding: the 6 missing hero layer images (see the SELENE verification note above).

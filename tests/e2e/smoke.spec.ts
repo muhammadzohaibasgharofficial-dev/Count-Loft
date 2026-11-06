@@ -17,15 +17,10 @@ test.describe('Count Loft — Core Site Smoke Tests', () => {
     await expect(mortgageCard).toBeVisible();
   });
 
-  test('Theme toggle switches between light and dark themes', async ({ page }) => {
+  test('Site uses the single SELENE dark theme (no theme toggle)', async ({ page }) => {
     await page.goto('/');
-    const toggleBtn = page.locator('.theme-toggle').first();
-    const html = page.locator('html');
-
-    const initialTheme = await html.getAttribute('data-theme');
-    await toggleBtn.click();
-    const newTheme = await html.getAttribute('data-theme');
-    expect(newTheme).not.toBe(initialTheme);
+    await expect(page.locator('html')).toHaveAttribute('data-theme', 'dark');
+    await expect(page.locator('.theme-toggle')).toHaveCount(0);
   });
 
   test('Loan Calculator computes monthly payment accurately', async ({ page }) => {

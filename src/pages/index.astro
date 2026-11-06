@@ -1,12 +1,13 @@
 ---
 /**
  * Count Loft — Platform homepage (Level 0).
- * Order: proof bar → header → dark hero → Tools (families) → All tools directory → How it works
+ * Order: header → SELENE Earthrise hero (React island) → search + proof → Tools (families) → All tools directory → How it works
  *        → Important pages → FAQ → footer. Everything is computed from src/data/families.ts.
  */
 import BaseLayout from '@components/layout/BaseLayout.astro';
 import JsonLd from '@components/seo/JsonLd.astro';
 import Icon from '@components/ui/Icon.astro';
+import SeleneStage from '../selene/SeleneStage';
 import Directory from '@components/ui/Directory.astro';
 import FaqAccordion from '@components/tool/FaqAccordion.astro';
 import { generateWebSiteJsonLd, generateOrganizationJsonLd, generateFaqJsonLd } from '@lib/seo/jsonld';
@@ -38,33 +39,25 @@ const pages = [
   title={`Count Loft — ${totalTools} Free Online Calculators for Finance, Health & Math`}
   description="Fast, accessible, and trustworthy online calculation tools. Instant results, formulas, worked examples, and charts with zero data tracking."
 >
-  <link slot="head" rel="preload" href="/fonts/fraunces-latin.woff2" as="font" type="font/woff2" crossorigin />
+  <link slot="head" rel="preload" as="image" href="/layers/d/sky.webp" media="(min-width: 768px)" fetchpriority="high" />
+  <link slot="head" rel="preload" as="image" href="/layers/m/sky.webp" media="(max-width: 767px)" fetchpriority="high" />
   <JsonLd schema={[generateWebSiteJsonLd(), generateOrganizationJsonLd(), generateFaqJsonLd(faqs)]} />
 
-  <div slot="before-header" class="announce">
-    <p>{totalTools} free tools · No sign-up · Your numbers never leave your browser</p>
-  </div>
+  <!-- 0.3 HERO: SELENE Earthrise (six pinned layers, one rAF loop; see src/selene) -->
+  <SeleneStage client:load />
 
-  <!-- 0.3 HERO (always dark) -->
-  <section class="hero" aria-labelledby="hero-title">
-    <div class="container hero-grid">
-      <div class="hero-copy">
-        <h1 id="hero-title" class="hero-title">A home for free online tools.</h1>
-        <p class="hero-sub">Calculators today, more tool families on the way. Nothing to sign up for, and nothing you type ever leaves your browser.</p>
-        <form class="hero-search" role="search" action="/search" method="get">
-          <label for="hero-q" class="visually-hidden">Search all {totalTools} tools</label>
-          <Icon name="search" size={22} class="hero-search-icon" />
-          <input id="hero-q" name="q" type="search" placeholder={`Search ${totalTools} tools: loan, bmi, zakat, tile…`} autocomplete="off" />
-          <button type="submit" class="cta cta--blue">Search</button>
-        </form>
-      </div>
-      <div class="fan" aria-hidden="true">
-        <div class="fan-card f3"><span class="mark tint-image"><Icon name="image" size={26} /></span><b>Image Tools</b><i>Coming soon</i></div>
-        <div class="fan-card f2"><span class="mark tint-pdf"><Icon name="pdf" size={26} /></span><b>PDF Tools</b><i>Coming soon</i></div>
-        <div class="fan-card f1"><span class="mark tint-calculators"><Icon name="calculator" size={26} /></span><b>Calculators</b><i>{totalTools} free tools</i></div>
-      </div>
-    </div>
-    <div class="container">
+  <!-- 0.35 SEARCH + PROOF (right under the hero, on the void) -->
+  <section class="intro" aria-labelledby="intro-title">
+    <div class="container intro-inner">
+      <p class="eyebrow">Count Loft</p>
+      <h2 id="intro-title" class="intro-title">A home for free online tools.</h2>
+      <p class="intro-sub">Calculators today, more tool families on the way. Nothing to sign up for, and nothing you type ever leaves your browser.</p>
+      <form class="hero-search" role="search" action="/search" method="get">
+        <label for="hero-q" class="visually-hidden">Search all {totalTools} tools</label>
+        <Icon name="search" size={22} class="hero-search-icon" />
+        <input id="hero-q" name="q" type="search" placeholder={`Search ${totalTools} tools: loan, bmi, zakat, tile…`} autocomplete="off" />
+        <button type="submit" class="cta cta--blue">Search</button>
+      </form>
       <dl class="proof">
         <div><dt>{totalTools}</dt><dd>free tools, ready now</dd></div>
         <div><dt>{liveFamilyCount()}</dt><dd>{liveFamilyCount() === 1 ? 'family live' : 'families live'}{soonCount > 0 ? ', more coming' : ''}</dd></div>
@@ -150,66 +143,50 @@ const pages = [
 </BaseLayout>
 
 <style>
-  .announce { background: var(--ink-deep); color: var(--cream); text-align: center; padding: 0.55rem 1rem; font-size: 0.8125rem; border-bottom: 1px solid #262a33; }
-  .announce p { color: inherit; margin: 0; line-height: 1.4; }
+  .intro { padding: clamp(2.5rem, 6vw, 4.5rem) 0 clamp(2rem, 5vw, 3.5rem); border-bottom: 1px solid var(--color-border); }
+  .intro-inner { max-width: 52rem; }
+  .intro-title { font-size: clamp(1.5rem, 3.6vw, 2.5rem); line-height: 1.15; }
+  .intro-sub { margin-top: 1rem; max-width: 36rem; font-size: 1.0625rem; color: var(--color-text); }
+  .hero-search { margin-top: 2rem; display: flex; align-items: center; gap: 0.5rem; max-width: 36rem; padding: 0.4rem 0.4rem 0.4rem 1rem; border-radius: 4px; background: var(--color-surface); border: 1px solid var(--color-border-strong); }
+  .hero-search:focus-within { border-color: var(--color-primary); }
+  .hero-search :global(.hero-search-icon) { color: var(--color-text-muted); flex: none; }
+  .hero-search input { flex: 1; min-width: 0; background: transparent; border: 0; color: #fff; font: inherit; font-size: 1rem; padding: 0.6rem 0; outline: none; }
+  .hero-search input::placeholder { color: var(--color-text-muted); }
+  .hero-search .cta { min-height: 2.5rem; }
 
-  .hero { background: var(--ink-deep); color: var(--cream); padding: clamp(3rem, 7vw, 5.5rem) 0 0; overflow: hidden; }
-  .hero-grid { display: grid; gap: 3rem; align-items: center; }
-  @media (min-width: 960px) { .hero-grid { grid-template-columns: 1.15fr 0.85fr; } }
-  .hero-title { font-size: clamp(2.8rem, 6vw, 4.8rem); line-height: 1.02; letter-spacing: -0.03em; color: var(--cream); max-width: 12ch; }
-  .hero-sub { margin-top: 1.25rem; max-width: 34rem; font-size: 1.125rem; color: #C9C5BA; }
-  .hero-search { margin-top: 2rem; display: flex; align-items: center; gap: 0.5rem; max-width: 36rem; padding: 0.5rem 0.5rem 0.5rem 1.1rem; border-radius: 999px; background: #1B1F27; border: 1px solid #3A404C; }
-  .hero-search:focus-within { border-color: #7AA2FF; }
-  .hero-search :global(.hero-search-icon) { color: #A8A89F; flex: none; }
-  .hero-search input { flex: 1; min-width: 0; background: transparent; border: 0; color: var(--cream); font: inherit; font-size: 1.0625rem; padding: 0.6rem 0; outline: none; }
-  .hero-search input::placeholder { color: #A8A89F; }
-  .hero-search .cta { min-height: 2.75rem; }
+  .proof { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1rem; margin: clamp(2rem, 5vw, 3rem) 0 0; padding-top: 1.5rem; border-top: 1px solid var(--color-border); }
+  .proof dt { font-family: var(--font-display); font-size: clamp(1.25rem, 3vw, 2rem); line-height: 1; color: #fff; }
+  .proof dd { margin: 0.5rem 0 0; font-family: var(--font-mono); font-size: 0.6875rem; letter-spacing: 0.12em; text-transform: uppercase; color: var(--color-text-muted); }
 
-  .fan { position: relative; height: 22rem; max-width: 24rem; width: 100%; margin-inline: auto; perspective: 1200px; }
-  .fan-card { position: absolute; left: 50%; top: 50%; width: 13.5rem; height: 17rem; margin: -8.5rem 0 0 -6.75rem; padding: 1.25rem; display: flex; flex-direction: column; justify-content: space-between; border-radius: 28px; background: #F4EFE3; color: var(--ink); box-shadow: 0 30px 60px -20px rgb(0 0 0 / 0.6); transition: transform 400ms cubic-bezier(.2,.7,.2,1); will-change: transform; }
-  .fan-card b { font-family: var(--font-display); font-size: 1.5rem; font-weight: 500; }
-  .fan-card i { font-style: normal; font-size: 0.8125rem; color: #5B574E; }
-  .f1 { background: #DCE8FF; transform: translateX(-3.2rem) rotate(-9deg) rotateY(8deg); z-index: 3; }
-  .f2 { background: #FFE3DC; transform: translateX(2.2rem) rotate(4deg) rotateY(-6deg); z-index: 2; }
-  .f3 { background: #DDF2E6; transform: translateX(7.4rem) rotate(15deg) rotateY(-10deg); z-index: 1; }
-  .hero-grid:hover .f1 { transform: translateX(-4.6rem) rotate(-4deg); }
-  .hero-grid:hover .f2 { transform: translateX(0.6rem) rotate(1deg); }
-  .hero-grid:hover .f3 { transform: translateX(5.8rem) rotate(7deg); }
-
-  .proof { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1rem; margin: clamp(2.5rem, 6vw, 4rem) 0 0; padding: 1.75rem 0 2.25rem; border-top: 1px solid #2B303A; }
-  .proof dt { font-family: var(--font-display); font-size: clamp(1.75rem, 4vw, 2.75rem); line-height: 1; color: var(--cream); }
-  .proof dd { margin: 0.4rem 0 0; font-size: 0.875rem; color: #B5B1A6; }
-
-  .section-title--xl { font-size: clamp(2.4rem, 5vw, 3.75rem); }
+  .section-title--xl { font-size: clamp(1.75rem, 4vw, 2.75rem); }
   .tools-section { padding-block: clamp(4.5rem, 10vw, 8rem); }
   .bento { display: grid; gap: 1.25rem; grid-template-columns: 1fr; }
   @media (min-width: 900px) { .bento { grid-template-columns: 2fr 1fr; grid-template-rows: 1fr 1fr; } .family.live { grid-row: span 2; } }
-  .family { position: relative; display: flex; flex-direction: column; gap: 0.75rem; padding: clamp(1.5rem, 3vw, 2.5rem); border-radius: 32px; border: 1px solid var(--color-border); background: var(--color-surface); }
+  .family { position: relative; display: flex; flex-direction: column; gap: 0.75rem; padding: clamp(1.5rem, 3vw, 2.5rem); border-radius: 10px; border: 1px solid var(--color-border); background: var(--color-surface); }
   .family.live { transition: transform 200ms ease, box-shadow 200ms ease; }
   .family.live:hover { transform: translateY(-4px); box-shadow: var(--shadow-lg); }
-  .family-title { font-family: var(--font-display); font-size: clamp(2rem, 4vw, 3rem); font-weight: 500; letter-spacing: -0.02em; margin-top: 0.75rem; }
-  .family.ghost .family-title { font-size: 1.5rem; margin-top: 0.25rem; }
+  .family-title { font-family: var(--font-display); font-size: clamp(1.375rem, 3vw, 2rem); font-weight: 400; letter-spacing: 0.02em; margin-top: 0.75rem; }
+  .family.ghost .family-title { font-size: 1.125rem; margin-top: 0.25rem; }
   .stretch { color: inherit; text-decoration: none; }
   .stretch::after { content: ""; position: absolute; inset: 0; border-radius: inherit; }
-  .family-count { color: #1D4ED8; font-weight: 600; font-size: 1.125rem; }
-  :root[data-theme="dark"] .family-count { color: #8DB4FF; }
+  .family-count { color: var(--color-primary); font-family: var(--font-mono); font-size: 0.75rem; letter-spacing: 0.12em; text-transform: uppercase; }
   .family-desc { color: var(--color-text-muted); max-width: 48ch; }
   .cat-chips { list-style: none; margin: 0.5rem 0 0; padding: 0; position: relative; z-index: 1; }
   .family-go { margin-top: auto; padding-top: 1rem; color: var(--color-text); }
   .family.live:hover .family-go { text-decoration: underline; }
   .family.ghost { border-style: dashed; background: transparent; justify-content: flex-start; opacity: 0.85; }
   .family.ghost .mark { filter: grayscale(0.6); }
-  .soon { align-self: flex-start; margin-top: auto; padding: 0.25rem 0.8rem; border-radius: 999px; border: 1px solid var(--color-border-strong); font-size: 0.8125rem; font-weight: 500; color: var(--color-text-muted); }
+  .soon { align-self: flex-start; margin-top: auto; padding: 0.25rem 0.8rem; border-radius: 4px; border: 1px solid var(--color-border-strong); font-family: var(--font-mono); font-size: 0.6875rem; letter-spacing: 0.12em; text-transform: uppercase; color: var(--color-text-muted); }
 
-  .directory { background: var(--color-surface-muted); }
+  .directory { background: var(--color-surface); border-block: 1px solid var(--color-border); }
   .steps { list-style: none; margin: 0; padding: 0; display: grid; gap: 1.25rem; grid-template-columns: 1fr; }
   @media (min-width: 800px) { .steps { grid-template-columns: repeat(3, 1fr); } }
   .step { padding: 1.75rem; }
-  .step h3 { margin: 1rem 0 0.4rem; font-size: 1.25rem; }
+  .step h3 { margin: 1rem 0 0.4rem; font-size: 1rem; }
   .step p { color: var(--color-text-muted); }
-  .step-n { display: grid; place-items: center; width: 2.5rem; height: 2.5rem; border-radius: 32%; background: #2563EB; color: #fff; font-weight: 700; }
+  .step-n { display: grid; place-items: center; width: 2.5rem; height: 2.5rem; border-radius: 6px; background: var(--color-primary); color: var(--color-bg); font-family: var(--font-mono); font-weight: 500; }
   .privacy-line { display: flex; align-items: center; gap: 0.6rem; margin-top: 2rem; font-weight: 500; }
-  .privacy-line :global(svg) { color: #15803D; flex: none; }
+  .privacy-line :global(svg) { color: var(--color-primary); flex: none; }
 
   .pages-band { border-block: 1px solid var(--color-border); }
   .pages-row { display: flex; flex-wrap: wrap; align-items: center; gap: 0.75rem 2rem; padding-block: 1.25rem; }

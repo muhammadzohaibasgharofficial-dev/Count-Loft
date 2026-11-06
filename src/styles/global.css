@@ -3,15 +3,21 @@
  * Imports tokens, reset, components, and utilities.
  */
 
-@import './tokens.css';
-@import './reset.css';
-@import './components.css';
-@import './utilities.css';
-@import './design.css';
+@layer site, theme, base, components, utilities;
 
+/* All site CSS sits in the "site" layer so the Tailwind utilities used by the SELENE
+   hero, header and footer (see src/selene/selene.css) always win over generic
+   element rules such as a { text-decoration: underline } or h1 { font-size }. */
+@import './tokens.css' layer(site);
+@import './reset.css' layer(site);
+@import './components.css' layer(site);
+@import './utilities.css' layer(site);
+@import './design.css' layer(site);
+
+@layer site {
 body {
   font-family: var(--font-sans);
-  font-size: var(--text-body);
+  font-size: var(--ui-text-body);
   color: var(--color-text);
   background-color: var(--color-bg);
   transition: background-color var(--transition-normal), color var(--transition-normal);
@@ -22,21 +28,21 @@ h1 {
   font-size: var(--text-h1);
   font-weight: var(--font-weight-bold);
   line-height: var(--leading-tight);
-  color: var(--color-text);
+  color: var(--color-heading);
 }
 
 h2 {
   font-size: var(--text-h2);
   font-weight: var(--font-weight-semibold);
   line-height: var(--leading-snug);
-  color: var(--color-text);
+  color: var(--color-heading);
 }
 
 h3 {
   font-size: var(--text-h3);
   font-weight: var(--font-weight-semibold);
   line-height: var(--leading-snug);
-  color: var(--color-text);
+  color: var(--color-heading);
 }
 
 p {
@@ -115,4 +121,5 @@ a:hover {
     transition-duration: 0.01ms !important;
     scroll-behavior: auto !important;
   }
+}
 }
